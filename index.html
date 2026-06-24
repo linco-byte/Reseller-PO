@@ -21,216 +21,286 @@
 </head>
 <body class="bg-gray-100 min-h-screen text-gray-800">
 
-    <div id="app" class="container mx-auto px-4 py-8 max-w-7xl">
-        <!-- Top Navigation / Header -->
-        <header class="mb-8 no-print flex justify-between items-center bg-white p-6 rounded-xl shadow-sm">
-            <div>
-                <h1 class="text-2xl font-bold text-blue-600">Reseller PO Portal</h1>
-                <p class="text-sm text-gray-500 mt-1">Generate a unique and compliant Purchase Order for Haha Vending.</p>
-            </div>
-            <button @click="downloadPDF" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg shadow transition flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                Download PO (PDF)
-            </button>
-        </header>
+    <div id="app">
+        <!-- REGISTRATION / LOGIN MODAL (GATEKEEPER) -->
+        <div v-if="!isLoggedIn" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 no-print">
+            <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-8 border border-gray-100">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-blue-600">Haha Vending Portal</h2>
+                    <p class="text-sm text-gray-500 mt-1">Please register or sign in to access the PO Generator.</p>
+                </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Left Side: Form Input Area (Hidden on PDF) -->
-            <div class="lg:col-span-5 space-y-6 no-print">
-                <!-- Order Information -->
-                <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
-                    <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">1. Order Information</h3>
+                <form @submit.prevent="handleRegister" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-400 mb-1">PO Number (Unique & Read-only)</label>
-                        <input type="text" v-model="form.poNumber" readonly class="w-full bg-gray-100 text-gray-500 border border-gray-300 rounded-lg px-3 py-2 cursor-not-allowed font-mono">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Full Name *</label>
+                        <input type="text" v-model="authForm.name" required placeholder="John Doe" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Date</label>
-                        <input type="date" v-model="form.date" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                        <input type="email" v-model="authForm.email" required placeholder="john@example.com" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Reseller Name</label>
-                        <select v-model="form.resellerName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
-                            <option value="">-- Select Reseller --</option>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                        <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 000-0000" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Associated Reseller *</label>
+                        <select v-model="authForm.resellerName" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                            <option value="">-- Select Your Company --</option>
                             <option v-for="reseller in resellers" :key="reseller" :value="reseller">{{ reseller }}</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Shipping Method</label>
-                        <select v-model="form.shippingMethod" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
-                            <option value="Self-pickup">Self-pickup</option>
-                            <option value="Logistics Shipping">Logistics Shipping</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Shipping Address</label>
-                        <textarea v-model="form.shippingAddress" rows="2" placeholder="Street, City, State, ZIP, Country" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"></textarea>
-                    </div>
-                </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition mt-2 shadow">
+                        Gain Access & Save Profile
+                    </button>
+                </form>
+            </div>
+        </div>
 
-                <!-- Payment Terms Input -->
-                <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
-                    <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">2. Payment Terms</h3>
-                    <div class="grid grid-cols-2 gap-4">
+        <!-- MAIN PO INTERFACE (Only visible if logged in) -->
+        <div v-if="isLoggedIn" class="container mx-auto px-4 py-8 max-w-7xl">
+            <!-- Top Navigation / Header -->
+            <header class="mb-8 no-print flex justify-between items-center bg-white p-6 rounded-xl shadow-sm">
+                <div>
+                    <h1 class="text-2xl font-bold text-blue-600">Reseller PO Portal</h1>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Welcome back, <span class="font-semibold text-gray-800">{{ currentUser.name }}</span> ({{ currentUser.resellerName }}).
+                        <button @click="handleLogout" class="text-red-500 hover:underline text-xs ml-2">Log Out / Switch Account</button>
+                    </p>
+                </div>
+                <button @click="downloadPDF" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg shadow transition flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    Download PO (PDF)
+                </button>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Left Side: Form Input Area (Hidden on PDF) -->
+                <div class="lg:col-span-5 space-y-6 no-print">
+                    <!-- Order Information -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
+                        <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">1. Order Information</h3>
                         <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Net Period (Days)</label>
-                            <input type="number" v-model.number="form.netDays" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                            <label class="block text-sm font-medium text-gray-400 mb-1">PO Number (Unique & Read-only)</label>
+                            <input type="text" v-model="form.poNumber" readonly class="w-full bg-gray-100 text-gray-500 border border-gray-300 rounded-lg px-3 py-2 cursor-not-allowed font-mono">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Down Payment ($)</label>
-                            <input type="number" v-model.number="form.downPayment" min="0" step="0.01" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Date</label>
+                            <input type="date" v-model="form.date" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
                         </div>
-                    </div>
-                </div>
-
-                <!-- Product Items -->
-                <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
-                    <div class="flex justify-between items-center border-b pb-2">
-                        <h3 class="text-lg font-semibold text-gray-700">3. Hardware Selection</h3>
-                        <button @click="addItem" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1 rounded transition">+ Add Item</button>
-                    </div>
-                    
-                    <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-gray-50 rounded-lg space-y-3 relative">
-                        <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-sm">Delete</button>
                         <div>
-                            <label class="block text-xs font-medium text-gray-500 mb-1">Product Model</label>
-                            <select v-model="item.modelKey" @change="onModelChange(index)" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none">
-                                <option value="">-- Select Product Hardware --</option>
-                                <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }} (${{ price }})</option>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Reseller Name (Auto-locked)</label>
+                            <input type="text" :value="form.resellerName" readonly class="w-full bg-gray-100 text-gray-500 border border-gray-300 rounded-lg px-3 py-2 cursor-not-allowed font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Shipping Method</label>
+                            <select v-model="form.shippingMethod" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                                <option value="Logistics Shipping">Logistics Shipping</option>
+                                <option value="Self-pickup">Self-pickup</option>
                             </select>
                         </div>
+                        
+                        <!-- Free Text input area for Self-pickup warehouse address -->
+                        <div v-if="form.shippingMethod === 'Self-pickup'">
+                            <label class="block text-sm font-medium text-blue-600 mb-1">Pickup Warehouse Address *</label>
+                            <textarea v-model="form.pickupWarehouseText" rows="3" placeholder="Please type the specific fulfillment warehouse address here..." class="w-full border border-blue-400 rounded-lg px-3 py-2 focus:outline-none bg-blue-50/30"></textarea>
+                        </div>
+                        
+                        <!-- Free Text input area for Logistics address -->
+                        <div v-if="form.shippingMethod === 'Logistics Shipping'">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Shipping Destination Address</label>
+                            <textarea v-model="form.shippingAddress" rows="3" placeholder="Street, City, State, ZIP, Country" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Payment Terms Input -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
+                        <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">2. Payment Terms</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1">Qty</label>
-                                <input type="number" v-model.number="item.qty" min="1" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none">
+                                <label class="block text-sm font-medium text-gray-600 mb-1">Net Period (Days)</label>
+                                <input type="number" v-model.number="form.netDays" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1">Unit Price ($ Locked)</label>
-                                <input type="number" :value="item.price" readonly class="w-full bg-gray-100 text-gray-500 border border-gray-300 rounded px-2 py-1 text-sm cursor-not-allowed">
+                                <label class="block text-sm font-medium text-gray-600 mb-1">Down Payment ($)</label>
+                                <input type="number" v-model.number="form.downPayment" min="0" step="0.01" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products Items Selection -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <h3 class="text-lg font-semibold text-gray-700">3. Products Selection</h3>
+                            <button @click="addItem" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1 rounded transition">+ Add Item</button>
+                        </div>
+                        
+                        <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-gray-50 rounded-lg space-y-3 relative">
+                            <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-sm">Delete</button>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Product Model</label>
+                                <select v-model="item.modelKey" @change="onModelChange(index)" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none">
+                                    <option value="">-- Select Product Hardware --</option>
+                                    <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }} (${{ price }})</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-500 mb-1">Qty</label>
+                                    <input type="number" v-model.number="item.qty" min="1" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-500 mb-1">Unit Price ($ Locked)</label>
+                                    <input type="number" :value="item.price" readonly class="w-full bg-gray-100 text-gray-500 border border-gray-300 rounded px-2 py-1 text-sm cursor-not-allowed">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Right Side: Live Preview (PDF Template) -->
-            <div class="lg:col-span-7 bg-white p-8 rounded-xl shadow-md border border-gray-200 text-slate-900" id="po-template">
-                <!-- PO Header -->
-                <div class="flex justify-between items-start border-b-2 border-gray-300 pb-6">
-                    <div>
-                        <h2 class="text-3xl font-bold tracking-tight text-gray-900">PURCHASE ORDER</h2>
-                        <p class="text-md font-bold text-blue-800 mt-2">Haha Vending</p>
-                        <p class="text-xs text-gray-500 mt-0.5">1754 North Brown Rd suite 200, Lawrenceville, GA 30043</p>
-                    </div>
-                    <div class="text-right text-sm text-gray-600 space-y-1">
-                        <p><strong class="text-gray-900">PO No:</strong> <span class="font-mono text-xs font-bold">{{ form.poNumber }}</span></p>
-                        <p><strong class="text-gray-900">Date:</strong> {{ form.date || '------' }}</p>
-                    </div>
-                </div>
-
-                <!-- Business Info -->
-                <div class="grid grid-cols-2 gap-8 my-6 text-sm">
-                    <div>
-                        <h4 class="font-bold text-gray-400 uppercase tracking-wider text-xs mb-2">Ship To (Reseller):</h4>
-                        <p class="font-bold text-gray-900">{{ form.resellerName || '[Please Select Reseller]' }}</p>
-                        <p class="text-gray-600 mt-1 whitespace-pre-line">{{ form.shippingAddress || '[Shipping Address Empty]' }}</p>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-gray-400 uppercase tracking-wider text-xs mb-2">Logistics & Terms:</h4>
-                        <p class="text-gray-600"><span class="font-semibold text-gray-800">Shipping Method:</span> {{ form.shippingMethod }}</p>
-                        <p class="text-gray-600"><span class="font-semibold text-gray-800">Payment Window:</span> Net {{ form.netDays }} Days</p>
-                    </div>
-                </div>
-
-                <!-- Items Table -->
-                <table class="w-full text-left border-collapse my-6 text-sm">
-                    <thead>
-                        <tr class="border-b-2 border-gray-300 text-gray-400 font-medium uppercase text-xs">
-                            <th class="py-2">Hardware Model / SKU</th>
-                            <th class="py-2 text-center w-20">Qty</th>
-                            <th class="py-2 text-right w-28">Unit Price</th>
-                            <th class="py-2 text-right w-28">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(item, index) in form.items" :key="index" class="border-b border-gray-200 text-gray-700">
-                            <td class="py-3 font-semibold text-gray-900">{{ item.modelKey || 'Unselected Hardware' }}</td>
-                            <td class="py-3 text-center">{{ item.qty }}</td>
-                            <td class="py-3 text-right">${{ formatMoney(item.price) }}</td>
-                            <td class="py-3 text-right font-bold text-gray-900">${{ formatMoney(item.qty * item.price) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- Summary Financials -->
-                <div class="flex justify-end text-sm">
-                    <div class="w-72 space-y-2 border-t border-gray-200 pt-4">
-                        <div class="flex justify-between text-gray-600">
-                            <span>Hardware Subtotal:</span>
-                            <span>${{ formatMoney(subTotal) }}</span>
+                <!-- Right Side: Live Preview (PDF Template) -->
+                <div class="lg:col-span-7 bg-white p-8 rounded-xl shadow-md border border-gray-200 text-slate-900" id="po-template">
+                    <!-- PO Header -->
+                    <div class="flex justify-between items-start border-b-2 border-gray-300 pb-6">
+                        <div>
+                            <h2 class="text-3xl font-bold tracking-tight text-gray-900">PURCHASE ORDER</h2>
+                            <p class="text-md font-bold text-blue-800 mt-2">Haha Vending</p>
+                            <p class="text-xs text-gray-500 mt-0.5">1754 North Brown Rd suite 200, Lawrenceville, GA 30043</p>
                         </div>
-                        <div class="flex justify-between text-blue-700 font-medium">
-                            <span>Down Payment Paid:</span>
-                            <span>-${{ formatMoney(form.downPayment) }}</span>
-                        </div>
-                        <div class="flex justify-between text-lg font-bold text-red-600 border-t border-gray-200 pt-2">
-                            <span>Balance Due (Net {{form.netDays}}):</span>
-                            <span>${{ formatMoney(balanceDue) }}</span>
+                        <div class="text-right text-sm text-gray-600 space-y-1">
+                            <p><strong class="text-gray-900">PO No:</strong> <span class="font-mono text-xs font-bold">{{ form.poNumber }}</span></p>
+                            <p><strong class="text-gray-900">Order Date:</strong> {{ form.date || '------' }}</p>
+                            <p><strong class="text-red-600">Due Date:</strong> <span class="font-bold text-red-600">{{ computedDueDate }}</span></p>
                         </div>
                     </div>
-                </div>
 
-                <!-- Monthly Service Fees Block -->
-                <div class="mt-8 pt-4 border-t border-gray-300">
-                    <h4 class="font-bold text-gray-500 uppercase tracking-wider text-xs mb-3">Schedule of Recurring Monthly Service Fees:</h4>
-                    <table class="w-full text-left border border-gray-200 text-xs text-gray-600">
+                    <!-- Business Info -->
+                    <div class="grid grid-cols-2 gap-8 my-6 text-sm">
+                        <div>
+                            <h4 class="font-bold text-gray-400 uppercase tracking-wider text-xs mb-2">Reseller Billing Details:</h4>
+                            <p class="font-bold text-gray-900">{{ form.resellerName }}</p>
+                            <p class="text-gray-500 mt-1 text-xs">Representative: {{ currentUser.name }}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-400 uppercase tracking-wider text-xs mb-2">Logistics & Payment Rules:</h4>
+                            <p class="text-gray-600"><span class="font-semibold text-gray-800">Shipping Method:</span> {{ form.shippingMethod }}</p>
+                            <p class="text-gray-600"><span class="font-semibold text-gray-800">Payment Term:</span> Net {{ form.netDays }} Days</p>
+                            <p class="text-red-600 font-medium"><span class="font-semibold text-gray-800">Maturity Date:</span> {{ computedDueDate }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Logistics Fulfillment Conditional Block -->
+                    <div class="my-4 p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs">
+                        <div v-if="form.shippingMethod === 'Self-pickup'">
+                            <span class="font-bold text-blue-700 block mb-0.5 uppercase tracking-wide text-[10px]">Self-Pickup Fulfillment Warehouse Address:</span>
+                            <p class="text-slate-800 whitespace-pre-line font-semibold mt-1">{{ form.pickupWarehouseText || '[Please input the pickup warehouse location in the left box]' }}</p>
+                        </div>
+                        <div v-else>
+                            <span class="font-bold text-slate-700 block mb-0.5 uppercase tracking-wide text-[10px]">Logistics Target Destination Address:</span>
+                            <p class="text-slate-600 whitespace-pre-line font-medium mt-1">{{ form.shippingAddress || '[No Destination Address Provided]' }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Items Table -->
+                    <table class="w-full text-left border-collapse my-6 text-sm">
                         <thead>
-                            <tr class="bg-gray-50 border-b border-gray-200 font-bold text-gray-700">
-                                <th class="p-2">Services</th>
-                                <th class="p-2">Service Fee</th>
-                                <th class="p-2">Billing Note</th>
+                            <tr class="border-b-2 border-gray-300 text-gray-400 font-medium uppercase text-xs">
+                                <th class="py-2">Product Model / SKU</th>
+                                <th class="py-2 text-center w-20">Qty</th>
+                                <th class="py-2 text-right w-28">Unit Price</th>
+                                <th class="py-2 text-right w-28">Amount</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="border-b border-gray-200">
-                                <td class="p-2 font-medium text-gray-900">SAAS Service</td>
-                                <td class="p-2">$15 / month</td>
-                                <td class="p-2">Payment starts from the device activation day</td>
-                            </tr>
-                            <tr class="border-b border-gray-200">
-                                <td class="p-2 font-medium text-gray-900">Data Card</td>
-                                <td class="p-2">$15 / month</td>
-                                <td class="p-2">Payment starts from the device activation day</td>
-                            </tr>
-                            <tr class="border-b border-gray-200">
-                                <td class="p-2 font-medium text-gray-900">AI Visual Recognition</td>
-                                <td class="p-2">$0.05 / transaction</td>
-                                <td class="p-2">Payment starts from the device activation day</td>
-                            </tr>
-                            <tr class="border-b border-gray-200">
-                                <td class="p-2 font-medium text-gray-900">POS Rental Fee</td>
-                                <td class="p-2">$10 / month</td>
-                                <td class="p-2">Payment starts from the device activation day</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2 font-medium text-gray-900">Payment Service Fee</td>
-                                <td class="p-2">5.95% of sales revenue</td>
-                                <td class="p-2">Payment starts from the device activation day</td>
+                            <tr v-for="(item, index) in form.items" :key="index" class="border-b border-gray-200 text-gray-700">
+                                <td class="py-3 font-semibold text-gray-900">{{ item.modelKey || 'Unselected Hardware' }}</td>
+                                <td class="py-3 text-center">{{ item.qty }}</td>
+                                <td class="py-3 text-right">${{ formatMoney(item.price) }}</td>
+                                <td class="py-3 text-right font-bold text-gray-900">${{ formatMoney(item.qty * item.price) }}</td>
                             </tr>
                         </tbody>
                     </table>
-                </div>
 
-                <!-- Terms & Conditions -->
-                <div class="mt-8 pt-4 border-t border-gray-200 text-xs text-gray-400 space-y-4">
-                    <div>
-                        <h5 class="font-bold text-gray-500 mb-1">Standard Declarations:</h5>
-                        <p>1. Please sign and return this acknowledgment via email within 2 business days of receipt.</p>
-                        <p>2. Monthly Service Fees: The reseller acknowledges that the subscription fees listed in the service table above will be calculated separately and billed monthly starting exactly from the individual device's activation date.</p>
+                    <!-- Summary Financials -->
+                    <div class="flex justify-end text-sm">
+                        <div class="w-72 space-y-2 border-t border-gray-200 pt-4">
+                            <div class="flex justify-between text-gray-600 font-semibold">
+                                <span>Sales:</span>
+                                <span>${{ formatMoney(subTotal) }}</span>
+                            </div>
+                            <div class="flex justify-between text-blue-700 font-medium">
+                                <span>Down Payment Paid:</span>
+                                <span>-${{ formatMoney(form.downPayment) }}</span>
+                            </div>
+                            <div class="flex justify-between text-lg font-bold text-red-600 border-t border-gray-200 pt-2">
+                                <span>Balance Due (Due {{ computedDueDate }}):</span>
+                                <span>${{ formatMoney(balanceDue) }}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex justify-between pt-6">
-                        <div class="border-t border-gray-300 w-56 pt-2 text-center">Authorized Reseller Signature</div>
-                        <div class="border-t border-gray-300 w-40 pt-2 text-center">Date</div>
+
+                    <!-- Monthly Service Fees Block -->
+                    <div class="mt-8 pt-4 border-t border-gray-300">
+                        <h4 class="font-bold text-gray-500 uppercase tracking-wider text-xs mb-3">Schedule of Recurring Monthly Service Fees:</h4>
+                        <table class="w-full text-left border border-gray-200 text-xs text-gray-600">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200 font-bold text-gray-700">
+                                    <th class="p-2">Services</th>
+                                    <th class="p-2">Service Fee</th>
+                                    <th class="p-2">Billing Note</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-200">
+                                    <td class="p-2 font-medium text-gray-900">SAAS Service</td>
+                                    <td class="p-2">$15 / month</td>
+                                    <td class="p-2">Payment starts from the device activation day</td>
+                                </tr>
+                                <tr class="border-b border-gray-200">
+                                    <td class="p-2 font-medium text-gray-900">Data Card</td>
+                                    <td class="p-2">$15 / month</td>
+                                    <td class="p-2">Payment starts from the device activation day</td>
+                                </tr>
+                                <tr class="border-b border-gray-200">
+                                    <td class="p-2 font-medium text-gray-900">AI Visual Recognition</td>
+                                    <td class="p-2">$0.05 / transaction</td>
+                                    <td class="p-2">Payment starts from the device activation day</td>
+                                </tr>
+                                <tr class="border-b border-gray-200">
+                                    <td class="p-2 font-medium text-gray-900">POS Rental Fee</td>
+                                    <td class="p-2">$10 / month</td>
+                                    <td class="p-2">Payment starts from the device activation day</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-medium text-gray-900">Payment Service Fee</td>
+                                    <td class="p-2">5.95% of sales revenue</td>
+                                    <td class="p-2">Payment starts from the device activation day</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Terms & Conditions -->
+                    <div class="mt-8 pt-4 border-t border-gray-200 text-xs text-gray-400 space-y-4">
+                        <div>
+                            <h5 class="font-bold text-gray-500 mb-1">Standard Declarations:</h5>
+                            <p>1. Please sign and return this acknowledgment via email within 2 business days of receipt.</p>
+                            <p>2. Monthly Service Fees: The reseller acknowledges that the subscription fees listed in the service table above will be calculated separately and billed monthly starting exactly from the individual device's activation date.</p>
+                            <p>3. Balance Pay-off Timeline: The remaining balance due of <strong class="text-gray-700">${{ formatMoney(balanceDue) }}</strong> must be cleared on or prior to the computed maturity date (<strong class="text-red-600 font-semibold">{{ computedDueDate }}</strong>).</p>
+                        </div>
+                        
+                        <!-- Auto-filled Vendor/Rep Information -->
+                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-gray-600 space-y-1">
+                            <p class="font-semibold text-gray-700">Authorized Reseller Representative Info:</p>
+                            <p><span class="font-medium">Name:</span> {{ currentUser.name }}</p>
+                            <p><span class="font-medium">Email:</span> {{ currentUser.email }}</p>
+                            <p><span class="font-medium">Phone:</span> {{ currentUser.phone }}</p>
+                        </div>
+
+                        <div class="flex justify-between pt-4">
+                            <div class="border-t border-gray-300 w-56 pt-2 text-center text-gray-500">Authorized Reseller Signature</div>
+                            <div class="border-t border-gray-300 w-40 pt-2 text-center text-gray-500">Date</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -238,11 +308,22 @@
     </div>
 
     <script>
-        const { createApp, ref, computed } = Vue;
+        const { createApp, ref, computed, onMounted } = Vue;
 
         createApp({
             setup() {
-                // Generate a highly specific, collision-free unique PO number
+                // Auth States
+                const isLoggedIn = ref(false);
+                const currentUser = ref({ name: '', email: '', phone: '', resellerName: '' });
+                
+                const authForm = ref({
+                    name: '',
+                    email: '',
+                    phone: '',
+                    resellerName: ''
+                });
+
+                // Unique PO logic
                 const generateUniquePONumber = () => {
                     const now = new Date();
                     const year = now.getFullYear();
@@ -251,12 +332,10 @@
                     const timeStr = String(now.getHours()).padStart(2, '0') + 
                                     String(now.getMinutes()).padStart(2, '0') + 
                                     String(now.getSeconds()).padStart(2, '0');
-                    // Add 4-character random hex string for serverless absolute uniqueness
                     const randomHex = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1).toUpperCase();
                     return `PO-${year}${month}${day}-${timeStr}-${randomHex}`;
                 };
 
-                // Resellers predefined array
                 const resellers = [
                     "Twelve 28 vending", "Vend Guys Local", "PBS vending", "Ai Vend Solution",
                     "Genius Vend", "Mod Brands", "NC vending LLC", "vendx",
@@ -265,25 +344,25 @@
                     "Century vending", "Aloha Smart Vending"
                 ];
 
-                // Product catalog prices map
+                // Standardized capital letter catalog keys
                 const productCatalog = {
                     "Mini360": 2400,
-                    "plus 440": 2600,
-                    "pro 542 -pax": 3200,
-                    "pro 542- nayax": 3500,
-                    "ultra 1200": 5000,
-                    "freezer 550": 3500,
-                    "max 620": 3400,
-                    "max 620s": 4000,
-                    "max 660": 3300
+                    "Plus 440": 2600,
+                    "Pro 542 - Pax": 3200,
+                    "Pro 542- Nayax": 3500,
+                    "Ultra 1200": 5000,
+                    "Freezer 550": 3500,
+                    "Max 620": 3400,
+                    "Max 620s": 4000,
+                    "Max 660": 3300
                 };
 
-                // Form Reactive State
                 const form = ref({
                     poNumber: generateUniquePONumber(),
                     date: new Date().toISOString().substr(0, 10),
                     resellerName: '',
                     shippingMethod: 'Logistics Shipping',
+                    pickupWarehouseText: '', // Free string input box for custom warehouse
                     shippingAddress: '',
                     netDays: 30,
                     downPayment: 0,
@@ -292,7 +371,42 @@
                     ]
                 });
 
-                // Triggered when a product option changes to lock the price
+                // Compute exact maturity deadline date
+                const computedDueDate = computed(() => {
+                    if (!form.value.date) return '------';
+                    const orderDate = new Date(form.value.date);
+                    const daysToAdd = parseInt(form.value.netDays) || 0;
+                    orderDate.setDate(orderDate.getDate() + daysToAdd);
+                    
+                    const yyyy = orderDate.getFullYear();
+                    const mm = String(orderDate.getMonth() + 1).padStart(2, '0');
+                    const dd = String(orderDate.getDate()).padStart(2, '0');
+                    return `${yyyy}-${mm}-${dd}`;
+                });
+
+                // Check LocalStorage session state
+                onMounted(() => {
+                    const savedUser = localStorage.getItem('haha_vending_user');
+                    if (savedUser) {
+                        currentUser.value = JSON.parse(savedUser);
+                        form.value.resellerName = currentUser.value.resellerName;
+                        isLoggedIn.value = true;
+                    }
+                });
+
+                const handleRegister = () => {
+                    localStorage.setItem('haha_vending_user', JSON.stringify(authForm.value));
+                    currentUser.value = { ...authForm.value };
+                    form.value.resellerName = currentUser.value.resellerName;
+                    isLoggedIn.value = true;
+                };
+
+                const handleLogout = () => {
+                    localStorage.removeItem('haha_vending_user');
+                    isLoggedIn.value = false;
+                    authForm.value = { name: '', email: '', phone: '', resellerName: '' };
+                };
+
                 const onModelChange = (index) => {
                     const item = form.value.items[index];
                     if (item.modelKey && productCatalog[item.modelKey]) {
@@ -302,7 +416,6 @@
                     }
                 };
 
-                // Form items logic
                 const addItem = () => {
                     form.value.items.push({ modelKey: '', qty: 1, price: 0.00 });
                 };
@@ -311,7 +424,6 @@
                     form.value.items.splice(index, 1);
                 };
 
-                // Calculations
                 const subTotal = computed(() => {
                     return form.value.items.reduce((sum, item) => sum + (item.qty * item.price || 0), 0);
                 });
@@ -325,25 +437,42 @@
                     return Number(val).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 };
 
-                // PDF generation logic
+                // Secure & verified PDF wrapper generation 
                 const downloadPDF = () => {
-                    const element = document.getElementById('po-template');
-                    const opt = {
-                        margin:       [0.4, 0.4, 0.4, 0.4],
-                        filename:     `${form.value.poNumber}_${form.value.resellerName || 'Order'}.pdf`,
-                        image:        { type: 'jpeg', quality: 0.98 },
-                        html2canvas:  { scale: 2, useCORS: true },
-                        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-                    };
-                    html2pdf().set(opt).from(element).save();
+                    try {
+                        const element = document.getElementById('po-template');
+                        if (!element) {
+                            alert("Error: Preview element not found.");
+                            return;
+                        }
+                        
+                        const opt = {
+                            margin:       [0.4, 0.4, 0.4, 0.4],
+                            filename:     `${form.value.poNumber}_${form.value.resellerName || 'Order'}.pdf`,
+                            image:        { type: 'jpeg', quality: 0.98 },
+                            html2canvas:  { scale: 2, useCORS: true, logging: false },
+                            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                        };
+                        
+                        html2pdf().set(opt).from(element).save();
+                    } catch (err) {
+                        console.error("PDF Download Failure Trace:", err);
+                        alert("Failed to compile PDF. Check the browser console log for detailed layout blocks.");
+                    }
                 };
 
                 return {
+                    isLoggedIn,
+                    currentUser,
+                    authForm,
                     form,
                     resellers,
                     productCatalog,
                     subTotal,
                     balanceDue,
+                    computedDueDate,
+                    handleRegister,
+                    handleLogout,
                     onModelChange,
                     addItem,
                     removeItem,
