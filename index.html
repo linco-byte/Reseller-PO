@@ -16,16 +16,21 @@
         
         /* STRICT PRINT CONSTRAINTS */
         @media print {
+            /* FORCE REMOVAL OF BROWSER HEADER/FOOTER (URL, Date, Page Numbers) */
+            @page {
+                margin: 0 !important;
+            }
+            
             /* Hide all web dashboard interface elements */
             .no-print, header, .lg\:col-span-5, button, select, input, textarea {
                 display: none !important;
             }
             
-            /* Expand the preview sheet to fill the entire A4/Letter print boundary */
+            /* Expand the preview sheet to fill the entire A4/Letter print boundary cleanly */
             body, .container, #po-template {
                 background: #ffffff !important;
                 color: #0f172a !important;
-                padding: 0 !important;
+                padding: 20mm !important; /* Standard corporate padding inside A4 */
                 margin: 0 !important;
                 width: 100% !important;
                 max-width: 100% !important;
@@ -55,7 +60,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M19.242 18.274A13.916 13.916 0 0021 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M12 11a13.942 13.942 0 00-2.316-5.074" /></svg>
                     </div>
                     <h2 class="text-xl font-bold text-slate-100 tracking-tight">Sales Representative Registry</h2>
-                    <p class="text-xs text-slate-400 mt-1">Set up your sales profile and link your active accounts.</p>
+                    <p class="text-xs text-slate-400 mt-1">Set up your profile. Credentials will be remembered securely.</p>
                 </div>
 
                 <form @submit.prevent="handleRegister" class="space-y-4 text-sm">
@@ -64,11 +69,11 @@
                         <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Corporate Email Address *</label>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Corporate Email Address (Remembered) *</label>
                         <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Direct Mobile Phone *</label>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Direct Mobile Phone (Remembered) *</label>
                         <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500">
                     </div>
                     
@@ -99,6 +104,7 @@
                     <h1 class="text-lg font-bold tracking-tight text-slate-100">PO Engine <span class="text-xs font-normal text-slate-500 mx-2">|</span> <span class="text-xs font-medium text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded">Sales Mode</span></h1>
                     <p class="text-xs text-slate-400 mt-1">
                         Active Representative: <span class="text-slate-200 font-semibold">{{ currentUser.name }}</span>
+                        <span class="text-slate-500 mx-1">({{ currentUser.email }})</span>
                         <button @click="handleLogout" class="text-red-400 hover:text-red-300 underline text-[11px] ml-3 transition-colors">Switch Profile</button>
                     </p>
                 </div>
@@ -195,6 +201,25 @@
                                     <input type="number" :value="item.price" readonly class="w-full bg-slate-900 text-slate-500 border border-slate-800 rounded px-2 py-1 text-xs cursor-not-allowed">
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. LATEST UPDATE: AUDIT LOG PANEL (登入名单留档查看) -->
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">4. Workspace Audit Log (登入留档)</h3>
+                            <button @click="clearAuditLog" class="text-[10px] text-red-400 hover:text-red-300 underline">Clear Logs</button>
+                        </div>
+                        <div class="max-h-48 overflow-y-auto space-y-2 pr-1">
+                            <div v-for="(log, idx) in auditLogs" :key="idx" class="p-2 bg-slate-900 rounded border border-slate-800 text-[11px] space-y-0.5">
+                                <div class="flex justify-between font-medium text-slate-200">
+                                    <span>👤 {{ log.name }}</span>
+                                    <span class="text-slate-500 text-[10px] font-mono">{{ log.timestamp }}</span>
+                                </div>
+                                <div class="text-slate-400">📧 {{ log.email }}</div>
+                                <div class="text-slate-400">📞 {{ log.phone }}</div>
+                            </div>
+                            <p v-if="auditLogs.length === 0" class="text-xs text-slate-600 italic text-center py-2">No login records found on this device.</p>
                         </div>
                     </div>
                 </div>
@@ -345,15 +370,16 @@
 
         createApp({
             setup() {
-                // Auth Architecture
                 const isLoggedIn = ref(false);
                 const currentUser = ref({ name: '', email: '', phone: '', boundResellers: [] });
+                const auditLogs = ref([]);
                 
+                // Form architecture initialized with default memory scanning
                 const authForm = ref({
                     name: '',
                     email: '',
                     phone: '',
-                    boundResellers: [] // Dynamic array holding multiple selection options
+                    boundResellers: []
                 });
 
                 const generateUniquePONumber = () => {
@@ -391,7 +417,7 @@
                 const form = ref({
                     poNumber: generateUniquePONumber(),
                     date: new Date().toISOString().substr(0, 10),
-                    resellerName: '', // Left blank initially to allow selection from bound options
+                    resellerName: '',
                     shippingMethod: 'Logistics Shipping',
                     pickupWarehouseText: '', 
                     shippingAddress: '',
@@ -402,10 +428,9 @@
                     ]
                 });
 
-                // Standard full-matrix date math pipeline
                 const computedDueDate = computed(() => {
                     if (!form.value.date) return '------';
-                    const orderDate = new Date(form.value.date + 'T00:00:00'); // enforce local day alignment
+                    const orderDate = new Date(form.value.date + 'T00:00:00');
                     const daysToAdd = parseInt(form.value.netDays) || 0;
                     orderDate.setDate(orderDate.getDate() + daysToAdd);
                     
@@ -415,25 +440,71 @@
                     return `${yyyy}-${mm}-${dd}`;
                 });
 
+                // Lifecycle checking: Pre-fill remembered credentials and load logs
                 onMounted(() => {
-                    const savedUser = localStorage.getItem('haha_vending_sales_rep');
+                    // 1. Scan for active session
+                    const savedUser = localStorage.getItem('haha_vending_active_session');
                     if (savedUser) {
                         currentUser.value = JSON.parse(savedUser);
                         isLoggedIn.value = true;
+                    } else {
+                        // 2. If no session, look for profile memory to autocomplete form fields
+                        const rememberedMemory = localStorage.getItem('haha_vending_profile_memory');
+                        if (rememberedMemory) {
+                            const data = JSON.parse(rememberedMemory);
+                            authForm.value.name = data.name || '';
+                            authForm.value.email = data.email || '';
+                            authForm.value.phone = data.phone || '';
+                            authForm.value.boundResellers = data.boundResellers || [];
+                        }
+                    }
+
+                    // 3. Extract the master audit log record registry
+                    const storedLogs = localStorage.getItem('haha_vending_audit_logs');
+                    if (storedLogs) {
+                        auditLogs.value = JSON.parse(storedLogs);
                     }
                 });
 
                 const handleRegister = () => {
-                    localStorage.setItem('haha_vending_sales_rep', JSON.stringify(authForm.value));
+                    // Save active session & establish deep memory tracking for future use
+                    localStorage.setItem('haha_vending_active_session', JSON.stringify(authForm.value));
+                    localStorage.setItem('haha_vending_profile_memory', JSON.stringify(authForm.value));
+                    
                     currentUser.value = { ...authForm.value };
+                    
+                    // Audit Log Record Pipeline
+                    const newLog = {
+                        name: authForm.value.name,
+                        email: authForm.value.email,
+                        phone: authForm.value.phone,
+                        timestamp: new Date().toLocaleString()
+                    };
+                    
+                    // Append log record securely
+                    auditLogs.value.unshift(newLog);
+                    localStorage.setItem('haha_vending_audit_logs', JSON.stringify(auditLogs.value));
+                    
                     isLoggedIn.value = true;
                 };
 
                 const handleLogout = () => {
-                    localStorage.removeItem('haha_vending_sales_rep');
+                    localStorage.removeItem('haha_vending_active_session');
                     isLoggedIn.value = false;
-                    authForm.value = { name: '', email: '', phone: '', boundResellers: [] };
                     form.value.resellerName = '';
+                    
+                    // Leave authForm memory intact but sync it from memory
+                    const rememberedMemory = localStorage.getItem('haha_vending_profile_memory');
+                    if (rememberedMemory) {
+                        authForm.value = JSON.parse(rememberedMemory);
+                    }
+                };
+
+                const clearAuditLog = () => {
+                    if(confirm("Are you sure you want to completely erase the local login archives?")) {
+                        auditLogs.value = [];
+                        localStorage.setItem('haha_vending_audit_logs', JSON.stringify([]));
+                    }
                 };
 
                 const onModelChange = (index) => {
@@ -466,18 +537,13 @@
                     return Number(val).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 };
 
-                // RE-ENGINEERED WEB PRINT STREAM GENERATION (100% RELIABLE)
+                // Native Print Stream Generation (100% Reliable & URL Footnote Guarded)
                 const downloadPDF = () => {
-                    // Update layout page title seamlessly to act as target filename on browser print engines
                     const standardTitle = document.title;
                     const cleanReseller = form.value.resellerName ? form.value.resellerName.replace(/[^a-zA-Z0-9]/g, '_') : 'Order';
                     
                     document.title = `${form.value.poNumber}_${cleanReseller}`;
-                    
-                    // Trigger Native Print Pipeline
                     window.print();
-                    
-                    // Reset tab title back to dashboard core state
                     document.title = standardTitle;
                 };
 
@@ -491,8 +557,10 @@
                     subTotal,
                     balanceDue,
                     computedDueDate,
+                    auditLogs,
                     handleRegister,
                     handleLogout,
+                    clearAuditLog,
                     onModelChange,
                     addItem,
                     removeItem,
