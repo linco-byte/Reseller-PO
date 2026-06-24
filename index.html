@@ -1,168 +1,236 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>经销商 PO 自动生成系统</title>
-    <!-- 引入 Tailwind CSS 用于快速美化布局 -->
+    <title>Reseller Purchase Order Generator</title>
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- 引入 Vue 3 框架 -->
+    <!-- Vue 3 Framework -->
     <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
-    <!-- 引入 html2pdf.js 核心库，用于将 HTML 转为完美的 PDF -->
+    <!-- html2pdf.js for high-quality PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* 针对 PDF 打印的特殊微调，确保下载时排版完美 */
         @media print {
             .no-print { display: none !important; }
         }
         #po-template {
-            font-family: 'Helvetica Neue', Arial, 'PingFang SC', sans-serif;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
         }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen text-gray-800">
 
     <div id="app" class="container mx-auto px-4 py-8 max-w-7xl">
-        <!-- 顶部标题栏 -->
+        <!-- Top Navigation / Header -->
         <header class="mb-8 no-print flex justify-between items-center bg-white p-6 rounded-xl shadow-sm">
             <div>
-                <h1 class="text-2xl font-bold text-blue-600">Reseller PO Generator</h1>
-                <p class="text-sm text-gray-500 mt-1">在线填写采购信息，一键生成并下载标准 PDF 订单</p>
+                <h1 class="text-2xl font-bold text-blue-600">Reseller PO Portal</h1>
+                <p class="text-sm text-gray-500 mt-1">Generate a unique and compliant Purchase Order for Haha Vending.</p>
             </div>
             <button @click="downloadPDF" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg shadow transition flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                下载 PO (PDF)
+                Download PO (PDF)
             </button>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- 左侧：表单输入区域（下载时隐藏） -->
+            <!-- Left Side: Form Input Area (Hidden on PDF) -->
             <div class="lg:col-span-5 space-y-6 no-print">
-                <!-- 基础信息表单 -->
+                <!-- Order Information -->
                 <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
-                    <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">1. 基础信息</h3>
+                    <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">1. Order Information</h3>
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">PO 编号 (PO Number)</label>
-                        <input type="text" v-model="form.poNumber" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                        <label class="block text-sm font-medium text-gray-400 mb-1">PO Number (Unique & Read-only)</label>
+                        <input type="text" v-model="form.poNumber" readonly class="w-full bg-gray-100 text-gray-500 border border-gray-300 rounded-lg px-3 py-2 cursor-not-allowed font-mono">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">订单日期 (Date)</label>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Date</label>
                         <input type="date" v-model="form.date" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">经销商名称 (Reseller Name)</label>
-                        <input type="text" v-model="form.resellerName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Reseller Name</label>
+                        <select v-model="form.resellerName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                            <option value="">-- Select Reseller --</option>
+                            <option v-for="reseller in resellers" :key="reseller" :value="reseller">{{ reseller }}</option>
+                        </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">收货地址 (Shipping Address)</label>
-                        <textarea v-model="form.shippingAddress" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"></textarea>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Shipping Method</label>
+                        <select v-model="form.shippingMethod" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                            <option value="Self-pickup">Self-pickup</option>
+                            <option value="Logistics Shipping">Logistics Shipping</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Shipping Address</label>
+                        <textarea v-model="form.shippingAddress" rows="2" placeholder="Street, City, State, ZIP, Country" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"></textarea>
                     </div>
                 </div>
 
-                <!-- 商品添加表单 -->
+                <!-- Payment Terms Input -->
+                <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">2. Payment Terms</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Net Period (Days)</label>
+                            <input type="number" v-model.number="form.netDays" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Down Payment ($)</label>
+                            <input type="number" v-model.number="form.downPayment" min="0" step="0.01" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Items -->
                 <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
                     <div class="flex justify-between items-center border-b pb-2">
-                        <h3 class="text-lg font-semibold text-gray-700">2. 采购货品清单</h3>
-                        <button @click="addItem" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1 rounded transition">+ 添加行</button>
+                        <h3 class="text-lg font-semibold text-gray-700">3. Hardware Selection</h3>
+                        <button @click="addItem" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1 rounded transition">+ Add Item</button>
                     </div>
                     
                     <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-gray-50 rounded-lg space-y-3 relative">
-                        <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-sm">删除</button>
+                        <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-sm">Delete</button>
                         <div>
-                            <label class="block text-xs font-medium text-gray-500 mb-1">商品描述 / SKU</label>
-                            <input type="text" v-model="item.description" placeholder="例如：高级无线鼠标 SKU-01" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm">
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Product Model</label>
+                            <select v-model="item.modelKey" @change="onModelChange(index)" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none">
+                                <option value="">-- Select Product Hardware --</option>
+                                <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }} (${{ price }})</option>
+                            </select>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1">数量 (Qty)</label>
-                                <input type="number" v-model.number="item.qty" min="1" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm">
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Qty</label>
+                                <input type="number" v-model.number="item.qty" min="1" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1">单价 (Unit Price $)</label>
-                                <input type="number" v-model.number="item.price" min="0" step="0.01" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm">
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Unit Price ($ Locked)</label>
+                                <input type="number" :value="item.price" readonly class="w-full bg-gray-100 text-gray-500 border border-gray-300 rounded px-2 py-1 text-sm cursor-not-allowed">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 右侧：实时预览区域（也是 PDF 导出的源 HTML） -->
-            <div class="lg:col-span-7 bg-white p-8 rounded-xl shadow-md border border-gray-200" id="po-template">
-                <!-- PO 抬头 -->
+            <!-- Right Side: Live Preview (PDF Template) -->
+            <div class="lg:col-span-7 bg-white p-8 rounded-xl shadow-md border border-gray-200 text-slate-900" id="po-template">
+                <!-- PO Header -->
                 <div class="flex justify-between items-start border-b-2 border-gray-300 pb-6">
                     <div>
                         <h2 class="text-3xl font-bold tracking-tight text-gray-900">PURCHASE ORDER</h2>
-                        <p class="text-sm text-gray-500 mt-2">您的供应商公司名称</p>
-                        <p class="text-xs text-gray-400">service@yourcompany.com | +86 123-4567-8901</p>
+                        <p class="text-md font-bold text-blue-800 mt-2">Haha Vending</p>
+                        <p class="text-xs text-gray-500 mt-0.5">1754 North Brown Rd suite 200, Lawrenceville, GA 30043</p>
                     </div>
                     <div class="text-right text-sm text-gray-600 space-y-1">
-                        <p><strong class="text-gray-900">PO 号:</strong> {{ form.poNumber || '------' }}</p>
-                        <p><strong class="text-gray-900">日期:</strong> {{ form.date || '------' }}</p>
+                        <p><strong class="text-gray-900">PO No:</strong> <span class="font-mono text-xs font-bold">{{ form.poNumber }}</span></p>
+                        <p><strong class="text-gray-900">Date:</strong> {{ form.date || '------' }}</p>
                     </div>
                 </div>
 
-                <!-- 商务信息（谁发出的 PO） -->
+                <!-- Business Info -->
                 <div class="grid grid-cols-2 gap-8 my-6 text-sm">
                     <div>
-                        <h4 class="font-bold text-gray-400 uppercase tracking-wider text-xs mb-2">发货至 (Ship To):</h4>
-                        <p class="font-semibold text-gray-900">{{ form.resellerName || '[未填写经销商名称]' }}</p>
-                        <p class="text-gray-600 mt-1 whitespace-pre-line">{{ form.shippingAddress || '[未填写收货地址]' }}</p>
+                        <h4 class="font-bold text-gray-400 uppercase tracking-wider text-xs mb-2">Ship To (Reseller):</h4>
+                        <p class="font-bold text-gray-900">{{ form.resellerName || '[Please Select Reseller]' }}</p>
+                        <p class="text-gray-600 mt-1 whitespace-pre-line">{{ form.shippingAddress || '[Shipping Address Empty]' }}</p>
                     </div>
                     <div>
-                        <h4 class="font-bold text-gray-400 uppercase tracking-wider text-xs mb-2">付款条款 (Terms):</h4>
-                        <p class="text-gray-600">账期：Net 30 Days</p>
-                        <p class="text-gray-600">支付方式：银行转账 (Wire Transfer)</p>
+                        <h4 class="font-bold text-gray-400 uppercase tracking-wider text-xs mb-2">Logistics & Terms:</h4>
+                        <p class="text-gray-600"><span class="font-semibold text-gray-800">Shipping Method:</span> {{ form.shippingMethod }}</p>
+                        <p class="text-gray-600"><span class="font-semibold text-gray-800">Payment Window:</span> Net {{ form.netDays }} Days</p>
                     </div>
                 </div>
 
-                <!-- 商品表格 -->
-                <table class="w-full text-left border-collapse my-8 text-sm">
+                <!-- Items Table -->
+                <table class="w-full text-left border-collapse my-6 text-sm">
                     <thead>
                         <tr class="border-b-2 border-gray-300 text-gray-400 font-medium uppercase text-xs">
-                            <th class="py-2">商品详情 (Description)</th>
-                            <th class="py-2 text-center w-20">数量</th>
-                            <th class="py-2 text-right w-28">单价</th>
-                            <th class="py-2 text-right w-28">总计</th>
+                            <th class="py-2">Hardware Model / SKU</th>
+                            <th class="py-2 text-center w-20">Qty</th>
+                            <th class="py-2 text-right w-28">Unit Price</th>
+                            <th class="py-2 text-right w-28">Amount</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="(item, index) in form.items" :key="index" class="border-b border-gray-200 text-gray-700">
-                            <td class="py-3 font-medium text-gray-900">{{ item.description || '未命名商品' }}</td>
+                            <td class="py-3 font-semibold text-gray-900">{{ item.modelKey || 'Unselected Hardware' }}</td>
                             <td class="py-3 text-center">{{ item.qty }}</td>
                             <td class="py-3 text-right">${{ formatMoney(item.price) }}</td>
-                            <td class="py-3 text-right font-semibold text-gray-900">${{ formatMoney(item.qty * item.price) }}</td>
+                            <td class="py-3 text-right font-bold text-gray-900">${{ formatMoney(item.qty * item.price) }}</td>
                         </tr>
                     </tbody>
                 </table>
 
-                <!-- 金额汇总 -->
+                <!-- Summary Financials -->
                 <div class="flex justify-end text-sm">
-                    <div class="w-64 space-y-2 border-t border-gray-200 pt-4">
+                    <div class="w-72 space-y-2 border-t border-gray-200 pt-4">
                         <div class="flex justify-between text-gray-600">
-                            <span>小计 (Subtotal):</span>
+                            <span>Hardware Subtotal:</span>
                             <span>${{ formatMoney(subTotal) }}</span>
                         </div>
-                        <div class="flex justify-between text-gray-600">
-                            <span>税率 (Tax 0%):</span>
-                            <span>$0.00</span>
+                        <div class="flex justify-between text-blue-700 font-medium">
+                            <span>Down Payment Paid:</span>
+                            <span>-${{ formatMoney(form.downPayment) }}</span>
                         </div>
-                        <div class="flex justify-between text-lg font-bold text-gray-900 border-t border-gray-200 pt-2">
-                            <span>总金额 (Total):</span>
-                            <span>${{ formatMoney(subTotal) }}</span>
+                        <div class="flex justify-between text-lg font-bold text-red-600 border-t border-gray-200 pt-2">
+                            <span>Balance Due (Net {{form.netDays}}):</span>
+                            <span>${{ formatMoney(balanceDue) }}</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 条款与签字位 -->
-                <div class="mt-12 pt-8 border-t border-gray-200 text-xs text-gray-400 space-y-6">
+                <!-- Monthly Service Fees Block -->
+                <div class="mt-8 pt-4 border-t border-gray-300">
+                    <h4 class="font-bold text-gray-500 uppercase tracking-wider text-xs mb-3">Schedule of Recurring Monthly Service Fees:</h4>
+                    <table class="w-full text-left border border-gray-200 text-xs text-gray-600">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 font-bold text-gray-700">
+                                <th class="p-2">Services</th>
+                                <th class="p-2">Service Fee</th>
+                                <th class="p-2">Billing Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-200">
+                                <td class="p-2 font-medium text-gray-900">SAAS Service</td>
+                                <td class="p-2">$15 / month</td>
+                                <td class="p-2">Payment starts from the device activation day</td>
+                            </tr>
+                            <tr class="border-b border-gray-200">
+                                <td class="p-2 font-medium text-gray-900">Data Card</td>
+                                <td class="p-2">$15 / month</td>
+                                <td class="p-2">Payment starts from the device activation day</td>
+                            </tr>
+                            <tr class="border-b border-gray-200">
+                                <td class="p-2 font-medium text-gray-900">AI Visual Recognition</td>
+                                <td class="p-2">$0.05 / transaction</td>
+                                <td class="p-2">Payment starts from the device activation day</td>
+                            </tr>
+                            <tr class="border-b border-gray-200">
+                                <td class="p-2 font-medium text-gray-900">POS Rental Fee</td>
+                                <td class="p-2">$10 / month</td>
+                                <td class="p-2">Payment starts from the device activation day</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2 font-medium text-gray-900">Payment Service Fee</td>
+                                <td class="p-2">5.95% of sales revenue</td>
+                                <td class="p-2">Payment starts from the device activation day</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Terms & Conditions -->
+                <div class="mt-8 pt-4 border-t border-gray-200 text-xs text-gray-400 space-y-4">
                     <div>
-                        <h5 class="font-bold text-gray-500 mb-1">标准说明与条款：</h5>
-                        <p>1. 请在收到此 PO 后 2 个工作日内签字盖章回传确认。</p>
-                        <p>2. 所有货品交付需严格对照本订单内约定的 SKU 及规格参数进行核对。</p>
+                        <h5 class="font-bold text-gray-500 mb-1">Standard Declarations:</h5>
+                        <p>1. Please sign and return this acknowledgment via email within 2 business days of receipt.</p>
+                        <p>2. Monthly Service Fees: The reseller acknowledges that the subscription fees listed in the service table above will be calculated separately and billed monthly starting exactly from the individual device's activation date.</p>
                     </div>
-                    <div class="flex justify-between pt-8">
-                        <div class="border-t border-gray-300 w-48 pt-2 text-center">经销商授权代表签字</div>
-                        <div class="border-t border-gray-300 w-48 pt-2 text-center">日期</div>
+                    <div class="flex justify-between pt-6">
+                        <div class="border-t border-gray-300 w-56 pt-2 text-center">Authorized Reseller Signature</div>
+                        <div class="border-t border-gray-300 w-40 pt-2 text-center">Date</div>
                     </div>
                 </div>
             </div>
@@ -174,55 +242,109 @@
 
         createApp({
             setup() {
-                // 初始化表单默认数据
+                // Generate a highly specific, collision-free unique PO number
+                const generateUniquePONumber = () => {
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                    const day = String(now.getDate()).padStart(2, '0');
+                    const timeStr = String(now.getHours()).padStart(2, '0') + 
+                                    String(now.getMinutes()).padStart(2, '0') + 
+                                    String(now.getSeconds()).padStart(2, '0');
+                    // Add 4-character random hex string for serverless absolute uniqueness
+                    const randomHex = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1).toUpperCase();
+                    return `PO-${year}${month}${day}-${timeStr}-${randomHex}`;
+                };
+
+                // Resellers predefined array
+                const resellers = [
+                    "Twelve 28 vending", "Vend Guys Local", "PBS vending", "Ai Vend Solution",
+                    "Genius Vend", "Mod Brands", "NC vending LLC", "vendx",
+                    "The vending center", "Vital Vending Sales LLC", "The Venders",
+                    "VP-Modern-Amenities LLC", "Vend Guys Internet", "Nayax",
+                    "Century vending", "Aloha Smart Vending"
+                ];
+
+                // Product catalog prices map
+                const productCatalog = {
+                    "Mini360": 2400,
+                    "plus 440": 2600,
+                    "pro 542 -pax": 3200,
+                    "pro 542- nayax": 3500,
+                    "ultra 1200": 5000,
+                    "freezer 550": 3500,
+                    "max 620": 3400,
+                    "max 620s": 4000,
+                    "max 660": 3300
+                };
+
+                // Form Reactive State
                 const form = ref({
-                    poNumber: 'PO-' + new Date().getFullYear() + String(new Date().getMonth() + 1).padStart(2, '0') + String(new Date().getDate()).padStart(2, '0') + '-01',
+                    poNumber: generateUniquePONumber(),
                     date: new Date().toISOString().substr(0, 10),
                     resellerName: '',
+                    shippingMethod: 'Logistics Shipping',
                     shippingAddress: '',
+                    netDays: 30,
+                    downPayment: 0,
                     items: [
-                        { description: '', qty: 1, price: 0.00 }
+                        { modelKey: '', qty: 1, price: 0.00 }
                     ]
                 });
 
-                // 动态计算总金额
-                const subTotal = computed(() => {
-                    return form.value.items.reduce((sum, item) => sum + (item.qty * item.price || 0), 0);
-                });
-
-                // 添加一行商品
-                const addItem = () => {
-                    form.value.items.push({ description: '', qty: 1, price: 0.00 });
+                // Triggered when a product option changes to lock the price
+                const onModelChange = (index) => {
+                    const item = form.value.items[index];
+                    if (item.modelKey && productCatalog[item.modelKey]) {
+                        item.price = productCatalog[item.modelKey];
+                    } else {
+                        item.price = 0.00;
+                    }
                 };
 
-                // 删除一行商品
+                // Form items logic
+                const addItem = () => {
+                    form.value.items.push({ modelKey: '', qty: 1, price: 0.00 });
+                };
+
                 const removeItem = (index) => {
                     form.value.items.splice(index, 1);
                 };
 
-                // 格式化金额数字
+                // Calculations
+                const subTotal = computed(() => {
+                    return form.value.items.reduce((sum, item) => sum + (item.qty * item.price || 0), 0);
+                });
+
+                const balanceDue = computed(() => {
+                    const due = subTotal.value - (form.value.downPayment || 0);
+                    return due < 0 ? 0 : due;
+                });
+
                 const formatMoney = (val) => {
                     return Number(val).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 };
 
-                // 调用 html2pdf 引擎下载完美的 PDF 
+                // PDF generation logic
                 const downloadPDF = () => {
                     const element = document.getElementById('po-template');
                     const opt = {
-                        margin:       0.5,
-                        filename:     `${form.value.poNumber || 'PO'}_${form.value.resellerName || 'Order'}.pdf`,
+                        margin:       [0.4, 0.4, 0.4, 0.4],
+                        filename:     `${form.value.poNumber}_${form.value.resellerName || 'Order'}.pdf`,
                         image:        { type: 'jpeg', quality: 0.98 },
-                        html2canvas:  { scale: 2, useCORS: true }, // scale: 2 保证高清打印
+                        html2canvas:  { scale: 2, useCORS: true },
                         jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
                     };
-                    
-                    // 触发下载
                     html2pdf().set(opt).from(element).save();
                 };
 
                 return {
                     form,
+                    resellers,
+                    productCatalog,
                     subTotal,
+                    balanceDue,
+                    onModelChange,
                     addItem,
                     removeItem,
                     formatMoney,
