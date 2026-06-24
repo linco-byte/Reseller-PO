@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>经销商 PO 自动生成系统</title>
+    <!-- 引入 Tailwind CSS 用于快速美化布局 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- 引入 Vue 3 框架 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <!-- 引入 html2pdf.js 核心库，用于将 HTML 转为完美的 PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        /* 针对 PDF 打印的特殊微调，确保下载时排版完美 */
+        @media print {
+            .no-print { display: none !important; }
+        }
+        #po-template {
+            font-family: 'Helvetica Neue', Arial, 'PingFang SC', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+
+    <div id="app" class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- 顶部标题栏 -->
+        <header class="mb-8 no-print flex justify-between items-center bg-white p-6 rounded-xl shadow-sm">
+            <div>
+                <h1 class="text-2xl font-bold text-blue-600">Reseller PO Generator</h1>
+                <p class="text-sm text-gray-500 mt-1">在线填写采购信息，一键生成并下载标准 PDF 订单</p>
+            </div>
+            <button @click="downloadPDF" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg shadow transition flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                下载 PO (PDF)
+            </button>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- 左侧：表单输入区域（下载时隐藏） -->
+            <div class="lg:col-span-5 space-y-6 no-print">
+                <!-- 基础信息表单 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">1. 基础信息</h3>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">PO 编号 (PO Number)</label>
+                        <input type="text" v-model="form.poNumber" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">订单日期 (Date)</label>
+                        <input type="date" v-model="form.date" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">经销商名称 (Reseller Name)</label>
+                        <input type="text" v-model="form.resellerName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">收货地址 (Shipping Address)</label>
+                        <textarea v-model="form.shippingAddress" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+
+                <!-- 商品添加表单 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 class="text-lg font-semibold text-gray-700">2. 采购货品清单</h3>
+                        <button @click="addItem" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1 rounded transition">+ 添加行</button>
+                    </div>
+                    
+                    <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-gray-50 rounded-lg space-y-3 relative">
+                        <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-sm">删除</button>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">商品描述 / SKU</label>
+                            <input type="text" v-model="item.description" placeholder="例如：高级无线鼠标 SKU-01" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">数量 (Qty)</label>
+                                <input type="number" v-model.number="item.qty" min="1" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">单价 (Unit Price $)</label>
+                                <input type="number" v-model.number="item.price" min="0" step="0.01" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：实时预览区域（也是 PDF 导出的源 HTML） -->
+            <div class="lg:col-span-7 bg-white p-8 rounded-xl shadow-md border border-gray-200" id="po-template">
+                <!-- PO 抬头 -->
+                <div class="flex justify-between items-start border-b-2 border-gray-300 pb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-tight text-gray-900">PURCHASE ORDER</h2>
+                        <p class="text-sm text-gray-500 mt-2">您的供应商公司名称</p>
+                        <p class="text-xs text-gray-400">service@yourcompany.com | +86 123-4567-8901</p>
+                    </div>
+                    <div class="text-right text-sm text-gray-600 space-y-1">
+                        <p><strong class="text-gray-900">PO 号:</strong> {{ form.poNumber || '------' }}</p>
+                        <p><strong class="text-gray-900">日期:</strong> {{ form.date || '------' }}</p>
+                    </div>
+                </div>
+
+                <!-- 商务信息（谁发出的 PO） -->
+                <div class="grid grid-cols-2 gap-8 my-6 text-sm">
+                    <div>
+                        <h4 class="font-bold text-gray-400 uppercase tracking-wider text-xs mb-2">发货至 (Ship To):</h4>
+                        <p class="font-semibold text-gray-900">{{ form.resellerName || '[未填写经销商名称]' }}</p>
+                        <p class="text-gray-600 mt-1 whitespace-pre-line">{{ form.shippingAddress || '[未填写收货地址]' }}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-400 uppercase tracking-wider text-xs mb-2">付款条款 (Terms):</h4>
+                        <p class="text-gray-600">账期：Net 30 Days</p>
+                        <p class="text-gray-600">支付方式：银行转账 (Wire Transfer)</p>
+                    </div>
+                </div>
+
+                <!-- 商品表格 -->
+                <table class="w-full text-left border-collapse my-8 text-sm">
+                    <thead>
+                        <tr class="border-b-2 border-gray-300 text-gray-400 font-medium uppercase text-xs">
+                            <th class="py-2">商品详情 (Description)</th>
+                            <th class="py-2 text-center w-20">数量</th>
+                            <th class="py-2 text-right w-28">单价</th>
+                            <th class="py-2 text-right w-28">总计</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, index) in form.items" :key="index" class="border-b border-gray-200 text-gray-700">
+                            <td class="py-3 font-medium text-gray-900">{{ item.description || '未命名商品' }}</td>
+                            <td class="py-3 text-center">{{ item.qty }}</td>
+                            <td class="py-3 text-right">${{ formatMoney(item.price) }}</td>
+                            <td class="py-3 text-right font-semibold text-gray-900">${{ formatMoney(item.qty * item.price) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 金额汇总 -->
+                <div class="flex justify-end text-sm">
+                    <div class="w-64 space-y-2 border-t border-gray-200 pt-4">
+                        <div class="flex justify-between text-gray-600">
+                            <span>小计 (Subtotal):</span>
+                            <span>${{ formatMoney(subTotal) }}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>税率 (Tax 0%):</span>
+                            <span>$0.00</span>
+                        </div>
+                        <div class="flex justify-between text-lg font-bold text-gray-900 border-t border-gray-200 pt-2">
+                            <span>总金额 (Total):</span>
+                            <span>${{ formatMoney(subTotal) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 条款与签字位 -->
+                <div class="mt-12 pt-8 border-t border-gray-200 text-xs text-gray-400 space-y-6">
+                    <div>
+                        <h5 class="font-bold text-gray-500 mb-1">标准说明与条款：</h5>
+                        <p>1. 请在收到此 PO 后 2 个工作日内签字盖章回传确认。</p>
+                        <p>2. 所有货品交付需严格对照本订单内约定的 SKU 及规格参数进行核对。</p>
+                    </div>
+                    <div class="flex justify-between pt-8">
+                        <div class="border-t border-gray-300 w-48 pt-2 text-center">经销商授权代表签字</div>
+                        <div class="border-t border-gray-300 w-48 pt-2 text-center">日期</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                // 初始化表单默认数据
+                const form = ref({
+                    poNumber: 'PO-' + new Date().getFullYear() + String(new Date().getMonth() + 1).padStart(2, '0') + String(new Date().getDate()).padStart(2, '0') + '-01',
+                    date: new Date().toISOString().substr(0, 10),
+                    resellerName: '',
+                    shippingAddress: '',
+                    items: [
+                        { description: '', qty: 1, price: 0.00 }
+                    ]
+                });
+
+                // 动态计算总金额
+                const subTotal = computed(() => {
+                    return form.value.items.reduce((sum, item) => sum + (item.qty * item.price || 0), 0);
+                });
+
+                // 添加一行商品
+                const addItem = () => {
+                    form.value.items.push({ description: '', qty: 1, price: 0.00 });
+                };
+
+                // 删除一行商品
+                const removeItem = (index) => {
+                    form.value.items.splice(index, 1);
+                };
+
+                // 格式化金额数字
+                const formatMoney = (val) => {
+                    return Number(val).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                };
+
+                // 调用 html2pdf 引擎下载完美的 PDF 
+                const downloadPDF = () => {
+                    const element = document.getElementById('po-template');
+                    const opt = {
+                        margin:       0.5,
+                        filename:     `${form.value.poNumber || 'PO'}_${form.value.resellerName || 'Order'}.pdf`,
+                        image:        { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  { scale: 2, useCORS: true }, // scale: 2 保证高清打印
+                        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                    };
+                    
+                    // 触发下载
+                    html2pdf().set(opt).from(element).save();
+                };
+
+                return {
+                    form,
+                    subTotal,
+                    addItem,
+                    removeItem,
+                    formatMoney,
+                    downloadPDF
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
