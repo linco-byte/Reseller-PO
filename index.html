@@ -3,276 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reseller Purchase Order Generator</title>
+    <title>Purchase Order Workspace</title>
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Vue 3 Framework -->
     <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
-    <!-- html2pdf.js for high-quality PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        @media print {
-            .no-print { display: none !important; }
+        /* Modern Minimalist Aesthetics */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        #po-template {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+        
+        /* STRICT PRINT CONSTRAINTS */
+        @media print {
+            /* Hide all web dashboard interface elements */
+            .no-print, header, .lg\:col-span-5, button, select, input, textarea {
+                display: none !important;
+            }
+            
+            /* Expand the preview sheet to fill the entire A4/Letter print boundary */
+            body, .container, #po-template {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            
+            /* Guard page break integrity */
+            #po-template {
+                page-break-inside: avoid;
+            }
+            
+            .print-text-dark {
+                color: #0f172a !important;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen text-gray-800">
+<body class="bg-slate-900 min-h-screen text-slate-100 antialiased">
 
     <div id="app">
-        <!-- REGISTRATION / LOGIN MODAL (GATEKEEPER) -->
-        <div v-if="!isLoggedIn" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 no-print">
-            <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-8 border border-gray-100">
+        <!-- SYSTEM GATEKEEPER: SALES REP REGISTRATION (DEEP BLACK MODAL) -->
+        <div v-if="!isLoggedIn" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center z-50 p-4 no-print">
+            <div class="bg-slate-900 rounded-xl shadow-2xl max-w-md w-full p-8 border border-slate-800">
                 <div class="text-center mb-6">
-                    <h2 class="text-2xl font-bold text-blue-600">Haha Vending Portal</h2>
-                    <p class="text-sm text-gray-500 mt-1">Please register or sign in to access the PO Generator.</p>
+                    <div class="h-10 w-10 bg-sky-500/10 text-sky-400 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M19.242 18.274A13.916 13.916 0 0021 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M12 11a13.942 13.942 0 00-2.316-5.074" /></svg>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-100 tracking-tight">Sales Representative Registry</h2>
+                    <p class="text-xs text-slate-400 mt-1">Set up your sales profile and link your active accounts.</p>
                 </div>
 
-                <form @submit.prevent="handleRegister" class="space-y-4">
+                <form @submit.prevent="handleRegister" class="space-y-4 text-sm">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Full Name *</label>
-                        <input type="text" v-model="authForm.name" required placeholder="John Doe" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Sales Rep Full Name *</label>
+                        <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
-                        <input type="email" v-model="authForm.email" required placeholder="john@example.com" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Corporate Email Address *</label>
+                        <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
-                        <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 000-0000" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Direct Mobile Phone *</label>
+                        <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500">
                     </div>
+                    
+                    <!-- ADVANCED UPDATE: MULTI-BINDING RESELLER ACCOUNTS -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Associated Reseller *</label>
-                        <select v-model="authForm.resellerName" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
-                            <option value="">-- Select Your Company --</option>
-                            <option v-for="reseller in resellers" :key="reseller" :value="reseller">{{ reseller }}</option>
-                        </select>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Assigned Reseller Accounts (Select all that apply) *</label>
+                        <div class="bg-slate-950 border border-slate-800 rounded-lg p-3 max-h-40 overflow-y-auto space-y-2 text-xs">
+                            <label v-for="reseller in resellers" :key="reseller" class="flex items-center gap-2 text-slate-300 hover:text-slate-100 cursor-pointer">
+                                <input type="checkbox" :value="reseller" v-model="authForm.boundResellers" class="rounded border-slate-800 bg-slate-900 text-sky-500 focus:ring-0">
+                                <span>{{ reseller }}</span>
+                            </label>
+                        </div>
+                        <p v-if="authForm.boundResellers.length === 0" class="text-[11px] text-amber-500/80 mt-1">⚠️ You must select at least one account to proceed.</p>
                     </div>
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition mt-2 shadow">
-                        Gain Access & Save Profile
+
+                    <button type="submit" :disabled="authForm.boundResellers.length === 0" class="w-full bg-sky-600 hover:bg-sky-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-medium py-2 rounded-lg transition-colors shadow-lg mt-2 tracking-wide">
+                        Initialize Workspace
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- MAIN PO INTERFACE (Only visible if logged in) -->
+        <!-- MAIN PO WORKSPACE (Minimalist Slate & Navy Dashboard) -->
         <div v-if="isLoggedIn" class="container mx-auto px-4 py-8 max-w-7xl">
-            <!-- Top Navigation / Header -->
-            <header class="mb-8 no-print flex justify-between items-center bg-white p-6 rounded-xl shadow-sm">
+            <!-- Sleek Horizontal Control Navbar -->
+            <header class="mb-8 no-print flex justify-between items-center bg-slate-950 p-5 rounded-xl border border-slate-800">
                 <div>
-                    <h1 class="text-2xl font-bold text-blue-600">Reseller PO Portal</h1>
-                    <p class="text-sm text-gray-500 mt-1">
-                        Welcome back, <span class="font-semibold text-gray-800">{{ currentUser.name }}</span> ({{ currentUser.resellerName }}).
-                        <button @click="handleLogout" class="text-red-500 hover:underline text-xs ml-2">Log Out / Switch Account</button>
+                    <h1 class="text-lg font-bold tracking-tight text-slate-100">PO Engine <span class="text-xs font-normal text-slate-500 mx-2">|</span> <span class="text-xs font-medium text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded">Sales Mode</span></h1>
+                    <p class="text-xs text-slate-400 mt-1">
+                        Active Representative: <span class="text-slate-200 font-semibold">{{ currentUser.name }}</span>
+                        <button @click="handleLogout" class="text-red-400 hover:text-red-300 underline text-[11px] ml-3 transition-colors">Switch Profile</button>
                     </p>
                 </div>
-                <button @click="downloadPDF" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg shadow transition flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                    Download PO (PDF)
+                <button @click="downloadPDF" class="bg-sky-600 hover:bg-sky-500 text-white font-medium px-5 py-2 rounded-lg shadow-md transition-all text-sm flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                    Download PO
                 </button>
             </header>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <!-- Left Side: Form Input Area (Hidden on PDF) -->
-                <div class="lg:col-span-5 space-y-6 no-print">
-                    <!-- Order Information -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
-                        <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">1. Order Information</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <!-- Left Side: Configurator Controls (Stripped down & hidden on print) -->
+                <div class="lg:col-span-5 space-y-6 no-print text-sm">
+                    
+                    <!-- 1. Metadata Block -->
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2">1. Logistics & Account Alignment</h3>
                         <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-1">PO Number (Unique & Read-only)</label>
-                            <input type="text" v-model="form.poNumber" readonly class="w-full bg-gray-100 text-gray-500 border border-gray-300 rounded-lg px-3 py-2 cursor-not-allowed font-mono">
+                            <label class="block text-xs font-medium text-slate-500 mb-1">PO Tracking Number</label>
+                            <input type="text" v-model="form.poNumber" readonly class="w-full bg-slate-900 text-slate-500 border border-slate-800 rounded-lg px-3 py-1.5 cursor-not-allowed font-mono text-xs">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Date</label>
-                            <input type="date" v-model="form.date" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Order Issuance Date</label>
+                            <input type="date" v-model="form.date" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-sky-500">
                         </div>
+                        
+                        <!-- RE-ENGINEERED MULTI-SELECT TARGET MANAGER -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-1">Reseller Name (Auto-locked)</label>
-                            <input type="text" :value="form.resellerName" readonly class="w-full bg-gray-100 text-gray-500 border border-gray-300 rounded-lg px-3 py-2 cursor-not-allowed font-semibold">
+                            <label class="block text-xs font-medium text-sky-400 mb-1">Target Reseller Account *</label>
+                            <select v-model="form.resellerName" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200 font-semibold focus:outline-none focus:border-sky-500">
+                                <option value="">-- Choose Account for This PO --</option>
+                                <option v-for="reseller in currentUser.boundResellers" :key="reseller" :value="reseller">{{ reseller }}</option>
+                            </select>
                         </div>
+                        
                         <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Shipping Method</label>
-                            <select v-model="form.shippingMethod" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Fulfillment Mode</label>
+                            <select v-model="form.shippingMethod" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-sky-500">
                                 <option value="Logistics Shipping">Logistics Shipping</option>
                                 <option value="Self-pickup">Self-pickup</option>
                             </select>
                         </div>
                         
-                        <!-- Free Text input area for Self-pickup warehouse address -->
+                        <!-- Conditional Textbox for Self-pickup -->
                         <div v-if="form.shippingMethod === 'Self-pickup'">
-                            <label class="block text-sm font-medium text-blue-600 mb-1">Pickup Warehouse Address *</label>
-                            <textarea v-model="form.pickupWarehouseText" rows="3" placeholder="Please type the specific fulfillment warehouse address here..." class="w-full border border-blue-400 rounded-lg px-3 py-2 focus:outline-none bg-blue-50/30"></textarea>
+                            <label class="block text-xs font-medium text-sky-400 mb-1">Pickup Warehouse Location Box *</label>
+                            <textarea v-model="form.pickupWarehouseText" rows="3" placeholder="Type specific corporate warehouse address here..." class="w-full bg-slate-900 border border-sky-800 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 text-xs"></textarea>
                         </div>
                         
-                        <!-- Free Text input area for Logistics address -->
+                        <!-- Conditional Textbox for Shipping -->
                         <div v-if="form.shippingMethod === 'Logistics Shipping'">
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Shipping Destination Address</label>
-                            <textarea v-model="form.shippingAddress" rows="3" placeholder="Street, City, State, ZIP, Country" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"></textarea>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Delivery Destination Address</label>
+                            <textarea v-model="form.shippingAddress" rows="3" placeholder="Reseller client location destination details..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 text-xs"></textarea>
                         </div>
                     </div>
 
-                    <!-- Payment Terms Input -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
-                        <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">2. Payment Terms</h3>
+                    <!-- 2. Financial Milestones -->
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2">2. Fiscal Configuration</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">Net Period (Days)</label>
-                                <input type="number" v-model.number="form.netDays" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Net Term (Days)</label>
+                                <input type="number" v-model.number="form.netDays" min="0" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-sky-500">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">Down Payment ($)</label>
-                                <input type="number" v-model.number="form.downPayment" min="0" step="0.01" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500">
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Down Payment ($)</label>
+                                <input type="number" v-model.number="form.downPayment" min="0" step="0.01" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-sky-500">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Products Items Selection -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
-                        <div class="flex justify-between items-center border-b pb-2">
-                            <h3 class="text-lg font-semibold text-gray-700">3. Products Selection</h3>
-                            <button @click="addItem" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1 rounded transition">+ Add Item</button>
+                    <!-- 3. Dynamic Matrix Configuration -->
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">3. Products Selection</h3>
+                            <button @click="addItem" class="text-xs bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 px-2.5 py-1 rounded transition-colors">+ Append SKU</button>
                         </div>
                         
-                        <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-gray-50 rounded-lg space-y-3 relative">
-                            <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-sm">Delete</button>
+                        <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-slate-900/60 border border-slate-800 rounded-lg space-y-3 relative">
+                            <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-2 text-red-400 hover:text-red-300 text-xs">Remove</button>
                             <div>
-                                <label class="block text-xs font-medium text-gray-500 mb-1">Product Model</label>
-                                <select v-model="item.modelKey" @change="onModelChange(index)" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none">
-                                    <option value="">-- Select Product Hardware --</option>
+                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Select Product</label>
+                                <select v-model="item.modelKey" @change="onModelChange(index)" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none">
+                                    <option value="">-- Choose Hardware SKU --</option>
                                     <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }} (${{ price }})</option>
                                 </select>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-500 mb-1">Qty</label>
-                                    <input type="number" v-model.number="item.qty" min="1" class="w-full bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none">
+                                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Quantity</label>
+                                    <input type="number" v-model.number="item.qty" min="1" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200 focus:outline-none">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-500 mb-1">Unit Price ($ Locked)</label>
-                                    <input type="number" :value="item.price" readonly class="w-full bg-gray-100 text-gray-500 border border-gray-300 rounded px-2 py-1 text-sm cursor-not-allowed">
+                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">MSRP Unit Cost (Locked)</label>
+                                    <input type="number" :value="item.price" readonly class="w-full bg-slate-900 text-slate-500 border border-slate-800 rounded px-2 py-1 text-xs cursor-not-allowed">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Side: Live Preview (PDF Template) -->
-                <div class="lg:col-span-7 bg-white p-8 rounded-xl shadow-md border border-gray-200 text-slate-900" id="po-template">
-                    <!-- PO Header -->
-                    <div class="flex justify-between items-start border-b-2 border-gray-300 pb-6">
+                <!-- Right Side: High-End Corporate Print Template Sheet -->
+                <div class="lg:col-span-7 bg-white p-10 rounded-none shadow-2xl text-slate-900 border border-gray-200 print-text-dark" id="po-template">
+                    
+                    <!-- Top Corporate Head -->
+                    <div class="flex justify-between items-start border-b-2 border-slate-900 pb-6">
                         <div>
-                            <h2 class="text-3xl font-bold tracking-tight text-gray-900">PURCHASE ORDER</h2>
-                            <p class="text-md font-bold text-blue-800 mt-2">Haha Vending</p>
-                            <p class="text-xs text-gray-500 mt-0.5">1754 North Brown Rd suite 200, Lawrenceville, GA 30043</p>
+                            <h2 class="text-2xl font-black tracking-tight text-slate-900">PURCHASE ORDER</h2>
+                            <p class="text-md font-extrabold text-blue-950 mt-1.5">Haha Vending</p>
+                            <p class="text-[11px] text-gray-500 tracking-wide font-medium">1754 North Brown Rd suite 200, Lawrenceville, GA 30043</p>
                         </div>
-                        <div class="text-right text-sm text-gray-600 space-y-1">
-                            <p><strong class="text-gray-900">PO No:</strong> <span class="font-mono text-xs font-bold">{{ form.poNumber }}</span></p>
-                            <p><strong class="text-gray-900">Order Date:</strong> {{ form.date || '------' }}</p>
-                            <p><strong class="text-red-600">Due Date:</strong> <span class="font-bold text-red-600">{{ computedDueDate }}</span></p>
+                        <div class="text-right text-xs space-y-1 text-gray-600">
+                            <p><strong class="text-slate-900 uppercase font-bold text-[10px] tracking-wider block">PO Identifier:</strong> <span class="font-mono text-xs font-bold text-slate-900">{{ form.poNumber }}</span></p>
+                            <p class="pt-1"><strong class="text-slate-900 font-semibold">Order Date:</strong> {{ form.date || '------' }}</p>
+                            <p><strong class="text-red-700 font-bold">Due Date:</strong> <span class="font-bold text-red-600 border-b border-red-200 pb-0.5">{{ computedDueDate }}</span></p>
                         </div>
                     </div>
 
-                    <!-- Business Info -->
-                    <div class="grid grid-cols-2 gap-8 my-6 text-sm">
+                    <!-- Client Logistics Matrix -->
+                    <div class="grid grid-cols-2 gap-8 my-6 text-xs">
                         <div>
-                            <h4 class="font-bold text-gray-400 uppercase tracking-wider text-xs mb-2">Reseller Billing Details:</h4>
-                            <p class="font-bold text-gray-900">{{ form.resellerName }}</p>
-                            <p class="text-gray-500 mt-1 text-xs">Representative: {{ currentUser.name }}</p>
+                            <h4 class="font-bold text-gray-400 uppercase tracking-wider text-[10px] mb-1.5">Reseller Billing Corporate:</h4>
+                            <p class="font-bold text-sm text-slate-900 tracking-tight">{{ form.resellerName || '[No Target Reseller Chosen]' }}</p>
                         </div>
                         <div>
-                            <h4 class="font-bold text-gray-400 uppercase tracking-wider text-xs mb-2">Logistics & Payment Rules:</h4>
-                            <p class="text-gray-600"><span class="font-semibold text-gray-800">Shipping Method:</span> {{ form.shippingMethod }}</p>
-                            <p class="text-gray-600"><span class="font-semibold text-gray-800">Payment Term:</span> Net {{ form.netDays }} Days</p>
-                            <p class="text-red-600 font-medium"><span class="font-semibold text-gray-800">Maturity Date:</span> {{ computedDueDate }}</p>
+                            <h4 class="font-bold text-gray-400 uppercase tracking-wider text-[10px] mb-1.5">Execution & Terms Rules:</h4>
+                            <p class="text-gray-600"><span class="font-medium text-slate-800">Fulfillment Strategy:</span> {{ form.shippingMethod }}</p>
+                            <p class="text-gray-600"><span class="font-medium text-slate-800">Payment Structure:</span> Net {{ form.netDays }} Days</p>
+                            <p class="text-red-600 font-semibold"><span class="font-medium text-slate-800">Maturity Date:</span> {{ computedDueDate }}</p>
                         </div>
                     </div>
 
-                    <!-- Logistics Fulfillment Conditional Block -->
-                    <div class="my-4 p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs">
+                    <!-- Address Block Box -->
+                    <div class="my-5 p-3 bg-slate-50 rounded border border-slate-200 text-xs">
                         <div v-if="form.shippingMethod === 'Self-pickup'">
-                            <span class="font-bold text-blue-700 block mb-0.5 uppercase tracking-wide text-[10px]">Self-Pickup Fulfillment Warehouse Address:</span>
-                            <p class="text-slate-800 whitespace-pre-line font-semibold mt-1">{{ form.pickupWarehouseText || '[Please input the pickup warehouse location in the left box]' }}</p>
+                            <span class="font-bold text-blue-900 block mb-1 uppercase tracking-wider text-[9px]">Self-Pickup Center Location Address:</span>
+                            <p class="text-slate-800 whitespace-pre-line font-medium leading-relaxed">{{ form.pickupWarehouseText || 'Please clarify specific address instructions inside the left form field.' }}</p>
                         </div>
                         <div v-else>
-                            <span class="font-bold text-slate-700 block mb-0.5 uppercase tracking-wide text-[10px]">Logistics Target Destination Address:</span>
-                            <p class="text-slate-600 whitespace-pre-line font-medium mt-1">{{ form.shippingAddress || '[No Destination Address Provided]' }}</p>
+                            <span class="font-bold text-slate-700 block mb-1 uppercase tracking-wider text-[9px]">Logistics Target Delivery Destination:</span>
+                            <p class="text-slate-700 whitespace-pre-line font-medium leading-relaxed">{{ form.shippingAddress || 'No client shipping endpoint provided.' }}</p>
                         </div>
                     </div>
 
-                    <!-- Items Table -->
-                    <table class="w-full text-left border-collapse my-6 text-sm">
+                    <!-- Line Itemized Ledger Matrix -->
+                    <table class="w-full text-left border-collapse my-6 text-xs">
                         <thead>
-                            <tr class="border-b-2 border-gray-300 text-gray-400 font-medium uppercase text-xs">
-                                <th class="py-2">Product Model / SKU</th>
-                                <th class="py-2 text-center w-20">Qty</th>
-                                <th class="py-2 text-right w-28">Unit Price</th>
-                                <th class="py-2 text-right w-28">Amount</th>
+                            <tr class="border-b-2 border-slate-900 text-gray-400 font-bold uppercase tracking-wider text-[10px]">
+                                <th class="py-2.5">Product Model / SKU Descriptor</th>
+                                <th class="py-2.5 text-center w-20">Qty</th>
+                                <th class="py-2.5 text-right w-28">Unit Price</th>
+                                <th class="py-2.5 text-right w-28">Total Amount</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr v-for="(item, index) in form.items" :key="index" class="border-b border-gray-200 text-gray-700">
-                                <td class="py-3 font-semibold text-gray-900">{{ item.modelKey || 'Unselected Hardware' }}</td>
-                                <td class="py-3 text-center">{{ item.qty }}</td>
-                                <td class="py-3 text-right">${{ formatMoney(item.price) }}</td>
-                                <td class="py-3 text-right font-bold text-gray-900">${{ formatMoney(item.qty * item.price) }}</td>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr v-for="(item, index) in form.items" :key="index" class="text-gray-700">
+                                <td class="py-3 font-semibold text-slate-900">{{ item.modelKey || 'Awaiting Selection...' }}</td>
+                                <td class="py-3 text-center font-medium">{{ item.qty }}</td>
+                                <td class="py-3 text-right text-gray-600">${{ formatMoney(item.price) }}</td>
+                                <td class="py-3 text-right font-bold text-slate-900">${{ formatMoney(item.qty * item.price) }}</td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <!-- Summary Financials -->
-                    <div class="flex justify-end text-sm">
-                        <div class="w-72 space-y-2 border-t border-gray-200 pt-4">
-                            <div class="flex justify-between text-gray-600 font-semibold">
+                    <!-- Balanced Fiscal Aggregations -->
+                    <div class="flex justify-end text-xs pt-2">
+                        <div class="w-64 space-y-2 border-t-2 border-slate-900 pt-3">
+                            <div class="flex justify-between text-gray-500 font-medium">
                                 <span>Sales:</span>
-                                <span>${{ formatMoney(subTotal) }}</span>
+                                <span class="font-semibold text-slate-900">${{ formatMoney(subTotal) }}</span>
                             </div>
-                            <div class="flex justify-between text-blue-700 font-medium">
+                            <div class="flex justify-between text-blue-800 font-semibold bg-blue-50/50 p-1 rounded">
                                 <span>Down Payment Paid:</span>
                                 <span>-${{ formatMoney(form.downPayment) }}</span>
                             </div>
-                            <div class="flex justify-between text-lg font-bold text-red-600 border-t border-gray-200 pt-2">
-                                <span>Balance Due (Due {{ computedDueDate }}):</span>
+                            <div class="flex justify-between text-sm font-black text-red-600 border-t border-gray-200 pt-2">
+                                <span>Balance Due:</span>
                                 <span>${{ formatMoney(balanceDue) }}</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Monthly Service Fees Block -->
-                    <div class="mt-8 pt-4 border-t border-gray-300">
-                        <h4 class="font-bold text-gray-500 uppercase tracking-wider text-xs mb-3">Schedule of Recurring Monthly Service Fees:</h4>
-                        <table class="w-full text-left border border-gray-200 text-xs text-gray-600">
+                    <!-- Schedule of Recurring Fees -->
+                    <div class="mt-8 pt-4 border-t border-gray-200">
+                        <h4 class="font-bold text-gray-400 uppercase tracking-wider text-[9px] mb-2.5">Schedule of Recurring Monthly Service Fees:</h4>
+                        <table class="w-full text-left border border-gray-200 text-[11px] text-gray-600">
                             <thead>
-                                <tr class="bg-gray-50 border-b border-gray-200 font-bold text-gray-700">
+                                <tr class="bg-slate-50 border-b border-gray-200 font-bold text-slate-800 text-[10px]">
                                     <th class="p-2">Services</th>
                                     <th class="p-2">Service Fee</th>
                                     <th class="p-2">Billing Note</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr class="border-b border-gray-200">
-                                    <td class="p-2 font-medium text-gray-900">SAAS Service</td>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr>
+                                    <td class="p-2 font-medium text-slate-900">SAAS Service</td>
                                     <td class="p-2">$15 / month</td>
                                     <td class="p-2">Payment starts from the device activation day</td>
                                 </tr>
-                                <tr class="border-b border-gray-200">
-                                    <td class="p-2 font-medium text-gray-900">Data Card</td>
+                                <tr>
+                                    <td class="p-2 font-medium text-slate-900">Data Card</td>
                                     <td class="p-2">$15 / month</td>
                                     <td class="p-2">Payment starts from the device activation day</td>
                                 </tr>
-                                <tr class="border-b border-gray-200">
-                                    <td class="p-2 font-medium text-gray-900">AI Visual Recognition</td>
+                                <tr>
+                                    <td class="p-2 font-medium text-slate-900">AI Visual Recognition</td>
                                     <td class="p-2">$0.05 / transaction</td>
                                     <td class="p-2">Payment starts from the device activation day</td>
                                 </tr>
-                                <tr class="border-b border-gray-200">
-                                    <td class="p-2 font-medium text-gray-900">POS Rental Fee</td>
+                                <tr>
+                                    <td class="p-2 font-medium text-slate-900">POS Rental Fee</td>
                                     <td class="p-2">$10 / month</td>
                                     <td class="p-2">Payment starts from the device activation day</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2 font-medium text-gray-900">Payment Service Fee</td>
+                                    <td class="p-2 font-medium text-slate-900">Payment Service Fee</td>
                                     <td class="p-2">5.95% of sales revenue</td>
                                     <td class="p-2">Payment starts from the device activation day</td>
                                 </tr>
@@ -280,26 +321,18 @@
                         </table>
                     </div>
 
-                    <!-- Terms & Conditions -->
-                    <div class="mt-8 pt-4 border-t border-gray-200 text-xs text-gray-400 space-y-4">
+                    <!-- Terms & Execution Footnote -->
+                    <div class="mt-8 pt-4 border-t border-gray-200 text-[10px] text-gray-400 space-y-3 leading-relaxed">
                         <div>
-                            <h5 class="font-bold text-gray-500 mb-1">Standard Declarations:</h5>
+                            <h5 class="font-bold text-gray-500 uppercase tracking-wide text-[9px] mb-0.5">Standard Declarations:</h5>
                             <p>1. Please sign and return this acknowledgment via email within 2 business days of receipt.</p>
-                            <p>2. Monthly Service Fees: The reseller acknowledges that the subscription fees listed in the service table above will be calculated separately and billed monthly starting exactly from the individual device's activation date.</p>
-                            <p>3. Balance Pay-off Timeline: The remaining balance due of <strong class="text-gray-700">${{ formatMoney(balanceDue) }}</strong> must be cleared on or prior to the computed maturity date (<strong class="text-red-600 font-semibold">{{ computedDueDate }}</strong>).</p>
-                        </div>
-                        
-                        <!-- Auto-filled Vendor/Rep Information -->
-                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-gray-600 space-y-1">
-                            <p class="font-semibold text-gray-700">Authorized Reseller Representative Info:</p>
-                            <p><span class="font-medium">Name:</span> {{ currentUser.name }}</p>
-                            <p><span class="font-medium">Email:</span> {{ currentUser.email }}</p>
-                            <p><span class="font-medium">Phone:</span> {{ currentUser.phone }}</p>
+                            <p>2. Monthly Service Fees: The reseller acknowledges that subscription rates listed above are calculated individual to each device deployment and automatically bill monthly on activation.</p>
+                            <p>3. Balance Pay-off Timeline: The remaining balance due of <strong class="text-gray-700">${{ formatMoney(balanceDue) }}</strong> must be explicitly cleared on or prior to the computed maturity date (<strong class="text-slate-900 font-bold">{{ computedDueDate }}</strong>).</p>
                         </div>
 
-                        <div class="flex justify-between pt-4">
-                            <div class="border-t border-gray-300 w-56 pt-2 text-center text-gray-500">Authorized Reseller Signature</div>
-                            <div class="border-t border-gray-300 w-40 pt-2 text-center text-gray-500">Date</div>
+                        <div class="flex justify-between pt-8">
+                            <div class="border-t border-slate-400 w-52 pt-1 text-center text-gray-400 font-medium">Authorized Reseller Signature</div>
+                            <div class="border-t border-slate-400 w-36 pt-1 text-center text-gray-400 font-medium">Date</div>
                         </div>
                     </div>
                 </div>
@@ -312,18 +345,17 @@
 
         createApp({
             setup() {
-                // Auth States
+                // Auth Architecture
                 const isLoggedIn = ref(false);
-                const currentUser = ref({ name: '', email: '', phone: '', resellerName: '' });
+                const currentUser = ref({ name: '', email: '', phone: '', boundResellers: [] });
                 
                 const authForm = ref({
                     name: '',
                     email: '',
                     phone: '',
-                    resellerName: ''
+                    boundResellers: [] // Dynamic array holding multiple selection options
                 });
 
-                // Unique PO logic
                 const generateUniquePONumber = () => {
                     const now = new Date();
                     const year = now.getFullYear();
@@ -344,7 +376,6 @@
                     "Century vending", "Aloha Smart Vending"
                 ];
 
-                // Standardized capital letter catalog keys
                 const productCatalog = {
                     "Mini360": 2400,
                     "Plus 440": 2600,
@@ -360,9 +391,9 @@
                 const form = ref({
                     poNumber: generateUniquePONumber(),
                     date: new Date().toISOString().substr(0, 10),
-                    resellerName: '',
+                    resellerName: '', // Left blank initially to allow selection from bound options
                     shippingMethod: 'Logistics Shipping',
-                    pickupWarehouseText: '', // Free string input box for custom warehouse
+                    pickupWarehouseText: '', 
                     shippingAddress: '',
                     netDays: 30,
                     downPayment: 0,
@@ -371,10 +402,10 @@
                     ]
                 });
 
-                // Compute exact maturity deadline date
+                // Standard full-matrix date math pipeline
                 const computedDueDate = computed(() => {
                     if (!form.value.date) return '------';
-                    const orderDate = new Date(form.value.date);
+                    const orderDate = new Date(form.value.date + 'T00:00:00'); // enforce local day alignment
                     const daysToAdd = parseInt(form.value.netDays) || 0;
                     orderDate.setDate(orderDate.getDate() + daysToAdd);
                     
@@ -384,27 +415,25 @@
                     return `${yyyy}-${mm}-${dd}`;
                 });
 
-                // Check LocalStorage session state
                 onMounted(() => {
-                    const savedUser = localStorage.getItem('haha_vending_user');
+                    const savedUser = localStorage.getItem('haha_vending_sales_rep');
                     if (savedUser) {
                         currentUser.value = JSON.parse(savedUser);
-                        form.value.resellerName = currentUser.value.resellerName;
                         isLoggedIn.value = true;
                     }
                 });
 
                 const handleRegister = () => {
-                    localStorage.setItem('haha_vending_user', JSON.stringify(authForm.value));
+                    localStorage.setItem('haha_vending_sales_rep', JSON.stringify(authForm.value));
                     currentUser.value = { ...authForm.value };
-                    form.value.resellerName = currentUser.value.resellerName;
                     isLoggedIn.value = true;
                 };
 
                 const handleLogout = () => {
-                    localStorage.removeItem('haha_vending_user');
+                    localStorage.removeItem('haha_vending_sales_rep');
                     isLoggedIn.value = false;
-                    authForm.value = { name: '', email: '', phone: '', resellerName: '' };
+                    authForm.value = { name: '', email: '', phone: '', boundResellers: [] };
+                    form.value.resellerName = '';
                 };
 
                 const onModelChange = (index) => {
@@ -437,28 +466,19 @@
                     return Number(val).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 };
 
-                // Secure & verified PDF wrapper generation 
+                // RE-ENGINEERED WEB PRINT STREAM GENERATION (100% RELIABLE)
                 const downloadPDF = () => {
-                    try {
-                        const element = document.getElementById('po-template');
-                        if (!element) {
-                            alert("Error: Preview element not found.");
-                            return;
-                        }
-                        
-                        const opt = {
-                            margin:       [0.4, 0.4, 0.4, 0.4],
-                            filename:     `${form.value.poNumber}_${form.value.resellerName || 'Order'}.pdf`,
-                            image:        { type: 'jpeg', quality: 0.98 },
-                            html2canvas:  { scale: 2, useCORS: true, logging: false },
-                            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-                        };
-                        
-                        html2pdf().set(opt).from(element).save();
-                    } catch (err) {
-                        console.error("PDF Download Failure Trace:", err);
-                        alert("Failed to compile PDF. Check the browser console log for detailed layout blocks.");
-                    }
+                    // Update layout page title seamlessly to act as target filename on browser print engines
+                    const standardTitle = document.title;
+                    const cleanReseller = form.value.resellerName ? form.value.resellerName.replace(/[^a-zA-Z0-9]/g, '_') : 'Order';
+                    
+                    document.title = `${form.value.poNumber}_${cleanReseller}`;
+                    
+                    // Trigger Native Print Pipeline
+                    window.print();
+                    
+                    // Reset tab title back to dashboard core state
+                    document.title = standardTitle;
                 };
 
                 return {
