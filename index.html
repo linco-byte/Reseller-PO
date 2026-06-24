@@ -13,12 +13,11 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         
-        /* STRICT PRINT CONSTRAINTS: FORCING SINGLE PAGE A4 */
+        /* STRICT PRINT CONSTRAINTS: FORCING DOUBLE PAGE A4 STREAM */
         @media print {
             html, body {
                 margin: 0 !important;
                 padding: 0 !important;
-                height: 100% !important;
                 background: #ffffff !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -33,21 +32,27 @@
                 display: none !important;
             }
             
-            /* Force preview sheet to container fit exactly onto 1 single A4 page */
-            #po-template {
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
+            /* Workspace wrapping adjustments for printing */
+            .main-workspace-grid {
+                display: block !important;
+            }
+
+            /* FORCE PAGE BREAK AFTER THE FIRST SHEET */
+            .print-page-1 {
+                page-break-after: always !important;
+                break-after: page !important;
+            }
+            
+            /* Precision fit for individual A4 standard frames */
+            .a4-print-sheet {
                 width: 210mm !important;
                 height: 297mm !important;
-                padding: 10mm 15mm !important; /* Precision balanced margins */
-                margin: 0 !important;
+                padding: 12mm 15mm !important; 
+                margin: 0 auto !important;
                 box-shadow: none !important;
                 border: none !important;
                 background: #ffffff !important;
                 color: #0f172a !important;
-                
-                /* Precision single-page scale crunch */
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: space-between !important;
@@ -59,7 +64,6 @@
                 color: #0f172a !important;
             }
             
-            /* Shrink table slightly during print to safeguard single-page layout */
             table {
                 font-size: 11px !important;
             }
@@ -128,12 +132,12 @@
                     <button @click="handleLogout" class="text-slate-400 hover:text-red-400 text-xs transition-colors">Switch Profile</button>
                     <button @click="downloadPDF" class="bg-sky-600 hover:bg-sky-500 text-white font-medium px-4 py-1.5 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                        Download PO (1-Page A4)
+                        Download PO (2-Pages A4)
                     </button>
                 </div>
             </header>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start main-workspace-grid">
                 <!-- Left Side: Configurator Controls -->
                 <div class="lg:col-span-5 space-y-5 no-print text-sm">
                     
@@ -253,168 +257,260 @@
                                 </div>
                                 <div class="text-right text-xs text-slate-400 pt-0.5">
                                     MSRP: <span class="font-mono text-slate-300">${{ formatMoney(item.price) }}</span>
-                                </div>
+                                }</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Side: High-End Corporate Print Template Sheet -->
-                <div class="lg:col-span-7 bg-white p-8 rounded-none shadow-2xl text-slate-900 border border-gray-200 print-text-dark" id="po-template">
+                <!-- Right Side: Printable Documents Frame -->
+                <div class="lg:col-span-7 space-y-8">
                     
-                    <!-- Top Corporate Head -->
-                    <div class="flex justify-between items-start border-b-2 border-slate-900 pb-3">
-                        <div>
-                            <!-- ENLARGED LOGO DESIGN INTEGRATION BOX -->
-                            <div class="mb-2 max-w-[260px] max-h-[90px] overflow-hidden flex items-center">
-                                <img src="logo.png" alt="Corporate Logo" onerror="this.style.display='none';" class="object-contain max-h-[85px] w-auto">
-                            </div>
-                            <h2 class="text-xl font-black tracking-tight text-slate-900">PURCHASE ORDER</h2>
-                            <p class="text-xs font-extrabold text-blue-950 mt-0.5">Haha Vending</p>
-                            <p class="text-[10px] text-gray-500 tracking-wide font-medium">1754 North Brown Rd suite 200, Lawrenceville, GA 30043</p>
-                        </div>
-                        <div class="text-right text-[11px] space-y-0.5 text-gray-600 pt-1">
-                            <p><strong class="text-slate-900 uppercase font-bold text-[9px] tracking-wider block">PO Identifier:</strong> <span class="font-mono text-xs font-bold text-slate-900">{{ form.poNumber }}</span></p>
-                            <p class="pt-0.5"><strong class="text-slate-900 font-semibold">Order Date:</strong> {{ form.date || '------' }}</p>
-                            <p><strong class="text-red-700 font-bold">Due Date:</strong> <span class="font-bold text-red-600 border-b border-red-200">{{ computedDueDate }}</span></p>
-                        </div>
-                    </div>
-
-                    <!-- STANDARDIZED BILLING TO & SHIPPING TO MATRIX -->
-                    <div class="grid grid-cols-2 gap-4 my-3 text-[11px]">
-                        <!-- BILLING TO COLUMN -->
-                        <div class="bg-slate-50 p-2.5 rounded border border-slate-150 flex flex-col justify-between">
-                            <div>
-                                <h4 class="font-bold text-blue-950 uppercase tracking-wider text-[9px] mb-1">Billing To:</h4>
-                                <p class="font-bold text-xs text-slate-900 mb-0.5">{{ form.resellerName || '[No Reseller Chosen]' }}</p>
-                                <p v-if="form.resellerContactName" class="text-slate-800 font-semibold">Attn: {{ form.resellerContactName }}</p>
-                            </div>
-                            <div class="text-gray-600 text-[10px] pt-1 space-y-0.5 border-t border-gray-100/70 mt-1">
-                                <p v-if="form.resellerEmail">Email: {{ form.resellerEmail }}</p>
-                                <p v-if="form.resellerPhone">Phone: {{ form.resellerPhone }}</p>
-                            </div>
-                        </div>
+                    <!-- ==================== PAGE 1: PURCHASE ORDER SHEET ==================== -->
+                    <div class="bg-white p-8 shadow-2xl text-slate-900 border border-gray-200 print-text-dark a4-print-sheet print-page-1">
                         
-                        <!-- SHIPPING TO / PICKUP FROM COLUMN -->
-                        <div class="bg-slate-50 p-2.5 rounded border border-slate-150 flex flex-col justify-between">
+                        <!-- Top Corporate Head -->
+                        <div class="flex justify-between items-start border-b-2 border-slate-900 pb-2">
                             <div>
-                                <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[9px] mb-1">
-                                    {{ form.shippingMethod === 'Self-pickup' ? 'Pickup From:' : 'Shipping To:' }}
-                                </h4>
-                                <div v-if="form.shippingMethod === 'Self-pickup'">
-                                    <p class="text-[10px] text-blue-900 font-bold uppercase mb-0.5">[Self-Pickup Center]</p>
-                                    <p class="text-gray-700 whitespace-pre-line leading-tight text-[10px]">{{ form.pickupWarehouseText || 'Pending address placement...' }}</p>
+                                <!-- ENLARGED LOGO DESIGN INTEGRATION BOX -->
+                                <div class="mb-2 max-w-[260px] max-h-[90px] overflow-hidden flex items-center">
+                                    <img src="logo.png" alt="Corporate Logo" onerror="this.style.display='none';" class="object-contain max-h-[85px] w-auto">
                                 </div>
-                                <div v-else>
-                                    <p v-if="form.shippingContactName" class="font-semibold text-slate-900 text-[11px] mb-0.5">Attn: {{ form.shippingContactName }}</p>
-                                    <p class="text-gray-700 whitespace-pre-line leading-tight text-[10px]">{{ form.shippingAddress || 'No client shipping endpoint provided.' }}</p>
-                                </div>
+                                <h2 class="text-xl font-black tracking-tight text-slate-900">PURCHASE ORDER</h2>
+                                <p class="text-xs font-extrabold text-blue-950 mt-0.5">Haha Vending</p>
+                                <p class="text-[10px] text-gray-500 tracking-wide font-medium">1754 North Brown Rd suite 200, Lawrenceville, GA 30043</p>
                             </div>
-                            <div v-if="form.shippingMethod === 'Logistics Shipping' && (form.shippingEmail || form.shippingPhone)" class="text-gray-600 text-[10px] pt-1 space-y-0.5 border-t border-gray-100/70 mt-1">
-                                <p v-if="form.shippingEmail">Email: {{ form.shippingEmail }}</p>
-                                <p v-if="form.shippingPhone">Phone: {{ form.shippingPhone }}</p>
+                            <div class="text-right text-[11px] space-y-0.5 text-gray-600 pt-1">
+                                <p><strong class="text-slate-900 uppercase font-bold text-[9px] tracking-wider block">PO Identifier:</strong> <span class="font-mono text-xs font-bold text-slate-900">{{ form.poNumber }}</span></p>
+                                <p class="pt-0.5"><strong class="text-slate-900 font-semibold">Order Date:</strong> {{ form.date || '------' }}</p>
+                                <p><strong class="text-red-700 font-bold">Due Date:</strong> <span class="font-bold text-red-600 border-b border-red-200">{{ computedDueDate }}</span></p>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Operational Terms Info Row -->
-                    <div class="text-[10px] text-gray-500 flex gap-6 border-b border-gray-100 pb-2 mb-2 font-medium">
-                        <p><span class="text-slate-800 font-semibold">Fulfillment Strategy:</span> {{ form.shippingMethod }}</p>
-                        <p><span class="text-slate-800 font-semibold">Payment Structure:</span> Net {{ form.netDays }} Days</p>
-                        <p class="text-red-600 font-semibold"><span class="text-slate-800 font-semibold">Maturity Date:</span> {{ computedDueDate }}</p>
-                    </div>
-
-                    <!-- Line Itemized Ledger Matrix -->
-                    <table class="w-full text-left border-collapse my-1 text-[11px]">
-                        <thead>
-                            <tr class="border-b-2 border-slate-900 text-gray-400 font-bold uppercase tracking-wider text-[9px]">
-                                <th class="py-1">Product Model / SKU Descriptor</th>
-                                <th class="py-1 text-center w-16">Qty</th>
-                                <th class="py-1 text-right w-24">Unit Price</th>
-                                <th class="py-1 text-right w-24">Total Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            <tr v-for="(item, index) in form.items" :key="index" class="text-gray-700">
-                                <td class="py-1.5 font-semibold text-slate-900">{{ item.modelKey || 'Awaiting Selection...' }}</td>
-                                <td class="py-1.5 text-center font-medium">{{ item.qty }}</td>
-                                <td class="py-1.5 text-right text-gray-600">${{ formatMoney(item.price) }}</td>
-                                <td class="py-1.5 text-right font-bold text-slate-900">${{ formatMoney(item.qty * item.price) }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <!-- Balanced Fiscal Aggregations -->
-                    <div class="flex justify-end text-[11px] pt-0.5">
-                        <div class="w-56 space-y-0.5 border-t-2 border-slate-900 pt-1.5">
-                            <div class="flex justify-between text-gray-500 font-medium">
-                                <span>Sales Subtotal:</span>
-                                <span class="font-semibold text-slate-900">${{ formatMoney(subTotal) }}</span>
+                        <!-- STANDARDIZED BILLING TO & SHIPPING TO MATRIX -->
+                        <div class="grid grid-cols-2 gap-4 my-2 text-[11px]">
+                            <!-- BILLING TO COLUMN -->
+                            <div class="bg-slate-50 p-2.5 rounded border border-slate-150 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="font-bold text-blue-950 uppercase tracking-wider text-[9px] mb-1">Billing To:</h4>
+                                    <p class="font-bold text-xs text-slate-900 mb-0.5">{{ form.resellerName || '[No Reseller Chosen]' }}</p>
+                                    <p v-if="form.resellerContactName" class="text-slate-800 font-semibold">Attn: {{ form.resellerContactName }}</p>
+                                </div>
+                                <div class="text-gray-600 text-[10px] pt-1 space-y-0.5 border-t border-gray-100/70 mt-1">
+                                    <p v-if="form.resellerEmail">Email: {{ form.resellerEmail }}</p>
+                                    <p v-if="form.resellerPhone">Phone: {{ form.resellerPhone }}</p>
+                                </div>
                             </div>
-                            <div class="flex justify-between text-blue-800 font-semibold bg-blue-50/50 px-1 py-0.5 rounded">
-                                <span>Down Payment Paid:</span>
-                                <span>-${{ formatMoney(form.downPayment) }}</span>
-                            </div>
-                            <div class="flex justify-between text-xs font-black text-red-600 border-t border-gray-200 pt-0.5">
-                                <span>Balance Due:</span>
-                                <span>${{ formatMoney(balanceDue) }}</span>
+                            
+                            <!-- SHIPPING TO / PICKUP FROM COLUMN -->
+                            <div class="bg-slate-50 p-2.5 rounded border border-slate-150 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[9px] mb-1">
+                                        {{ form.shippingMethod === 'Self-pickup' ? 'Pickup From:' : 'Shipping To:' }}
+                                    </h4>
+                                    <div v-if="form.shippingMethod === 'Self-pickup'">
+                                        <p class="text-[10px] text-blue-900 font-bold uppercase mb-0.5">[Self-Pickup Center]</p>
+                                        <p class="text-gray-700 whitespace-pre-line leading-tight text-[10px]">{{ form.pickupWarehouseText || 'Pending address placement...' }}</p>
+                                    </div>
+                                    <div v-else>
+                                        <p v-if="form.shippingContactName" class="font-semibold text-slate-900 text-[11px] mb-0.5">Attn: {{ form.shippingContactName }}</p>
+                                        <p class="text-gray-700 whitespace-pre-line leading-tight text-[10px]">{{ form.shippingAddress || 'No client shipping endpoint provided.' }}</p>
+                                    </div>
+                                </div>
+                                <div v-if="form.shippingMethod === 'Logistics Shipping' && (form.shippingEmail || form.shippingPhone)" class="text-gray-600 text-[10px] pt-1 space-y-0.5 border-t border-gray-100/70 mt-1">
+                                    <p v-if="form.shippingEmail">Email: {{ form.shippingEmail }}</p>
+                                    <p v-if="form.shippingPhone">Phone: {{ form.shippingPhone }}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Schedule of Recurring Fees -->
-                    <div class="mt-2 pt-1.5 border-t border-gray-200">
-                        <h4 class="font-bold text-gray-400 uppercase tracking-wider text-[8px] mb-0.5">Schedule of Recurring Monthly Service Fees:</h4>
-                        <table class="w-full text-left border border-gray-100 text-[9px] text-gray-500">
+                        <!-- Operational Terms Info Row -->
+                        <div class="text-[10px] text-gray-500 flex gap-6 border-b border-gray-100 pb-1.5 mb-1.5 font-medium">
+                            <p><span class="text-slate-800 font-semibold">Fulfillment Strategy:</span> {{ form.shippingMethod }}</p>
+                            <p><span class="text-slate-800 font-semibold">Payment Structure:</span> Net {{ form.netDays }} Days</p>
+                            <p class="text-red-600 font-semibold"><span class="text-slate-800 font-semibold">Maturity Date:</span> {{ computedDueDate }}</p>
+                        </div>
+
+                        <!-- Line Itemized Ledger Matrix -->
+                        <table class="w-full text-left border-collapse my-1 text-[11px]">
                             <thead>
-                                <tr class="bg-slate-50 border-b border-gray-100 font-bold text-slate-800 text-[8px]">
-                                    <th class="p-1 pl-2">Services</th>
-                                    <th class="p-1">Service Fee</th>
-                                    <th class="p-1 pr-2">Billing Note</th>
+                                <tr class="border-b-2 border-slate-900 text-gray-400 font-bold uppercase tracking-wider text-[9px]">
+                                    <th class="py-1">Product Model / SKU Descriptor</th>
+                                    <th class="py-1 text-center w-16">Qty</th>
+                                    <th class="py-1 text-right w-24">Unit Price</th>
+                                    <th class="py-1 text-right w-24">Total Amount</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                <tr>
-                                    <td class="p-1 pl-2 font-medium text-slate-900">SAAS Service</td>
-                                    <td class="p-1">$15 / month</td>
-                                    <td class="p-1 pr-2">Payment starts from device activation day</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-1 pl-2 font-medium text-slate-900">Data Card</td>
-                                    <td class="p-1">$15 / month</td>
-                                    <td class="p-1 pr-2">Payment starts from device activation day</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-1 pl-2 font-medium text-slate-900">AI Visual Recognition</td>
-                                    <td class="p-1">$0.05 / tx</td>
-                                    <td class="p-1 pr-2">Payment starts from device activation day</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-1 pl-2 font-medium text-slate-900">POS Rental Fee</td>
-                                    <td class="p-1">$10 / month</td>
-                                    <td class="p-1 pr-2">Payment starts from device activation day</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-1 pl-2 font-medium text-slate-900">Payment Service Fee</td>
-                                    <td class="p-1 text-[8px]">5.95% of rev</td>
-                                    <td class="p-1 pr-2">Payment starts from device activation day</td>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr v-for="(item, index) in form.items" :key="index" class="text-gray-700">
+                                    <td class="py-1.5 font-semibold text-slate-900">{{ item.modelKey || 'Awaiting Selection...' }}</td>
+                                    <td class="py-1.5 text-center font-medium">{{ item.qty }}</td>
+                                    <td class="py-1.5 text-right text-gray-600">${{ formatMoney(item.price) }}</td>
+                                    <td class="py-1.5 text-right font-bold text-slate-900">${{ formatMoney(item.qty * item.price) }}</td>
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
 
-                    <!-- Terms & Execution Footnote -->
-                    <div class="mt-2 pt-1.5 border-t border-gray-200 text-[9px] text-gray-400 space-y-1 leading-tight">
-                        <div>
+                        <!-- Balanced Fiscal Aggregations -->
+                        <div class="flex justify-end text-[11px] pt-0.5">
+                            <div class="w-56 space-y-0.5 border-t-2 border-slate-900 pt-1.5">
+                                <div class="flex justify-between text-gray-500 font-medium">
+                                    <span>Sales Subtotal:</span>
+                                    <span class="font-semibold text-slate-900">${{ formatMoney(subTotal) }}</span>
+                                </div>
+                                <div class="flex justify-between text-blue-800 font-semibold bg-blue-50/50 px-1 py-0.5 rounded">
+                                    <span>Down Payment Paid:</span>
+                                    <span>-${{ formatMoney(form.downPayment) }}</span>
+                                </div>
+                                <div class="flex justify-between text-xs font-black text-red-600 border-t border-gray-200 pt-0.5">
+                                    <span>Balance Due:</span>
+                                    <span>${{ formatMoney(balanceDue) }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Schedule of Recurring Fees -->
+                        <div class="mt-2 pt-1 border-t border-gray-200">
+                            <h4 class="font-bold text-gray-400 uppercase tracking-wider text-[8px] mb-0.5">Schedule of Recurring Monthly Service Fees:</h4>
+                            <table class="w-full text-left border border-gray-100 text-[9px] text-gray-500">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-gray-100 font-bold text-slate-800 text-[8px]">
+                                        <th class="p-1 pl-2">Services</th>
+                                        <th class="p-1">Service Fee</th>
+                                        <th class="p-1 pr-2">Billing Note</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50">
+                                    <tr>
+                                        <td class="p-1 pl-2 font-medium text-slate-900">SAAS Service</td>
+                                        <td class="p-1">$15 / month</td>
+                                        <td class="p-1 pr-2">Payment starts from device activation day</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-1 pl-2 font-medium text-slate-900">Data Card</td>
+                                        <td class="p-1">$15 / month</td>
+                                        <td class="p-1 pr-2">Payment starts from device activation day</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-1 pl-2 font-medium text-slate-900">AI Visual Recognition</td>
+                                        <td class="p-1">$0.05 / tx</td>
+                                        <td class="p-1 pr-2">Payment starts from device activation day</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-1 pl-2 font-medium text-slate-900">POS Rental Fee</td>
+                                        <td class="p-1">$10 / month</td>
+                                        <td class="p-1 pr-2">Payment starts from device activation day</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-1 pl-2 font-medium text-slate-900">Payment Service Fee</td>
+                                        <td class="p-1 text-[8px]">5.95% of rev</td>
+                                        <td class="p-1 pr-2">Payment starts from device activation day</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Terms & Execution Footnote -->
+                        <div class="mt-1.5 pt-1 border-t border-gray-200 text-[9px] text-gray-400 space-y-1 leading-tight">
                             <p>1. Please sign and return this acknowledgment via email within 2 business days of receipt.</p>
-                            <p>2. Balance Pay-off Timeline: The remaining balance due of <strong class="text-gray-700">${{ formatMoney(balanceDue) }}</strong> must be cleared prior to the computed maturity date (<strong class="text-slate-900 font-bold">{{ computedDueDate }}</strong>).</p>
-                        </div>
+                            <p>2. Balance Pay-off: The balance of <strong class="text-gray-700">${{ formatMoney(balanceDue) }}</strong> must be cleared prior to the maturity date (<strong class="text-slate-900 font-bold">{{ computedDueDate }}</strong>). Bank details are attached on Page 2.</p>
 
-                        <div class="flex justify-between pt-3">
-                            <div class="border-t border-slate-300 w-44 pt-0.5 text-center text-gray-400 text-[8px]">Authorized Reseller Signature</div>
-                            <div class="border-t border-slate-300 w-28 pt-0.5 text-center text-gray-400 text-[8px]">Date</div>
+                            <div class="flex justify-between pt-2.5">
+                                <div class="border-t border-slate-300 w-44 pt-0.5 text-center text-gray-400 text-[8px]">Authorized Reseller Signature</div>
+                                <div class="border-t border-slate-300 w-28 pt-0.5 text-center text-gray-400 text-[8px]">Date</div>
+                            </div>
                         </div>
                     </div>
+
+
+                    <!-- ==================== PAGE 2: HAHA BANK INFORMATION ==================== -->
+                    <div class="bg-white p-8 shadow-2xl text-slate-900 border border-gray-200 print-text-dark a4-print-sheet">
+                        <div>
+                            <!-- Header Info -->
+                            <div class="flex justify-between items-center border-b-2 border-slate-900 pb-3 mb-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="logo.png" alt="Corporate Logo" onerror="this.style.display='none';" class="object-contain max-h-[50px] w-auto">
+                                    <div>
+                                        <h2 class="text-md font-black tracking-wider text-slate-900 uppercase">Haha Vending</h2>
+                                        <p class="text-[9px] text-gray-400 font-mono">Attachment to {{ form.poNumber }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs font-bold bg-slate-900 text-white px-2.5 py-1 rounded tracking-widest uppercase text-[9px]">Page 2 / 2</span>
+                                </div>
+                            </div>
+
+                            <h3 class="text-base font-black text-blue-950 mb-4 border-b border-gray-200 pb-1 tracking-tight flex items-center gap-1.5">
+                                🏢 Company's Bank & Wire Remittance Information
+                            </h3>
+
+                            <!-- SECTION 1: ZELLE CHANNEL -->
+                            <div class="mb-5 bg-slate-50 border border-slate-200 rounded-lg p-4">
+                                <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2 mb-2.5 text-purple-800">
+                                    ⚡ 1. Zelle Fast Transfer Channels
+                                </h4>
+                                <div class="grid grid-cols-2 gap-4 text-xs">
+                                    <div class="p-2.5 bg-white rounded border border-gray-200/60 shadow-sm">
+                                        <p class="text-[10px] text-gray-400 uppercase font-bold">Channel A (Via Mobile)</p>
+                                        <p class="font-bold text-slate-900 mt-1 text-sm">Tel: 213-781-4659</p>
+                                        <p class="text-gray-600 font-medium text-[11px] mt-0.5">Beneficiary: <span class="text-slate-900 font-semibold">HAHASMART INNOVATION INC</span></p>
+                                    </div>
+                                    <div class="p-2.5 bg-white rounded border border-gray-200/60 shadow-sm">
+                                        <p class="text-[10px] text-gray-400 uppercase font-bold">Channel B (Via Email)</p>
+                                        <p class="font-bold text-slate-900 mt-1 text-sm">Email: faray@hahabianli.com</p>
+                                        <p class="text-gray-600 font-medium text-[11px] mt-0.5">Beneficiary: <span class="text-slate-900 font-semibold">HAHA INNOVATION INC</span></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECTION 2: BANK WIRE MTRX -->
+                            <div class="space-y-4">
+                                <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider text-blue-900">
+                                    🏦 2. Corporate Bank Account Registry (Domestic & International Wires)
+                                </h4>
+
+                                <!-- (1) Bank of America -->
+                                <div class="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                                    <div class="bg-red-50 border-b border-gray-200 px-3 py-1.5 font-bold text-red-900 text-xs flex justify-between">
+                                        <span>(1) Bank of America, NA</span>
+                                        <span class="text-[10px] text-red-700/80 uppercase tracking-wider font-mono">Primary Settlement</span>
+                                    </div>
+                                    <div class="p-3 text-[11px] grid grid-cols-2 gap-x-4 gap-y-1.5 bg-white text-gray-700">
+                                        <p class="col-span-2"><strong class="text-slate-900">Beneficiary Name:</strong> HAHASMART INNOVATION INC</p>
+                                        <p><strong class="text-slate-900">Beneficiary Account Number:</strong> <span class="font-mono font-bold text-slate-900 bg-slate-50 px-1 py-0.5 rounded border border-gray-100">325217415040</span> <span class="text-red-600 font-bold text-[9px] uppercase">[Mandatory]</span></p>
+                                        <p><strong class="text-slate-900">Bank Routing Number (Domestic):</strong> <span class="font-mono font-medium text-slate-900">026009593</span></p>
+                                        <p class="col-span-2"><strong class="text-slate-900">Swift Code (International):</strong> <span class="font-mono font-medium text-slate-900">BOFAUS3N</span></p>
+                                        <p class="col-span-2"><strong class="text-slate-900">Bank Corporate Address:</strong> Bank of America, NA, 222 Broadway, New York, New York 10038</p>
+                                    </div>
+                                </div>
+
+                                <!-- (2) Chase Bank -->
+                                <div class="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                                    <div class="bg-blue-50 border-b border-gray-200 px-3 py-1.5 font-bold text-blue-900 text-xs flex justify-between">
+                                        <span>(2) Chase Bank (JPMorgan Chase)</span>
+                                        <span class="text-[10px] text-blue-700/80 uppercase tracking-wider font-mono">Secondary Settlement</span>
+                                    </div>
+                                    <div class="p-3 text-[11px] grid grid-cols-2 gap-x-4 gap-y-1.5 bg-white text-gray-700">
+                                        <p class="col-span-2"><strong class="text-slate-900">Beneficiary Name:</strong> HAHASMART INNOVATION INC</p>
+                                        <p><strong class="text-slate-900">Beneficiary Account Number:</strong> <span class="font-mono font-bold text-slate-900 bg-slate-50 px-1 py-0.5 rounded border border-gray-100">2908910509</span> <span class="text-red-600 font-bold text-[9px] uppercase">[Mandatory]</span></p>
+                                        <p><strong class="text-slate-900">Bank Routing Number (Domestic):</strong> <span class="font-mono font-medium text-slate-900">061092387</span></p>
+                                        <p class="col-span-2"><strong class="text-slate-900">Swift Code (International):</strong> <span class="font-mono font-medium text-slate-900">CHASUS33</span></p>
+                                        <p class="col-span-2"><strong class="text-slate-900">Bank Corporate Address:</strong> 270 Park Avenue, New York, NY 10017, USA</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Protective Footnote & Signoff for compliance -->
+                        <div class="border-t border-gray-200 pt-3 text-[9px] text-gray-400 space-y-1.5 mt-4">
+                            <p class="italic">Notice: Please ensure all routing codes and account numbers match precisely before firing transfers to prevent institutional transaction rejections.</p>
+                            <div class="flex justify-between pt-6">
+                                <div class="border-t border-slate-300 w-44 pt-0.5 text-center text-[8px]">Finance Department Verification</div>
+                                <div class="border-t border-slate-300 w-28 pt-0.5 text-center text-[8px]">Execution Date</div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -514,14 +610,13 @@
                     return `PO-${year}${month}${day}-${timeStr}-${randomHex}`;
                 };
 
-                // FIXED: 100% TIMEZONE-SAFE UTC DUE DATE ENGINE (0-DAY LOCK MECHANISM)
                 const computedDueDate = computed(() => {
                     if (!form.value.date) return '------';
                     const parts = form.value.date.split('-');
                     if (parts.length !== 3) return '------';
                     
                     const addedDays = parseInt(form.value.netDays, 10) || 0;
-                    if (addedDays === 0) return form.value.date; // Tight lock to same day
+                    if (addedDays === 0) return form.value.date;
                     
                     const year = parseInt(parts[0], 10);
                     const month = parseInt(parts[1], 10) - 1; 
@@ -554,7 +649,6 @@
                     if (storedLogs) auditLogs.value = JSON.parse(storedLogs);
                 });
 
-                // MEMORY STORAGE STRATEGY: RETAINS COMPREHENSIVE ADDRESSES & CONTACT INFO
                 const loadResellerMemory = () => {
                     if (!form.value.resellerName) return;
                     const memoryKey = `reseller_mem_v3_${form.value.resellerName.replace(/\s+/g, '_')}`;
@@ -627,7 +721,6 @@
                     form.value.resellerName = '';
                 };
 
-                // CROSS-DEVICE DATA EXCHANGE: TEXT FILE SYNC UTILITIES
                 const exportGlobalLogs = () => {
                     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(auditLogs.value));
                     const downloadAnchor = document.createElement('a');
@@ -646,7 +739,6 @@
                         if (Array.isArray(imported)) {
                             let currentPool = JSON.parse(localStorage.getItem('haha_vending_global_audit_pool') || '[]');
                             
-                            // Deduplicate algorithm based on rep identifier + timestamp signature
                             const existingKeys = new Set(currentPool.map(l => `${l.name}_${l.timestamp}`));
                             imported.forEach(log => {
                                 if (!existingKeys.has(`${log.name}_${log.timestamp}`)) {
@@ -654,7 +746,6 @@
                                 }
                             });
                             
-                            // Re-sort by time linear flow
                             currentPool.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                             
                             localStorage.setItem('haha_vending_global_audit_pool', JSON.stringify(currentPool));
