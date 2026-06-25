@@ -262,7 +262,7 @@
                     <!-- 4. DISCOUNT CONFIGURATOR MATRIX -->
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-600 flex items-center gap-1.5">🏷️ 4. Discount Matrix (折扣配置)</h3>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-600 flex items-center gap-1.5">🏷️ 4. Discount Matrix</h3>
                             <button @click="addDiscount" class="text-[11px] bg-purple-50 border border-purple-200 text-purple-600 font-bold px-2.5 py-1 rounded-md hover:bg-purple-100 transition-all cursor-pointer shadow-sm">+ Add New Discount</button>
                         </div>
                         
@@ -275,19 +275,28 @@
                             
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Target Scope (折抵范围)</label>
+                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Target Scope</label>
                                     <select v-model="discount.scope" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
-                                        <option value="unit">Per Item Price (每个商品减)</option>
-                                        <option value="total">Total Order Amount (总价统一减)</option>
+                                        <option value="unit">Per Item Discount</option>
+                                        <option value="total">Total Order Discount</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Calculation Method (计算方式)</label>
+                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Calculation Method</label>
                                     <select v-model="discount.type" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
-                                        <option value="amount">Fixed Amount 固定金额 ($)</option>
-                                        <option value="percent">Percentage 百分比 (%)</option>
+                                        <option value="amount">Fixed Amount ($)</option>
+                                        <option value="percent">Percentage (%)</option>
                                     </select>
                                 </div>
+                            </div>
+
+                            <!-- Model Association dropdown (Only visible if scope is unit-level) -->
+                            <div v-if="discount.scope === 'unit'">
+                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Apply To Hardware Model *</label>
+                                <select v-model="discount.targetModel" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-medium">
+                                    <option value="">-- Choose target product model --</option>
+                                    <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }}</option>
+                                </select>
                             </div>
 
                             <div class="grid grid-cols-3 gap-2 items-end">
@@ -298,7 +307,7 @@
                                     <input type="number" v-model.number="discount.value" min="0" step="0.01" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold text-slate-800">
                                 </div>
                                 <div class="col-span-2">
-                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Reason / Motivation (备注事由) *</label>
+                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Reason / Motivation *</label>
                                     <input type="text" v-model="discount.reason" placeholder="e.g. Bulk promotion discount" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
                                 </div>
                             </div>
@@ -374,7 +383,7 @@
                             <p class="text-red-600 font-semibold"><span class="text-slate-800 font-semibold">Payment Due Date:</span> {{ computedDueDate }}</p>
                         </div>
 
-                        <!-- Line Itemized Ledger Matrix -->
+                        <!-- Line Itemized Ledger Matrix (Unit Price always shows original unmodified MSRP) -->
                         <table class="w-full text-left border-collapse my-1 text-[11px]">
                             <thead>
                                 <tr class="border-b-2 border-slate-900 text-gray-400 font-bold uppercase tracking-wider text-[9px]">
@@ -385,18 +394,14 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
-                                <template v-for="(item, index) in computedItems" :key="index">
+                                <template v-for="(item, index) in form.items" :key="index">
                                     <tr class="text-gray-700">
                                         <td class="py-1.5 font-semibold text-slate-900">
                                             {{ item.modelKey || 'Awaiting Selection...' }}
-                                            <!-- Dynamic Unit Discount Motive Badging -->
-                                            <div v-if="item.hasUnitDiscount" class="text-[9px] text-purple-600 font-normal italic block">
-                                                * Price adjusted via unit discounts (MSRP: ${{ formatMoney(item.originalPrice) }})
-                                            </div>
                                         </td>
                                         <td class="py-1.5 text-center font-medium">{{ item.qty }}</td>
-                                        <td class="py-1.5 text-right text-gray-600">${{ formatMoney(item.finalPrice) }}</td>
-                                        <td class="py-1.5 text-right font-bold text-slate-900">${{ formatMoney(item.qty * item.finalPrice) }}</td>
+                                        <td class="py-1.5 text-right text-gray-600">${{ formatMoney(item.price) }}</td>
+                                        <td class="py-1.5 text-right font-bold text-slate-900">${{ formatMoney(item.qty * item.price) }}</td>
                                     </tr>
                                 </template>
                             </tbody>
@@ -404,23 +409,23 @@
 
                         <!-- Fiscal Aggregations -->
                         <div class="flex justify-end text-[11px] pt-0.5">
-                            <div class="w-64 space-y-0.5 border-t-2 border-slate-900 pt-1.5">
+                            <div class="w-72 space-y-0.5 border-t-2 border-slate-900 pt-1.5">
                                 <div class="flex justify-between text-gray-500 font-medium">
                                     <span>Sales Subtotal:</span>
-                                    <span class="font-semibold text-slate-900">${{ formatMoney(subTotal) }}</span>
+                                    <span class="font-semibold text-slate-900">${{ formatMoney(grossSubTotal) }}</span>
                                 </div>
                                 
-                                <!-- Dynamic Global / Total Order Deductions Render -->
-                                <div v-for="(disValue, disReason) in totalLevelDiscountsGrouped" :key="disReason" class="flex justify-between text-purple-700 bg-purple-50/40 px-1 py-0.5 text-[10px] rounded border border-purple-100/50">
-                                    <span class="italic font-medium text-left truncate max-w-[160px]">Discount: {{ disReason }}</span>
+                                <!-- Dynamic Breakdown of All Applied Discounts (Item-level & Total-level) -->
+                                <div v-for="(disValue, disReason) in itemizedDiscountsBreakdown" :key="disReason" class="flex justify-between text-purple-700 bg-purple-50/50 px-1.5 py-0.5 text-[10px] rounded border border-purple-100/50">
+                                    <span class="italic font-medium text-left truncate max-w-[190px]">{{ disReason }}</span>
                                     <span class="font-bold">-${{ formatMoney(disValue) }}</span>
                                 </div>
 
-                                <div class="flex justify-between text-blue-800 font-semibold bg-blue-50/50 px-1 py-0.5 rounded">
+                                <div class="flex justify-between text-blue-800 font-semibold bg-blue-50/50 px-1.5 py-0.5 rounded mt-1">
                                     <span>Down Payment Paid:</span>
                                     <span>-${{ formatMoney(form.downPayment) }}</span>
                                 </div>
-                                <div class="flex justify-between text-xs font-black text-red-600 border-t border-gray-200 pt-0.5">
+                                <div class="flex justify-between text-xs font-black text-red-600 border-t border-gray-200 pt-1">
                                     <span>Balance Due:</span>
                                     <span>${{ formatMoney(balanceDue) }}</span>
                                 </div>
@@ -473,10 +478,10 @@
                             <p>1. Please sign and return this acknowledgment via email within 2 business days of receipt.</p>
                             <p>2. Balance Pay-off: The balance of <strong class="text-gray-700">${{ formatMoney(balanceDue) }}</strong> must be cleared prior to the payment due date (<strong class="text-slate-900 font-bold">{{ computedDueDate }}</strong>). Bank details are attached on Page 2.</p>
 
-                            <!-- EXTRA LARGE SIGNATURE FIELD (手写留白区域已大幅加高) -->
+                            <!-- EXTRA LARGE SIGNATURE FIELD -->
                             <div class="flex justify-between pt-24">
-                                <div class="border-t-4 border-slate-950 w-80 pt-2 text-center font-black text-slate-900 text-xs tracking-wider">Authorized Reseller Signature (签字区域)</div>
-                                <div class="border-t-4 border-slate-950 w-44 pt-2 text-center font-black text-slate-900 text-xs tracking-wider">Date (日期)</div>
+                                <div class="border-t-4 border-slate-950 w-80 pt-2 text-center font-black text-slate-900 text-xs tracking-wider">Authorized Reseller Signature</div>
+                                <div class="border-t-4 border-slate-950 w-44 pt-2 text-center font-black text-slate-900 text-xs tracking-wider">Date</div>
                             </div>
                         </div>
                     </div>
@@ -531,7 +536,7 @@
                                 <!-- (1) Bank of America -->
                                 <div class="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                                     <div class="bg-red-50 border-b border-gray-200 px-3 py-1.5 font-bold text-red-900 text-xs flex justify-between">
-                                        <span>(1) Bank of America, NA</span>
+                                        <span>(1) Bank of America</span>
                                         <span class="text-[10px] text-red-700/80 uppercase tracking-wider font-mono">Primary Settlement</span>
                                     </div>
                                     <div class="p-3 text-[11px] grid grid-cols-2 gap-x-4 gap-y-1.5 bg-white text-gray-700">
@@ -539,7 +544,7 @@
                                         <p><strong class="text-slate-900">Beneficiary Account Number:</strong> <span class="font-mono font-bold text-slate-900 bg-slate-50 px-1 py-0.5 rounded border border-gray-100">325217415040</span> <span class="text-red-600 font-bold text-[9px] uppercase">[Mandatory]</span></p>
                                         <p><strong class="text-slate-900">Bank Routing Number (Domestic):</strong> <span class="font-mono font-medium text-slate-900">026009593</span></p>
                                         <p class="col-span-2"><strong class="text-slate-900">Swift Code (International):</strong> <span class="font-mono font-medium text-slate-900">BOFAUS3N</span></p>
-                                        <p class="col-span-2"><strong class="text-slate-900">Bank Corporate Address:</strong> Bank of America, NA, 222 Broadway, New York, New York 10038</p>
+                                        <p class="col-span-2"><strong class="text-slate-900">Bank Corporate Address:</strong> Bank of America, 222 Broadway, New York, New York 10038</p>
                                     </div>
                                 </div>
 
@@ -560,7 +565,7 @@
                             </div>
                         </div>
 
-                        <!-- Footnote Cleaned Signoff (没有任何 verification 和 execution date 字段) -->
+                        <!-- Footnote Cleaned Signoff -->
                         <div class="border-t border-gray-200 pt-3 text-[9px] text-gray-400 space-y-1.5 mt-4">
                             <p class="italic">Notice: Please ensure all routing codes and account numbers match precisely before firing transfers to prevent institutional transaction rejections.</p>
                         </div>
@@ -588,7 +593,7 @@
                     </div>
 
                     <p class="text-[11px] text-slate-500 leading-relaxed bg-slate-50 p-2.5 rounded border border-slate-200">
-                        🔔 <strong>云端同步：</strong> 点击 <strong>Download All Logs</strong> 即可下载汇聚了所有团队成员的完整查阅记录文件。
+                        🔔 <strong>Cloud Storage Sync:</strong> Click <strong>Download All Logs</strong> to download the complete view log history archive compiled from all operations.
                     </p>
                     
                     <div class="max-h-52 overflow-y-auto space-y-2 pr-1 border border-slate-100 rounded-lg p-2 bg-slate-50/40">
@@ -660,7 +665,7 @@
                     netDays: 30,
                     downPayment: 0,
                     items: [{ modelKey: '', qty: 1, price: 0.00 }],
-                    discounts: [] // Holds active multi-level input discounts
+                    discounts: [] 
                 });
 
                 const generateUniquePONumber = () => {
@@ -690,74 +695,79 @@
                     return dateInstance.toISOString().substr(0, 10);
                 });
 
-                // Compute item rules stacking Unit Level Discounts directly onto items
-                const computedItems = computed(() => {
-                    const unitDiscounts = form.value.discounts.filter(d => d.scope === 'unit' && (d.value || 0) > 0);
-                    
-                    return form.value.items.map(item => {
-                        let originalPrice = item.price || 0;
-                        let finalPrice = originalPrice;
-                        let hasUnitDiscount = false;
+                // Standard Gross Subtotal calculation (Always calculated using unmodified original MSRP prices)
+                const grossSubTotal = computed(() => {
+                    return form.value.items.reduce((sum, item) => sum + (item.qty * (item.price || 0)), 0);
+                });
 
-                        unitDiscounts.forEach(d => {
-                            hasUnitDiscount = true;
-                            if (d.type === 'amount') {
-                                finalPrice -= d.value;
-                            } else if (d.type === 'percent') {
-                                finalPrice -= originalPrice * (d.value / 100);
+                // Pure Calculation & Presentation Logic: Maps all item-level & global discounts straight into the final list
+                const itemizedDiscountsBreakdown = computed(() => {
+                    const breakdowns = {};
+
+                    form.value.discounts.forEach(d => {
+                        const baseVal = d.value || 0;
+                        if (baseVal <= 0) return;
+
+                        // Case A: Product Model Associated Unit Discount
+                        if (d.scope === 'unit' && d.targetModel) {
+                            // Find total matching quantities across the items array
+                            const targetItems = form.value.items.filter(i => i.modelKey === d.targetModel);
+                            const totalQty = targetItems.reduce((s, i) => s + (i.qty || 0), 0);
+                            
+                            if (totalQty > 0) {
+                                let calculatedDeduction = 0;
+                                let itemPrice = productCatalog[d.targetModel] || 0;
+
+                                if (d.type === 'amount') {
+                                    calculatedDeduction = baseVal * totalQty;
+                                } else if (d.type === 'percent') {
+                                    calculatedDeduction = (itemPrice * (baseVal / 100)) * totalQty;
+                                }
+
+                                const descriptiveTitle = d.reason 
+                                    ? `Discount (${d.targetModel}): ${d.reason}`
+                                    : `Discount: Unit item markdown for ${d.targetModel}`;
+                                
+                                breakdowns[descriptiveTitle] = (breakdowns[descriptiveTitle] || 0) + calculatedDeduction;
                             }
-                        });
+                        } 
+                        // Case B: General Order Level Total Discount
+                        else if (d.scope === 'total') {
+                            let calculatedDeduction = 0;
+                            if (d.type === 'amount') {
+                                calculatedDeduction = baseVal;
+                            } else if (d.type === 'percent') {
+                                calculatedDeduction = grossSubTotal.value * (baseVal / 100);
+                            }
 
-                        if (finalPrice < 0) finalPrice = 0;
+                            const descriptiveTitle = d.reason 
+                                    ? `Discount (Total Order): ${d.reason}`
+                                    : `Discount: Global order volume markdown`;
 
-                        return {
-                            ...item,
-                            originalPrice,
-                            finalPrice,
-                            hasUnitDiscount
-                        };
-                    });
-                });
-
-                // Subtotal calculation computed from item pool
-                const subTotal = computed(() => {
-                    return computedItems.value.reduce((sum, item) => sum + (item.qty * item.finalPrice || 0), 0);
-                });
-
-                // Compute and group Global Total Level deductions
-                const totalLevelDiscountsGrouped = computed(() => {
-                    const totalDiscounts = form.value.discounts.filter(d => d.scope === 'total' && (d.value || 0) > 0);
-                    const groups = {};
-                    const baseSub = subTotal.value;
-
-                    totalDiscounts.forEach(d => {
-                        let val = 0;
-                        if (d.type === 'amount') {
-                            val = d.value;
-                        } else if (d.type === 'percent') {
-                            val = baseSub * (d.value / 100);
+                            breakdowns[descriptiveTitle] = (breakdowns[descriptiveTitle] || 0) + calculatedDeduction;
                         }
-                        const reasonText = d.reason || "General Promotion";
-                        groups[reasonText] = (groups[reasonText] || 0) + val;
                     });
 
-                    return groups;
+                    return breakdowns;
                 });
 
+                // Aggregate sum total of all calculated line itemized discount blocks
                 const totalDiscountsSum = computed(() => {
-                    return Object.values(totalLevelDiscountsGrouped.value).reduce((s, v) => s + v, 0);
+                    return Object.values(itemizedDiscountsBreakdown.value).reduce((s, v) => s + v, 0);
                 });
 
+                // Clean calculation stream determining final balance due
                 const balanceDue = computed(() => {
-                    const step1 = subTotal.value - totalDiscountsSum.value;
-                    const step2 = step1 - (form.value.downPayment || 0);
-                    return Math.max(0, step2);
+                    const discountedTotal = grossSubTotal.value - totalDiscountsSum.value;
+                    const finalWithDownpayment = discountedTotal - (form.value.downPayment || 0);
+                    return Math.max(0, finalWithDownpayment);
                 });
 
                 const addDiscount = () => {
                     form.value.discounts.push({
-                        scope: 'total', // default to total summary deduction
+                        scope: 'total', 
                         type: 'amount',
+                        targetModel: '',
                         value: 0,
                         reason: ''
                     });
@@ -923,7 +933,7 @@
 
                 return {
                     isLoggedIn, showAdminModal, currentUser, authForm, form, resellers, productCatalog,
-                    computedItems, subTotal, totalLevelDiscountsGrouped, balanceDue, computedDueDate, auditLogs, handleRegister, handleLogout,
+                    grossSubTotal, itemizedDiscountsBreakdown, balanceDue, computedDueDate, auditLogs, handleRegister, handleLogout,
                     promptAdminAccess, clearAuditLog, loadResellerMemory, saveResellerMemory,
                     exportGlobalLogs, fetchCloudLogs, addDiscount, removeDiscount,
                     onModelChange, addItem, removeItem, formatMoney, downloadPDF
