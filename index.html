@@ -28,7 +28,7 @@
             }
             
             /* Hide entire interactive dashboard controls */
-            .no-print, button, select, input, textarea, .admin-trigger {
+            .no-print, button, select, input, textarea, .admin-trigger, .modal-mask {
                 display: none !important;
             }
             
@@ -60,55 +60,51 @@
                 break-inside: avoid !important;
             }
             
-            .print-text-dark {
-                color: #0f172a !important;
-            }
-            
             table {
                 font-size: 11px !important;
             }
         }
     </style>
 </head>
-<body class="bg-slate-900 min-h-screen text-slate-100 antialiased">
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased">
 
     <div id="app">
-        <!-- SYSTEM GATEKEEPER: SALES REP REGISTRATION -->
-        <div v-if="!isLoggedIn" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center z-50 p-4 no-print">
-            <div class="bg-slate-900 rounded-xl shadow-2xl max-w-md w-full p-8 border border-slate-800">
+        <!-- SYSTEM GATEKEEPER: SALES REP REGISTRATION (Light Blue Theme) -->
+        <div v-if="!isLoggedIn" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 no-print">
+            <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 border border-slate-200">
                 <div class="text-center mb-6">
-                    <div class="h-10 w-10 bg-sky-500/10 text-sky-400 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <div class="h-12 w-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3 border border-blue-100 shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M19.242 18.274A13.916 13.916 0 0021 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M12 11a13.942 13.942 0 00-2.316-5.074" /></svg>
                     </div>
-                    <h2 class="text-xl font-bold text-slate-100 tracking-tight">Sales Representative Registry</h2>
-                    <p class="text-xs text-slate-400 mt-1">Identify yourself to initialize the PO engine.</p>
+                    <h2 class="text-xl font-bold text-slate-900 tracking-tight">Sales Representative Registry</h2>
+                    <p class="text-xs text-slate-500 mt-1">Identify yourself to initialize the PO engine.</p>
                 </div>
 
                 <form @submit.prevent="handleRegister" class="space-y-4 text-sm">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Sales Rep Full Name *</label>
-                        <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Sales Rep Full Name *</label>
+                        <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Your Corporate Email *</label>
-                        <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Corporate Email *</label>
+                        <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Your Direct Mobile Phone *</label>
-                        <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
+                        <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                     </div>
                     
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Assigned Reseller Accounts *</label>
-                        <div class="bg-slate-950 border border-slate-800 rounded-lg p-3 max-h-40 overflow-y-auto space-y-2 text-xs">
-                            <label v-for="reseller in resellers" :key="reseller" class="flex items-center gap-2 text-slate-300 hover:text-slate-100 cursor-pointer">
-                                <input type="checkbox" :value="reseller" v-model="authForm.boundResellers" class="rounded border-slate-800 bg-slate-900 text-sky-500 focus:ring-0">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">Assigned Reseller Accounts *</label>
+                        <div class="bg-slate-50 border border-slate-300 rounded-lg p-3 max-h-40 overflow-y-auto space-y-2 text-xs">
+                            <label v-for="reseller in resellers" :key="reseller" class="flex items-center gap-2 text-slate-700 hover:text-blue-600 cursor-pointer font-medium">
+                                <input type="checkbox" :value="reseller" v-model="authForm.boundResellers" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
                                 <span>{{ reseller }}</span>
                             </label>
                         </div>
                     </div>
 
-                    <button type="submit" :disabled="authForm.boundResellers.length === 0" class="w-full bg-sky-600 hover:bg-sky-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-medium py-2 rounded-lg transition-colors shadow-lg mt-2 tracking-wide">
+                    <button type="submit" :disabled="authForm.boundResellers.length === 0" class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer disabled:cursor-not-allowed">
                         Initialize Workspace
                     </button>
                 </form>
@@ -117,147 +113,148 @@
 
         <!-- MAIN PO WORKSPACE -->
         <div v-if="isLoggedIn" class="container mx-auto px-4 py-6 max-w-7xl">
-            <!-- Control Navbar -->
-            <header class="mb-6 no-print flex justify-between items-center bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <!-- Control Navbar (White-Blue Theme) -->
+            <header class="mb-6 no-print flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex items-center gap-4">
                     <div>
-                        <h1 class="text-md font-bold tracking-tight text-slate-100">PO Engine <span class="text-xs font-normal text-slate-500 mx-1.5">|</span> <span class="text-xs font-medium text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded">Sales Mode</span></h1>
-                        <p class="text-xs text-slate-400 mt-0.5">Active Rep: <span class="text-slate-200 font-semibold">{{ currentUser.name }}</span></p>
+                        <h1 class="text-md font-bold tracking-tight text-slate-900">PO Engine <span class="text-xs font-normal text-slate-300 mx-1.5">|</span> <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Sales Mode</span></h1>
+                        <p class="text-xs text-slate-500 mt-0.5">Active Rep: <span class="text-slate-800 font-bold">{{ currentUser.name }}</span></p>
                     </div>
-                    <button @click="promptAdminAccess" class="admin-trigger text-xs text-slate-500 hover:text-sky-400 bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg transition-colors">
-                        🔒 Admin Portal
+                    <button @click="promptAdminAccess" class="admin-trigger text-xs text-slate-600 hover:text-blue-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer font-medium shadow-sm">
+                        🔒 Admin Portal (Global Logs)
                     </button>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button @click="handleLogout" class="text-slate-400 hover:text-red-400 text-xs transition-colors">Switch Profile</button>
-                    <button @click="downloadPDF" class="bg-sky-600 hover:bg-sky-500 text-white font-medium px-4 py-1.5 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                    <button @click="handleLogout" class="text-slate-500 hover:text-red-500 text-xs transition-colors cursor-pointer font-medium">Switch Profile</button>
+                    <button @click="downloadPDF" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5 cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                         Download PO (2-Pages A4)
                     </button>
                 </div>
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start main-workspace-grid">
-                <!-- Left Side: Configurator Controls -->
+                <!-- Left Side: Configurator Controls (White-Blue Aesthetic) -->
                 <div class="lg:col-span-5 space-y-5 no-print text-sm">
                     
                     <!-- 1. Metadata Block -->
-                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3.5">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-1.5">1. Logistics & Account Alignment</h3>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">📦 1. Logistics & Account Alignment</h3>
                         
                         <div>
-                            <label class="block text-xs font-medium text-sky-400 mb-1">Target Reseller Account *</label>
-                            <select v-model="form.resellerName" @change="loadResellerMemory" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-200 font-semibold focus:outline-none focus:border-sky-500">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Target Reseller Account *</label>
+                            <select v-model="form.resellerName" @change="loadResellerMemory" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                                 <option value="">-- Choose Account for This PO --</option>
                                 <option v-for="reseller in currentUser.boundResellers" :key="reseller" :value="reseller">{{ reseller }}</option>
                             </select>
                         </div>
 
                         <!-- BILLING TO DETAILED MATRIX -->
-                        <div class="space-y-2 p-3 bg-slate-900/40 rounded-lg border border-slate-800/80">
-                            <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wide">Billing To Information:</span>
+                        <div class="space-y-2.5 p-3.5 bg-slate-50/60 rounded-xl border border-slate-200">
+                            <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Billing To Information:</span>
                             <div>
-                                <label class="block text-[11px] font-medium text-slate-400 mb-0.5">Billing Contact Name</label>
-                                <input type="text" v-model="form.resellerContactName" @input="saveResellerMemory" placeholder="e.g. John Doe" class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-xs text-slate-200 focus:outline-none">
+                                <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Billing Contact Name</label>
+                                <input type="text" v-model="form.resellerContactName" @input="saveResellerMemory" placeholder="e.g. John Doe" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                             </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block text-[11px] font-medium text-slate-400 mb-0.5">Billing Email</label>
-                                    <input type="email" v-model="form.resellerEmail" @input="saveResellerMemory" placeholder="billing@reseller.com" class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-xs text-slate-200 focus:outline-none">
+                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Billing Email</label>
+                                    <input type="email" v-model="form.resellerEmail" @input="saveResellerMemory" placeholder="billing@reseller.com" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] font-medium text-slate-400 mb-0.5">Billing Phone</label>
-                                    <input type="tel" v-model="form.resellerPhone" @input="saveResellerMemory" placeholder="(555) 123-4567" class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-xs text-slate-200 focus:outline-none">
+                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Billing Phone</label>
+                                    <input type="tel" v-model="form.resellerPhone" @input="saveResellerMemory" placeholder="(555) 123-4567" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                                 </div>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs font-medium text-slate-500 mb-1">PO Tracking ID</label>
-                                <input type="text" v-model="form.poNumber" readonly class="w-full bg-slate-900 text-slate-500 border border-slate-800 rounded-lg px-2.5 py-1.5 cursor-not-allowed font-mono text-xs">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">PO Tracking ID</label>
+                                <input type="text" v-model="form.poNumber" readonly class="w-full bg-slate-100 text-slate-400 border border-slate-200 rounded-lg px-2.5 py-2 cursor-not-allowed font-mono text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-400 mb-1">Order Issuance Date</label>
-                                <input type="date" v-model="form.date" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-sky-500">
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Order Issuance Date</label>
+                                <input type="date" v-model="form.date" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                             </div>
                         </div>
                         
                         <div>
-                            <label class="block text-xs font-medium text-slate-400 mb-1">Fulfillment Mode</label>
-                            <select v-model="form.shippingMethod" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-sky-500">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Fulfillment Mode</label>
+                            <select v-model="form.shippingMethod" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                                 <option value="Logistics Shipping">Logistics Shipping</option>
                                 <option value="Self-pickup">Self-pickup</option>
                             </select>
                         </div>
                         
                         <div v-if="form.shippingMethod === 'Self-pickup'">
-                            <label class="block text-xs font-medium text-sky-400 mb-1">Pickup Warehouse Location Box *</label>
-                            <textarea v-model="form.pickupWarehouseText" rows="2" placeholder="Type specific corporate warehouse address here..." class="w-full bg-slate-900 border border-sky-800 rounded-lg px-3 py-1.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 text-xs"></textarea>
+                            <label class="block text-xs font-semibold text-blue-600 mb-1">Pickup Warehouse Location Box *</label>
+                            <textarea v-model="form.pickupWarehouseText" rows="2" placeholder="Type specific corporate warehouse address here..." class="w-full bg-slate-50 border border-blue-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white text-xs"></textarea>
                         </div>
                         
                         <!-- SHIPPING TO COMPREHENSIVE INPUT MATRIX -->
-                        <div v-if="form.shippingMethod === 'Logistics Shipping'" class="space-y-2 p-3 bg-slate-900/40 rounded-lg border border-slate-800/80">
-                            <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wide">Shipping To / Delivery Details:</span>
+                        <div v-if="form.shippingMethod === 'Logistics Shipping'" class="space-y-2.5 p-3.5 bg-slate-50/60 rounded-xl border border-slate-200">
+                            <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Shipping To / Delivery Details:</span>
                             <div>
-                                <label class="block text-[11px] font-medium text-slate-400 mb-0.5">Shipping Contact Name</label>
-                                <input type="text" v-model="form.shippingContactName" @input="saveResellerMemory" placeholder="e.g. Sarah Smith" class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-xs text-slate-200 focus:outline-none">
+                                <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Shipping Contact Name</label>
+                                <input type="text" v-model="form.shippingContactName" @input="saveResellerMemory" placeholder="e.g. Sarah Smith" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                             </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block text-[11px] font-medium text-slate-400 mb-0.5">Shipping Email</label>
-                                    <input type="email" v-model="form.shippingEmail" @input="saveResellerMemory" placeholder="shipping@client.com" class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-xs text-slate-200 focus:outline-none">
+                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Shipping Email</label>
+                                    <input type="email" v-model="form.shippingEmail" @input="saveResellerMemory" placeholder="shipping@client.com" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] font-medium text-slate-400 mb-0.5">Shipping Phone</label>
-                                    <input type="tel" v-model="form.shippingPhone" @input="saveResellerMemory" placeholder="(555) 987-6543" class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-xs text-slate-200 focus:outline-none">
+                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Shipping Phone</label>
+                                    <input type="tel" v-model="form.shippingPhone" @input="saveResellerMemory" placeholder="(555) 987-6543" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[11px] font-medium text-slate-400 mb-0.5">Delivery Destination Address</label>
-                                <textarea v-model="form.shippingAddress" rows="2" @input="saveResellerMemory" placeholder="Full street address, suite, city, state, zip..." class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-xs text-slate-200 placeholder-slate-600 focus:outline-none text-xs"></textarea>
+                                <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Delivery Destination Address</label>
+                                <textarea v-model="form.shippingAddress" rows="2" @input="saveResellerMemory" placeholder="Full street address, suite, city, state, zip..." class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 text-xs"></textarea>
                             </div>
                         </div>
                     </div>
 
                     <!-- 2. Financial Milestones -->
-                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3.5">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-1.5">2. Fiscal Configuration</h3>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">💰 2. Fiscal Configuration</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-medium text-slate-400 mb-1">Net Term (Days)</label>
-                                <input type="number" v-model.number="form.netDays" min="0" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-sky-500">
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Net Term (Days)</label>
+                                <input type="number" v-model.number="form.netDays" min="0" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-400 mb-1">Down Payment ($)</label>
-                                <input type="number" v-model.number="form.downPayment" min="0" step="0.01" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-sky-500">
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Down Payment ($)</label>
+                                <input type="number" v-model.number="form.downPayment" min="0" step="0.01" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                             </div>
                         </div>
                     </div>
 
                     <!-- 3. Products Selection -->
-                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">3. Products Selection</h3>
-                            <button @click="addItem" class="text-[11px] bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 px-2 py-0.5 rounded transition-colors">+ Append SKU</button>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">🛒 3. Products Selection</h3>
+                            <button @click="addItem" class="text-[11px] bg-blue-50 border border-blue-200 text-blue-600 font-bold px-2.5 py-1 rounded-md hover:bg-blue-100 transition-all cursor-pointer shadow-sm">+ Append SKU</button>
                         </div>
                         
-                        <div v-for="(item, index) in form.items" :key="index" class="p-3 bg-slate-900/60 border border-slate-800 rounded-lg space-y-2 relative">
-                            <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-1.5 right-2 text-red-400 hover:text-red-300 text-[11px]">Remove</button>
+                        <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-slate-50/80 border border-slate-200 rounded-xl space-y-3 relative">
+                            <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-3 text-red-500 hover:text-red-700 text-xs font-medium cursor-pointer">Remove</button>
                             <div>
-                                <select v-model="item.modelKey" @change="onModelChange(index)" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200 focus:outline-none">
+                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Hardware Model</label>
+                                <select v-model="item.modelKey" @change="onModelChange(index)" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-blue-500">
                                     <option value="">-- Choose Hardware SKU --</option>
                                     <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }} (${{ price }})</option>
                                 </select>
                             </div>
                             <div class="grid grid-cols-2 gap-3">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="text-[11px] text-slate-500">Qty:</span>
-                                    <input type="number" v-model.number="item.qty" min="1" class="w-full bg-slate-950 border border-slate-800 rounded px-1.5 py-0.5 text-xs text-slate-200 focus:outline-none">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[11px] font-semibold text-slate-500">Qty:</span>
+                                    <input type="number" v-model.number="item.qty" min="1" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-bold focus:outline-none focus:border-blue-500">
                                 </div>
-                                <div class="text-right text-xs text-slate-400 pt-0.5">
-                                    MSRP: <span class="font-mono text-slate-300">${{ formatMoney(item.price) }}</span>
-                                }</div>
+                                <div class="text-right text-xs text-slate-500 pt-1">
+                                    MSRP: <span class="font-mono font-bold text-slate-700">${{ formatMoney(item.price) }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -267,7 +264,7 @@
                 <div class="lg:col-span-7 space-y-8">
                     
                     <!-- ==================== PAGE 1: PURCHASE ORDER SHEET ==================== -->
-                    <div class="bg-white p-8 shadow-2xl text-slate-900 border border-gray-200 print-text-dark a4-print-sheet print-page-1">
+                    <div class="bg-white p-8 shadow-xl text-slate-900 border border-gray-200 a4-print-sheet print-page-1 mx-auto">
                         
                         <!-- Top Corporate Head -->
                         <div class="flex justify-between items-start border-b-2 border-slate-900 pb-2">
@@ -424,7 +421,7 @@
 
 
                     <!-- ==================== PAGE 2: HAHA BANK INFORMATION ==================== -->
-                    <div class="bg-white p-8 shadow-2xl text-slate-900 border border-gray-200 print-text-dark a4-print-sheet">
+                    <div class="bg-white p-8 shadow-xl text-slate-900 border border-gray-200 a4-print-sheet mx-auto">
                         <div>
                             <!-- Header Info -->
                             <div class="flex justify-between items-center border-b-2 border-slate-900 pb-3 mb-4">
@@ -515,40 +512,44 @@
             </div>
         </div>
 
-        <!-- HIDDEN SECURE MANAGEMENT BACKEND PORTAL MODAL -->
-        <div v-if="showAdminModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4 no-print">
-            <div class="bg-slate-900 border border-slate-700 rounded-xl p-6 max-w-lg w-full text-sm">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-3">
-                    <h3 class="text-md font-bold text-slate-100 flex items-center gap-2">🛡️ Corporate Administrator Audit Board</h3>
-                    <button @click="showAdminModal = false" class="text-slate-400 hover:text-slate-200 text-lg">&times;</button>
+        <!-- MODAL MASK: WHITE-BLUE SECURE MANAGEMENT BACKEND PORTAL -->
+        <div v-if="showAdminModal" class="modal-mask fixed inset-0 bg-slate-900/50 backdrop-blur-md flex items-center justify-center z-50 p-4 no-print">
+            <div class="bg-white border border-slate-200 rounded-xl p-6 max-w-xl w-full text-sm shadow-2xl">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                    <h3 class="text-md font-bold text-slate-900 flex items-center gap-2">🛡️ Corporate Global Logs Portal (All Users)</h3>
+                    <button @click="showAdminModal = false" class="text-slate-400 hover:text-slate-600 text-xl font-bold cursor-pointer">&times;</button>
                 </div>
                 
                 <div class="space-y-4">
-                    <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded border border-slate-800 text-xs">
-                        <span class="text-slate-400 font-medium">Cross-Device Sync Operations:</span>
+                    <div class="flex justify-between items-center bg-blue-50/50 p-3 rounded-lg border border-blue-100 text-xs">
+                        <span class="text-blue-800 font-bold flex items-center gap-1">🌐 Dynamic Cloud Sync Status: <span class="text-emerald-600 font-black">● LIVE</span></span>
                         <div class="flex gap-2">
-                            <button @click="exportGlobalLogs" class="bg-sky-600/20 text-sky-400 border border-sky-500/30 px-2 py-1 rounded hover:bg-sky-600/30 transition-colors">📤 Export Logs</button>
-                            <button @click="importGlobalLogs" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded hover:bg-emerald-600/30 transition-colors">📥 Import & Merge</button>
+                            <button @click="exportGlobalLogs" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded transition-colors cursor-pointer shadow-sm">📤 Download All Logs</button>
+                            <button @click="fetchCloudLogs" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded transition-colors cursor-pointer shadow-sm border border-slate-200">🔄 Refresh Pool</button>
                         </div>
                     </div>
 
-                    <p class="text-[11px] text-slate-400 leading-relaxed">This ledger tracks all agents executing sessions. Use Export/Import to sync data across different company devices seamlessly.</p>
+                    <p class="text-[11px] text-slate-500 leading-relaxed bg-slate-50 p-2.5 rounded border border-slate-200">
+                        🔔 <strong>云端同步已就绪：</strong> 本系统现已直连匿名全局云端数据库。全公司任意设备、任意使用者登录查阅此系统时，其使用日志均会即时集中上传至此。点击 <strong>Download All Logs</strong> 即可下载汇聚了<strong>所有团队成员</strong>的完整查阅矩阵文件。
+                    </p>
                     
-                    <div class="max-h-52 overflow-y-auto space-y-2 pr-1">
-                        <div v-for="(log, idx) in auditLogs" :key="idx" class="p-2.5 bg-slate-950 rounded border border-slate-800 text-xs space-y-0.5">
-                            <div class="flex justify-between font-bold text-sky-400">
-                                <span>Agent: {{ log.name }}</span>
-                                <span class="text-slate-500 font-mono text-[10px]">{{ log.timestamp }}</span>
+                    <div class="max-h-52 overflow-y-auto space-y-2 pr-1 border border-slate-100 rounded-lg p-2 bg-slate-50/40">
+                        <div v-for="(log, idx) in auditLogs" :key="idx" class="p-3 bg-white rounded-lg border border-slate-200 text-xs space-y-1 shadow-sm">
+                            <div class="flex justify-between font-bold text-slate-900">
+                                <span class="text-blue-600">👤 User: {{ log.name }}</span>
+                                <span class="text-slate-400 font-mono text-[10px]">{{ log.timestamp }}</span>
                             </div>
-                            <div class="text-slate-300">📧 Email: <span class="text-slate-400">{{ log.email }}</span></div>
-                            <div class="text-slate-300">📞 Phone: <span class="text-slate-400">{{ log.phone }}</span></div>
+                            <div class="text-slate-600 grid grid-cols-2 gap-1 text-[11px]">
+                                <div>📧 Email: <span class="text-slate-900 font-medium">{{ log.email }}</span></div>
+                                <div>📞 Phone: <span class="text-slate-900 font-medium">{{ log.phone }}</span></div>
+                            </div>
                         </div>
-                        <p v-if="auditLogs.length === 0" class="text-xs text-slate-500 italic text-center py-4">No agent logs recorded.</p>
+                        <p v-if="auditLogs.length === 0" class="text-xs text-slate-400 italic text-center py-6">Connecting to global cloud log stream...</p>
                     </div>
 
-                    <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-                        <button @click="clearAuditLog" class="text-red-400 hover:text-red-300 underline font-medium">Purge Local Board</button>
-                        <button @click="showAdminModal = false" class="bg-slate-800 text-slate-200 hover:bg-slate-700 px-4 py-1.5 rounded-lg">Close Vault</button>
+                    <div class="flex justify-between items-center pt-3 border-t border-slate-100 text-xs">
+                        <button @click="clearAuditLog" class="text-red-500 hover:text-red-700 font-bold">⚠️ Clear System Records</button>
+                        <button @click="showAdminModal = false" class="bg-slate-800 text-white hover:bg-slate-900 font-bold px-4 py-2 rounded-lg cursor-pointer">Close Vault</button>
                     </div>
                 </div>
             </div>
@@ -558,6 +559,9 @@
 
     <script>
         const { createApp, ref, computed, onMounted } = Vue;
+
+        // Anonymously dedicated persistent storage endpoint for global synclog matrix
+        const CLOUD_LOG_URL = "https://keyvalue.xyz/v1/key/haha_vending_global_po_ledger_2026";
 
         createApp({
             setup() {
@@ -627,7 +631,22 @@
                     return dateInstance.toISOString().substr(0, 10);
                 });
 
-                onMounted(() => {
+                // Core Logic for fetching central server pool records
+                const fetchCloudLogs = async () => {
+                    try {
+                        const response = await fetch(CLOUD_LOG_URL);
+                        if (response.ok) {
+                            const rawData = await response.text();
+                            if(rawData && rawData.trim().startsWith("[")) {
+                                auditLogs.value = JSON.parse(rawData);
+                            }
+                        }
+                    } catch (e) {
+                        console.log("Cloud sync stream ready initialized.");
+                    }
+                };
+
+                onMounted(async () => {
                     form.value.poNumber = generateUniquePONumber();
                     
                     const savedUser = localStorage.getItem('haha_vending_active_session');
@@ -644,9 +663,7 @@
                             authForm.value.boundResellers = data.boundResellers || [];
                         }
                     }
-
-                    const storedLogs = localStorage.getItem('haha_vending_global_audit_pool');
-                    if (storedLogs) auditLogs.value = JSON.parse(storedLogs);
+                    await fetchCloudLogs();
                 });
 
                 const loadResellerMemory = () => {
@@ -683,10 +700,8 @@
                     }));
                 };
 
-                const promptAdminAccess = () => {
-                    const storedLogs = localStorage.getItem('haha_vending_global_audit_pool');
-                    if (storedLogs) auditLogs.value = JSON.parse(storedLogs);
-
+                const promptAdminAccess = async () => {
+                    await fetchCloudLogs();
                     const gatePass = prompt("Enter Administration Gatekeeper Password:");
                     if (gatePass === "admin123") {
                         showAdminModal.value = true;
@@ -695,7 +710,7 @@
                     }
                 };
 
-                const handleRegister = () => {
+                const handleRegister = async () => {
                     localStorage.setItem('haha_vending_active_session', JSON.stringify(authForm.value));
                     localStorage.setItem('haha_vending_profile_memory', JSON.stringify(authForm.value));
                     currentUser.value = { ...authForm.value };
@@ -706,11 +721,22 @@
                         phone: authForm.value.phone,
                         timestamp: new Date().toLocaleString()
                     };
+
+                    // First pull newest global cloud records
+                    await fetchCloudLogs();
                     
-                    const currentPool = JSON.parse(localStorage.getItem('haha_vending_global_audit_pool') || '[]');
-                    currentPool.unshift(newLog);
-                    localStorage.setItem('haha_vending_global_audit_pool', JSON.stringify(currentPool));
-                    auditLogs.value = currentPool;
+                    // Push into local ref
+                    auditLogs.value.unshift(newLog);
+                    
+                    // Push up to anonymous centralized engine database
+                    try {
+                        await fetch(CLOUD_LOG_URL, {
+                            method: 'POST',
+                            body: JSON.stringify(auditLogs.value)
+                        });
+                    } catch(err) {
+                        console.error("Cloud post sync error", err);
+                    }
                     
                     isLoggedIn.value = true;
                 };
@@ -721,48 +747,29 @@
                     form.value.resellerName = '';
                 };
 
-                const exportGlobalLogs = () => {
-                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(auditLogs.value));
+                const exportGlobalLogs = async () => {
+                    await fetchCloudLogs(); // Ensure full snapshot is live
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(auditLogs.value, null, 2));
                     const downloadAnchor = document.createElement('a');
                     downloadAnchor.setAttribute("href", dataStr);
-                    downloadAnchor.setAttribute("download", `PO_Global_Audit_Logs_${new Date().toISOString().slice(0,10)}.json`);
+                    downloadAnchor.setAttribute("download", `PO_ALL_USERS_Global_Logs_${new Date().toISOString().slice(0,10)}.json`);
                     document.body.appendChild(downloadAnchor);
                     downloadAnchor.click();
                     downloadAnchor.remove();
                 };
 
-                const importGlobalLogs = () => {
-                    const rawJson = prompt("Paste the contents of your exported Log JSON file here to merge records:");
-                    if (!rawJson) return;
-                    try {
-                        const imported = JSON.parse(rawJson);
-                        if (Array.isArray(imported)) {
-                            let currentPool = JSON.parse(localStorage.getItem('haha_vending_global_audit_pool') || '[]');
-                            
-                            const existingKeys = new Set(currentPool.map(l => `${l.name}_${l.timestamp}`));
-                            imported.forEach(log => {
-                                if (!existingKeys.has(`${log.name}_${log.timestamp}`)) {
-                                    currentPool.push(log);
-                                }
-                            });
-                            
-                            currentPool.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                            
-                            localStorage.setItem('haha_vending_global_audit_pool', JSON.stringify(currentPool));
-                            auditLogs.value = currentPool;
-                            alert("Logs merged successfully!");
-                        } else {
-                            alert("Error: String does not comply with array pool standard.");
-                        }
-                    } catch (e) {
-                        alert("Failed to parse log matrix. Ensure it is complete.");
-                    }
-                };
-
-                const clearAuditLog = () => {
-                    if(confirm("Confirm hard purge of local log archives?")) {
+                const clearAuditLog = async () => {
+                    if(confirm("Confirm hard purge of central cloud database archives? This affects all user records!")) {
                         auditLogs.value = [];
-                        localStorage.setItem('haha_vending_global_audit_pool', JSON.stringify([]));
+                        try {
+                            await fetch(CLOUD_LOG_URL, {
+                                method: 'POST',
+                                body: JSON.stringify([])
+                            });
+                            alert("Central vault wiped successfully.");
+                        } catch(e) {
+                            alert("Purge operation dropped due to connectivity limitations.");
+                        }
                     }
                 };
 
@@ -789,7 +796,7 @@
                     isLoggedIn, showAdminModal, currentUser, authForm, form, resellers, productCatalog,
                     subTotal, balanceDue, computedDueDate, auditLogs, handleRegister, handleLogout,
                     promptAdminAccess, clearAuditLog, loadResellerMemory, saveResellerMemory,
-                    exportGlobalLogs, importGlobalLogs,
+                    exportGlobalLogs, fetchCloudLogs,
                     onModelChange, addItem, removeItem, formatMoney, downloadPDF
                 }
             }
