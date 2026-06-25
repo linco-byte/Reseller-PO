@@ -69,7 +69,7 @@
 <body class="bg-slate-50 min-h-screen text-slate-800 antialiased">
 
     <div id="app">
-        <!-- SYSTEM GATEKEEPER: SALES REP REGISTRATION (Light Blue Theme) -->
+        <!-- SYSTEM GATEKEEPER: SALES REP REGISTRATION -->
         <div v-if="!isLoggedIn" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 no-print">
             <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 border border-slate-200">
                 <div class="text-center mb-6">
@@ -113,7 +113,7 @@
 
         <!-- MAIN PO WORKSPACE -->
         <div v-if="isLoggedIn" class="container mx-auto px-4 py-6 max-w-7xl">
-            <!-- Control Navbar (White-Blue Theme) -->
+            <!-- Control Navbar -->
             <header class="mb-6 no-print flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex items-center gap-4">
                     <div>
@@ -134,7 +134,7 @@
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start main-workspace-grid">
-                <!-- Left Side: Configurator Controls (White-Blue Aesthetic) -->
+                <!-- Left Side: Configurator Controls -->
                 <div class="lg:col-span-5 space-y-5 no-print text-sm">
                     
                     <!-- 1. Metadata Block -->
@@ -174,7 +174,7 @@
                                 <input type="text" v-model="form.poNumber" readonly class="w-full bg-slate-100 text-slate-400 border border-slate-200 rounded-lg px-2.5 py-2 cursor-not-allowed font-mono text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Order Issuance Date</label>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Order Date</label>
                                 <input type="date" v-model="form.date" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                             </div>
                         </div>
@@ -269,7 +269,6 @@
                         <!-- Top Corporate Head -->
                         <div class="flex justify-between items-start border-b-2 border-slate-900 pb-2">
                             <div>
-                                <!-- ENLARGED LOGO DESIGN INTEGRATION BOX -->
                                 <div class="mb-2 max-w-[260px] max-h-[90px] overflow-hidden flex items-center">
                                     <img src="logo.png" alt="Corporate Logo" onerror="this.style.display='none';" class="object-contain max-h-[85px] w-auto">
                                 </div>
@@ -280,11 +279,11 @@
                             <div class="text-right text-[11px] space-y-0.5 text-gray-600 pt-1">
                                 <p><strong class="text-slate-900 uppercase font-bold text-[9px] tracking-wider block">PO Identifier:</strong> <span class="font-mono text-xs font-bold text-slate-900">{{ form.poNumber }}</span></p>
                                 <p class="pt-0.5"><strong class="text-slate-900 font-semibold">Order Date:</strong> {{ form.date || '------' }}</p>
-                                <p><strong class="text-red-700 font-bold">Due Date:</strong> <span class="font-bold text-red-600 border-b border-red-200">{{ computedDueDate }}</span></p>
+                                <p><strong class="text-red-700 font-bold">Payment Due Date:</strong> <span class="font-bold text-red-600 border-b border-red-200">{{ computedDueDate }}</span></p>
                             </div>
                         </div>
 
-                        <!-- STANDARDIZED BILLING TO & SHIPPING TO MATRIX -->
+                        <!-- BILLING TO & SHIPPING TO MATRIX -->
                         <div class="grid grid-cols-2 gap-4 my-2 text-[11px]">
                             <!-- BILLING TO COLUMN -->
                             <div class="bg-slate-50 p-2.5 rounded border border-slate-150 flex flex-col justify-between">
@@ -325,7 +324,7 @@
                         <div class="text-[10px] text-gray-500 flex gap-6 border-b border-gray-100 pb-1.5 mb-1.5 font-medium">
                             <p><span class="text-slate-800 font-semibold">Fulfillment Strategy:</span> {{ form.shippingMethod }}</p>
                             <p><span class="text-slate-800 font-semibold">Payment Structure:</span> Net {{ form.netDays }} Days</p>
-                            <p class="text-red-600 font-semibold"><span class="text-slate-800 font-semibold">Maturity Date:</span> {{ computedDueDate }}</p>
+                            <p class="text-red-600 font-semibold"><span class="text-slate-800 font-semibold">Payment Due Date:</span> {{ computedDueDate }}</p>
                         </div>
 
                         <!-- Line Itemized Ledger Matrix -->
@@ -348,7 +347,7 @@
                             </tbody>
                         </table>
 
-                        <!-- Balanced Fiscal Aggregations -->
+                        <!-- Fiscal Aggregations -->
                         <div class="flex justify-end text-[11px] pt-0.5">
                             <div class="w-56 space-y-0.5 border-t-2 border-slate-900 pt-1.5">
                                 <div class="flex justify-between text-gray-500 font-medium">
@@ -410,7 +409,7 @@
                         <!-- Terms & Execution Footnote -->
                         <div class="mt-1.5 pt-1 border-t border-gray-200 text-[9px] text-gray-400 space-y-1 leading-tight">
                             <p>1. Please sign and return this acknowledgment via email within 2 business days of receipt.</p>
-                            <p>2. Balance Pay-off: The balance of <strong class="text-gray-700">${{ formatMoney(balanceDue) }}</strong> must be cleared prior to the maturity date (<strong class="text-slate-900 font-bold">{{ computedDueDate }}</strong>). Bank details are attached on Page 2.</p>
+                            <p>2. Balance Pay-off: The balance of <strong class="text-gray-700">${{ formatMoney(balanceDue) }}</strong> must be cleared prior to the payment due date (<strong class="text-slate-900 font-bold">{{ computedDueDate }}</strong>). Bank details are attached on Page 2.</p>
 
                             <div class="flex justify-between pt-2.5">
                                 <div class="border-t border-slate-300 w-44 pt-0.5 text-center text-gray-400 text-[8px]">Authorized Reseller Signature</div>
@@ -420,7 +419,7 @@
                     </div>
 
 
-                    <!-- ==================== PAGE 2: HAHA BANK INFORMATION ==================== -->
+                    <!-- ==================== PAGE 2: COMPANY BANK INFORMATION ==================== -->
                     <div class="bg-white p-8 shadow-xl text-slate-900 border border-gray-200 a4-print-sheet mx-auto">
                         <div>
                             <!-- Header Info -->
@@ -437,14 +436,14 @@
                                 </div>
                             </div>
 
-                            <h3 class="text-base font-black text-blue-950 mb-4 border-b border-gray-200 pb-1 tracking-tight flex items-center gap-1.5">
-                                🏢 Company's Bank & Wire Remittance Information
+                            <h3 class="text-base font-black text-blue-950 mb-4 border-b border-gray-200 pb-1 tracking-tight">
+                                Company Bank & Wire Remittance Information
                             </h3>
 
-                            <!-- SECTION 1: ZELLE CHANNEL -->
+                            <!-- SECTION 1: ZELLE CHANNEL (NO ICONS) -->
                             <div class="mb-5 bg-slate-50 border border-slate-200 rounded-lg p-4">
-                                <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2 mb-2.5 text-purple-800">
-                                    ⚡ 1. Zelle Fast Transfer Channels
+                                <h4 class="text-xs font-bold text-purple-900 uppercase tracking-wider mb-2.5">
+                                    1. Zelle Fast Transfer Channels
                                 </h4>
                                 <div class="grid grid-cols-2 gap-4 text-xs">
                                     <div class="p-2.5 bg-white rounded border border-gray-200/60 shadow-sm">
@@ -460,10 +459,10 @@
                                 </div>
                             </div>
 
-                            <!-- SECTION 2: BANK WIRE MTRX -->
+                            <!-- SECTION 2: BANK WIRE MATRIX (NO ICONS) -->
                             <div class="space-y-4">
-                                <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider text-blue-900">
-                                    🏦 2. Corporate Bank Account Registry (Domestic & International Wires)
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-blue-900">
+                                    2. Corporate Bank Account Registry (Domestic & International Wires)
                                 </h4>
 
                                 <!-- (1) Bank of America -->
@@ -494,11 +493,12 @@
                                         <p class="col-span-2"><strong class="text-slate-900">Swift Code (International):</strong> <span class="font-mono font-medium text-slate-900">CHASUS33</span></p>
                                         <p class="col-span-2"><strong class="text-slate-900">Bank Corporate Address:</strong> 270 Park Avenue, New York, NY 10017, USA</p>
                                     </div>
+                                }
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Protective Footnote & Signoff for compliance -->
+                        <!-- Footnote & Signoff -->
                         <div class="border-t border-gray-200 pt-3 text-[9px] text-gray-400 space-y-1.5 mt-4">
                             <p class="italic">Notice: Please ensure all routing codes and account numbers match precisely before firing transfers to prevent institutional transaction rejections.</p>
                             <div class="flex justify-between pt-6">
@@ -512,7 +512,7 @@
             </div>
         </div>
 
-        <!-- MODAL MASK: WHITE-BLUE SECURE MANAGEMENT BACKEND PORTAL -->
+        <!-- MODAL MASK: MANAGEMENT BACKEND PORTAL -->
         <div v-if="showAdminModal" class="modal-mask fixed inset-0 bg-slate-900/50 backdrop-blur-md flex items-center justify-center z-50 p-4 no-print">
             <div class="bg-white border border-slate-200 rounded-xl p-6 max-w-xl w-full text-sm shadow-2xl">
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
@@ -530,7 +530,7 @@
                     </div>
 
                     <p class="text-[11px] text-slate-500 leading-relaxed bg-slate-50 p-2.5 rounded border border-slate-200">
-                        🔔 <strong>云端同步已就绪：</strong> 本系统现已直连匿名全局云端数据库。全公司任意设备、任意使用者登录查阅此系统时，其使用日志均会即时集中上传至此。点击 <strong>Download All Logs</strong> 即可下载汇聚了<strong>所有团队成员</strong>的完整查阅矩阵文件。
+                        🔔 <strong>云端同步：</strong> 点击 <strong>Download All Logs</strong> 即可下载汇聚了所有团队成员的完整查阅记录文件。
                     </p>
                     
                     <div class="max-h-52 overflow-y-auto space-y-2 pr-1 border border-slate-100 rounded-lg p-2 bg-slate-50/40">
@@ -631,7 +631,6 @@
                     return dateInstance.toISOString().substr(0, 10);
                 });
 
-                // Core Logic for fetching central server pool records
                 const fetchCloudLogs = async () => {
                     try {
                         const response = await fetch(CLOUD_LOG_URL);
@@ -642,7 +641,7 @@
                             }
                         }
                     } catch (e) {
-                        console.log("Cloud sync stream ready initialized.");
+                        console.log("Cloud sync stream ready.");
                     }
                 };
 
@@ -722,13 +721,9 @@
                         timestamp: new Date().toLocaleString()
                     };
 
-                    // First pull newest global cloud records
                     await fetchCloudLogs();
-                    
-                    // Push into local ref
                     auditLogs.value.unshift(newLog);
                     
-                    // Push up to anonymous centralized engine database
                     try {
                         await fetch(CLOUD_LOG_URL, {
                             method: 'POST',
@@ -748,7 +743,7 @@
                 };
 
                 const exportGlobalLogs = async () => {
-                    await fetchCloudLogs(); // Ensure full snapshot is live
+                    await fetchCloudLogs();
                     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(auditLogs.value, null, 2));
                     const downloadAnchor = document.createElement('a');
                     downloadAnchor.setAttribute("href", dataStr);
@@ -759,7 +754,7 @@
                 };
 
                 const clearAuditLog = async () => {
-                    if(confirm("Confirm hard purge of central cloud database archives? This affects all user records!")) {
+                    if(confirm("Confirm hard purge of central cloud database archives?")) {
                         auditLogs.value = [];
                         try {
                             await fetch(CLOUD_LOG_URL, {
