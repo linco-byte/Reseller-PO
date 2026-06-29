@@ -9,16 +9,54 @@
     <!-- Vue 3 Framework -->
     <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
         @media print {
-            html, body { margin: 0 !important; padding: 0 !important; background: #ffffff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            @page { size: A4 portrait !important; margin: 0 !important; }
-            .no-print, button, select, input, textarea { display: none !important; }
-            .main-workspace-grid { display: block !important; }
-            .print-page-1 { page-break-after: always !important; break-after: page !important; }
-            .a4-print-sheet { width: 210mm !important; min-height: 294mm !important; padding: 10mm 15mm !important; margin: 0 auto !important; box-shadow: none !important; border: none !important; background: #ffffff !important; color: #0f172a !important; display: flex !important; flex-direction: column !important; box-sizing: border-box !important; page-break-inside: avoid !important; break-inside: avoid !important; }
-            .print-footer-anchor { margin-top: auto !important; page-break-inside: avoid !important; break-inside: avoid !important; }
-            table { font-size: 9.5px !important; }
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            @page {
+                size: A4 portrait !important;
+                margin: 0 !important;
+            }
+            .no-print, button, select, input, textarea {
+                display: none !important;
+            }
+            .main-workspace-grid {
+                display: block !important;
+            }
+            .print-page-1 {
+                page-break-after: always !important;
+                break-after: page !important;
+            }
+            .a4-print-sheet {
+                width: 210mm !important;
+                min-height: 294mm !important;
+                padding: 10mm 15mm !important;
+                margin: 0 auto !important;
+                box-shadow: none !important;
+                border: none !important;
+                background: #ffffff !important;
+                color: #0f172a !important;
+                display: flex !important;
+                flex-direction: column !important;
+                box-sizing: border-box !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .print-footer-anchor {
+                margin-top: auto !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            table {
+                font-size: 9.5px !important;
+            }
         }
     </style>
 </head>
@@ -29,7 +67,9 @@
         <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 border border-slate-200">
             <div class="text-center mb-6">
                 <div class="h-12 w-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3 border border-purple-100 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
                 </div>
                 <h2 class="text-xl font-bold text-slate-900 tracking-tight">Financing PO Engine Registry</h2>
                 <p class="text-xs text-slate-500 mt-1">Authorized Sales Profile Setup</p>
@@ -47,16 +87,7 @@
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
                     <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1.5">Assigned Reseller Accounts *</label>
-                    <div class="bg-slate-50 border border-slate-300 rounded-lg p-3 max-h-40 overflow-y-auto space-y-2 text-xs">
-                        <label v-for="reseller in resellers" :key="reseller" class="flex items-center gap-2 text-slate-700 hover:text-purple-600 cursor-pointer font-medium">
-                            <input type="checkbox" :value="reseller" v-model="authForm.boundResellers" class="rounded border-slate-300 text-purple-600 focus:ring-purple-500">
-                            <span>{{ reseller }}</span>
-                        </label>
-                    </div>
-                </div>
-                <button type="submit" :disabled="authForm.boundResellers.length === 0" class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer disabled:cursor-not-allowed">
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer">
                     Open Financing Workspace
                 </button>
             </form>
@@ -79,7 +110,9 @@
             <div class="flex items-center gap-3">
                 <button @click="handleLogout" class="text-slate-500 hover:text-red-500 text-xs transition-colors cursor-pointer font-medium">Switch Profile</button>
                 <button @click="window.print()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5 cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
                     Print / Download Financing PO (2-Pages)
                 </button>
             </div>
@@ -95,10 +128,9 @@
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Target Reseller Account *</label>
                         <select v-model="form.resellerName" @change="loadResellerMemory" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-bold focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
                             <option value="">-- Choose Account for This PO --</option>
-                            <option v-for="reseller in currentUser.boundResellers" :key="reseller" :value="reseller">{{ reseller }}</option>
+                            <option v-for="reseller in resellers" :key="reseller" :value="reseller">{{ reseller }}</option>
                         </select>
                     </div>
-                    
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 mb-1">PO Tracking ID (Auto)</label>
@@ -109,7 +141,6 @@
                             <input type="text" v-model="form.clientPoNumber" placeholder="e.g. PO-2026-FIN" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 font-mono text-xs focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
                         </div>
                     </div>
-
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Estimated Downpayment Date</label>
@@ -159,7 +190,6 @@
                         <h3 class="text-xs font-bold uppercase tracking-wider text-purple-600 flex items-center gap-1.5">🛒 2. Hardware Allocation</h3>
                         <button @click="addItem" class="text-[11px] bg-purple-50 border border-purple-200 text-purple-600 font-bold px-2.5 py-1 rounded-md hover:bg-purple-100 transition-all">+ Add SKU Line</button>
                     </div>
-                    
                     <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-slate-50/80 border border-slate-200 rounded-xl space-y-3 relative">
                         <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-3 text-red-500 text-xs font-medium">Remove</button>
                         <div>
@@ -178,7 +208,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="p-2.5 bg-purple-50 text-purple-900 rounded-lg text-xs font-bold flex justify-between items-center">
                         <span>Total Hardware Fleet:</span>
                         <span class="text-sm font-black">{{ totalHardwareQty }} Units</span>
@@ -188,14 +217,12 @@
                 <!-- 3. Financing Policy Matrix -->
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-purple-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">⚖️ 3. Financing Parameter Engine</h3>
-                    
                     <div class="grid grid-cols-2 gap-2 text-[10px] bg-slate-50 p-3 rounded-lg border border-slate-200 font-medium">
                         <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 1, 'text-slate-400': currentTierIndex !== 1}">🎁 Tier 1 (1 Unit): 50% Down | 3 Mos</div>
                         <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 2, 'text-slate-400': currentTierIndex !== 2}">📈 Tier 2 (2-4 Units): 30% Down | 6 Mos</div>
                         <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 3, 'text-slate-400': currentTierIndex !== 3}">🚀 Tier 3 (5-9 Units): Fixed Down | 12 Mos</div>
                         <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 4, 'text-slate-400': currentTierIndex !== 4}">👑 Tier 4 (10+ Units): Promo Down | 18-24 Mos</div>
                     </div>
-
                     <div class="space-y-3 bg-purple-50/20 p-4 rounded-xl border border-purple-100 text-xs">
                         <div class="grid grid-cols-2 gap-3">
                             <div>
@@ -209,7 +236,6 @@
                                 <input type="number" v-model.number="form.financingSetupFee" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-mono font-bold">
                             </div>
                         </div>
-
                         <div class="pt-1 border-t border-purple-100 mt-2">
                             <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Downpayment Metric Adjustments:</span>
                             <div class="grid grid-cols-2 gap-3">
@@ -231,7 +257,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Freight Packaging Surcharge ($)</label>
@@ -306,20 +331,20 @@
                         <!-- Products Breakdown Table -->
                         <table class="w-full text-left border-collapse my-1 text-[9.5px]">
                             <thead>
-                                <tr class="border-b border-slate-900 text-gray-400 font-bold uppercase tracking-wider text-[8px]">
-                                    <th class="py-0.5">Structured Hardware Allocation Item SKU</th>
-                                    <th class="py-0.5 text-center w-14">Qty</th>
-                                    <th class="py-0.5 text-right w-24">Wholesale Price</th>
-                                    <th class="py-0.5 text-right w-24">Extended Base Cost</th>
-                                </tr>
-                            </table>
+                            <tr class="border-b border-slate-900 text-gray-400 font-bold uppercase tracking-wider text-[8px]">
+                                <th class="py-0.5">Structured Hardware Allocation Item SKU</th>
+                                <th class="py-0.5 text-center w-14">Qty</th>
+                                <th class="py-0.5 text-right w-24">Wholesale Price</th>
+                                <th class="py-0.5 text-right w-24">Extended Base Cost</th>
+                            </tr>
+                            </thead>
                             <tbody class="divide-y divide-gray-100">
-                                <tr v-for="(item, index) in form.items" :key="index" class="text-gray-700">
-                                    <td class="py-1 font-semibold text-slate-900">{{ item.modelKey || 'Awaiting Hardware Allocation Line...' }}</td>
-                                    <td class="py-1 text-center font-bold text-slate-900">{{ item.qty }}</td>
-                                    <td class="py-1 text-right text-gray-600">${{ formatMoney(item.price) }}</td>
-                                    <td class="py-1 text-right font-bold text-slate-900">${{ formatMoney(item.qty * item.price) }}</td>
-                                </tr>
+                            <tr v-for="(item, index) in form.items" :key="index" class="text-gray-700">
+                                <td class="py-1 font-semibold text-slate-900">{{ item.modelKey || 'Awaiting Hardware Allocation Line...' }}</td>
+                                <td class="py-1 text-center font-bold text-slate-900">{{ item.qty }}</td>
+                                <td class="py-1 text-right text-gray-600">${{ formatMoney(item.price) }}</td>
+                                <td class="py-1 text-right font-bold text-slate-900">${{ formatMoney(item.qty * item.price) }}</td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -364,7 +389,6 @@
                             <p class="font-bold text-slate-500 uppercase tracking-wider mb-0.5">Structured Portfolio Financing Terms & Warranties:</p>
                             <p>This document constitutes a formal rider to the master business structure between the parties. The Financed Balance outlined here will be parsed into consecutive installment cycles detailed on Annex B (Page 2). Failure to settle obligations within established windows triggers automated cellular lockout mechanisms on all distributed node systems.</p>
                         </div>
-
                         <div class="grid grid-cols-2 gap-8 mt-4 text-[9px]">
                             <div class="border-t border-slate-400 pt-1">
                                 <p class="font-bold text-slate-800">Haha Vending Corporate Authorization</p>
@@ -384,32 +408,31 @@
                         <h3 class="text-sm font-black tracking-tight text-slate-900">ANNEX B: ITEMIZED REPAYMENT RUN MATRIX</h3>
                         <p class="text-[9px] text-gray-500">Core Financial Rider Reference tied to Financing PO ID: <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span></p>
                     </div>
-
                     <div class="mt-3 text-[9.5px] text-gray-700 flex-grow space-y-4">
                         <p class="leading-relaxed font-medium">Upon verified processing of the Initial Downpayment Invoice (<span class="font-bold text-blue-700">${{ formatMoney(totalDownpaymentDue) }}</span>), the outstanding Financed Balance (<span class="font-bold text-red-600">${{ formatMoney(totalFinancedBalance) }}</span>) is structured into <span class="font-bold text-purple-700">{{ form.financingMonths }}</span> periodic billing cycles:</p>
 
                         <table class="w-full text-left border-collapse text-[9.5px]">
                             <thead>
-                                <tr class="border-b-2 border-slate-800 text-slate-500 font-bold uppercase tracking-wider text-[7.5px]">
-                                    <th class="py-1 w-24">Cycle Interval</th>
-                                    <th class="py-1 w-36">Target Maturity Date</th>
-                                    <th class="py-1">Operational Portfolio Standing Guidance</th>
-                                    <th class="py-1 text-right w-28">Installment Due</th>
-                                </tr>
+                            <tr class="border-b-2 border-slate-800 text-slate-500 font-bold uppercase tracking-wider text-[7.5px]">
+                                <th class="py-1 w-24">Cycle Interval</th>
+                                <th class="py-1 w-36">Target Maturity Date</th>
+                                <th class="py-1">Operational Portfolio Standing Guidance</th>
+                                <th class="py-1 text-right w-28">Installment Due</th>
+                            </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 font-medium">
-                                <tr class="bg-blue-50/40 text-blue-900">
-                                    <td class="py-1.5 px-1 font-bold">Downpayment</td>
-                                    <td class="py-1.5 px-1 font-mono font-bold">{{ form.date || 'TBD (Contract Execution Date)' }}</td>
-                                    <td class="py-1.5 px-1 italic">Immediate clearance mandatory (Includes Tax, Logistics Freight & Setup Fees)</td>
-                                    <td class="py-1.5 px-1 text-right font-mono font-bold">${{ formatMoney(totalDownpaymentDue) }}</td>
-                                </tr>
-                                <tr v-for="schedule in computedSchedules" :key="schedule.term" class="text-slate-700 hover:bg-slate-50">
-                                    <td class="py-1.5 px-1 font-semibold text-slate-900">Installment {{ schedule.term }}</td>
-                                    <td class="py-1.5 px-1 font-mono text-gray-600">{{ schedule.dueDate }}</td>
-                                    <td class="py-1.5 px-1 text-gray-500">Hardware base capital distribution payment module cycle.</td>
-                                    <td class="py-1.5 px-1 text-right font-mono font-bold text-slate-900">${{ formatMoney(schedule.amount) }}</td>
-                                </tr>
+                            <tr class="bg-blue-50/40 text-blue-900">
+                                <td class="py-1.5 px-1 font-bold">Downpayment</td>
+                                <td class="py-1.5 px-1 font-mono font-bold">{{ form.date || 'TBD (Contract Execution Date)' }}</td>
+                                <td class="py-1.5 px-1 italic">Immediate clearance mandatory (Includes Tax, Logistics Freight & Setup Fees)</td>
+                                <td class="py-1.5 px-1 text-right font-mono font-bold">${{ formatMoney(totalDownpaymentDue) }}</td>
+                            </tr>
+                            <tr v-for="schedule in computedSchedules" :key="schedule.term" class="text-slate-700 hover:bg-slate-50">
+                                <td class="py-1.5 px-1 font-semibold text-slate-900">Installment {{ schedule.term }}</td>
+                                <td class="py-1.5 px-1 font-mono text-gray-600">{{ schedule.dueDate }}</td>
+                                <td class="py-1.5 px-1 text-gray-500">Hardware base capital distribution payment module cycle.</td>
+                                <td class="py-1.5 px-1 text-right font-mono font-bold text-slate-900">${{ formatMoney(schedule.amount) }}</td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -431,63 +454,97 @@
             const authForm = ref({
                 name: '',
                 email: '',
-                phone: '',
-                boundResellers: []
+                phone: ''
             });
-            const currentUser = ref(null);
 
-            // COMPREHENSIVE PRODUCT CATALOG DATABASE
+            const currentUser = ref({
+                name: '',
+                email: '',
+                phone: ''
+            });
+
+            // PRODUCT SPECIFICATION CATALOG
             const productCatalog = {
-                "Haha Smart Vending Pro V4": 3499.00,
-                "Haha Ice & Beverage Center Combo": 4850.00,
-                "Haha Slimline Snack Dispenser Lite": 1899.00,
-                "Haha Interactive Touchscreen Locker Node": 2650.00
+                "Haha Smart Vending Machine (Standard Node 1-Slot)": 3200,
+                "Haha Smart Combo Vendor (Dual Temperature 2-Slot)": 4500,
+                "Haha Ice & Drink Elite Station (Heavy Capacity Node)": 5800,
+                "Haha Micro-Market Checkout Kiosk (Point of Sale Node)": 1500
             };
 
-            // CORE PO CONFIGURATORS
+            // SYNCED STORAGE SYSTEM MEMORY FOR PROFILE & ACCOUNTS
+            const savedProfile = localStorage.getItem('financing_user_profile');
+            if (savedProfile) {
+                try {
+                    const parsed = JSON.parse(savedProfile);
+                    currentUser.value = parsed;
+                    isLoggedIn.value = true;
+                } catch(e) {
+                    localStorage.removeItem('financing_user_profile');
+                }
+            }
+
+            const generateTrackingID = () => {
+                const rng = Math.floor(100000 + Math.random() * 900000);
+                return `PO-FIN-${rng}`;
+            };
+
+            // PRIMARY FORM MATRIX STATE
             const form = ref({
-                poNumber: 'PO-FIN-' + Math.floor(100000 + Math.random() * 900000),
+                poNumber: generateTrackingID(),
                 clientPoNumber: '',
                 resellerName: '',
-                date: new Date().toISOString().substring(0, 10),
+                date: new Date().toISOString().split('T')[0],
                 shippingMethod: 'Logistics Shipping',
-                pickupWarehouseText: 'Haha Atlanta Regional Consolidation Hub\n4405 International Blvd, Norcross, GA 30093',
-                
-                // Billing Info
+                pickupWarehouseText: 'Haha Logistics Depot Core Hub - 1754 North Brown Rd, Lawrenceville, GA 30043',
                 resellerContactName: '',
                 resellerEmail: '',
                 resellerPhone: '',
-
-                // Shipping Info (Fulfillment Address Block)
                 shippingContactName: '',
                 shippingPhone: '',
                 shippingAddress: '',
-
-                items: [{ modelKey: '', qty: 1, price: 0 }],
-
-                // Financing parameters
+                items: [
+                    { modelKey: '', qty: 1, price: 0 }
+                ],
                 financingMonths: 3,
-                financingSetupFee: 50,
+                financingSetupFee: 150,
                 downpaymentMode: 'percentage',
                 downpaymentPercent: 50,
-                downpaymentFixedPerUnit: 1500,
-
-                freightInput: 150,
+                downpaymentFixedPerUnit: 1000,
+                freightInput: 350,
                 taxRate: 7.00
             });
 
-            // LIFECYCLE MEMORY MANAGEMENT
+            const handleRegister = () => {
+                currentUser.value = {
+                    name: authForm.value.name,
+                    email: authForm.value.email,
+                    phone: authForm.value.phone
+                };
+                localStorage.setItem('financing_user_profile', JSON.stringify(currentUser.value));
+                isLoggedIn.value = true;
+            };
+
+            const handleLogout = () => {
+                localStorage.removeItem('financing_user_profile');
+                isLoggedIn.value = false;
+                authForm.value = { name: '', email: '', phone: '' };
+            };
+
+            // PERSISTENT ACCOUNT MATRIX MEMORY
             const loadResellerMemory = () => {
                 if(!form.value.resellerName) return;
-                const cache = localStorage.getItem(`fin_cache_${form.value.resellerName}`);
-                if(cache) {
-                    const data = JSON.parse(cache);
-                    form.value.resellerContactName = data.contactName || '';
-                    form.value.resellerEmail = data.email || '';
-                    form.value.resellerPhone = data.phone || '';
-                    form.value.shippingContactName = data.shipContact || '';
-                    form.value.shippingPhone = data.shipPhone || '';
-                    form.value.shippingAddress = data.shipAddress || '';
+                const memoryKey = `reseller_mem_${form.value.resellerName.replace(/\s+/g, '_')}`;
+                const saved = localStorage.getItem(memoryKey);
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        form.value.resellerContactName = parsed.resellerContactName || '';
+                        form.value.resellerEmail = parsed.resellerEmail || '';
+                        form.value.resellerPhone = parsed.resellerPhone || '';
+                        form.value.shippingContactName = parsed.shippingContactName || '';
+                        form.value.shippingPhone = parsed.shippingPhone || '';
+                        form.value.shippingAddress = parsed.shippingAddress || '';
+                    } catch(e) {}
                 } else {
                     form.value.resellerContactName = '';
                     form.value.resellerEmail = '';
@@ -500,27 +557,19 @@
 
             const saveResellerMemory = () => {
                 if(!form.value.resellerName) return;
-                const data = {
-                    contactName: form.value.resellerContactName,
-                    email: form.value.resellerEmail,
-                    phone: form.value.resellerPhone,
-                    shipContact: form.value.shippingContactName,
-                    shipPhone: form.value.shippingPhone,
-                    shipAddress: form.value.shippingAddress
+                const memoryKey = `reseller_mem_${form.value.resellerName.replace(/\s+/g, '_')}`;
+                const payload = {
+                    resellerContactName: form.value.resellerContactName,
+                    resellerEmail: form.value.resellerEmail,
+                    resellerPhone: form.value.resellerPhone,
+                    shippingContactName: form.value.shippingContactName,
+                    shippingPhone: form.value.shippingPhone,
+                    shippingAddress: form.value.shippingAddress
                 };
-                localStorage.setItem(`fin_cache_${form.value.resellerName}`, JSON.stringify(data));
+                localStorage.setItem(memoryKey, JSON.stringify(payload));
             };
 
-            const handleRegister = () => {
-                currentUser.value = { ...authForm.value };
-                isLoggedIn.value = true;
-            };
-
-            const handleLogout = () => {
-                isLoggedIn.value = false;
-            };
-
-            // PRODUCTS MODIFIERS
+            // GRID LINE MANAGEMENT
             const addItem = () => {
                 form.value.items.push({ modelKey: '', qty: 1, price: 0 });
             };
@@ -536,110 +585,105 @@
                 syncFinancingTiers();
             };
 
-            // AUTO RULES POLICY MATRIX ENGINE
+            // HARDWARE TOTAL QUANTITY
             const totalHardwareQty = computed(() => {
-                return form.value.items.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+                return form.value.items.reduce((acc, curr) => acc + (Number(curr.qty) || 0), 0);
             });
 
+            // FINANCING POLICY AUTOMATED ADJUSTMENTS
             const currentTierIndex = computed(() => {
                 const qty = totalHardwareQty.value;
-                if(qty >= 10) return 4;
-                if(qty >= 5) return 3;
-                if(qty >= 2) return 2;
+                if (qty >= 10) return 4;
+                if (qty >= 5) return 3;
+                if (qty >= 2) return 2;
                 return 1;
             });
 
             const validMonthsOptions = computed(() => {
-                if(currentTierIndex.value === 4) return [18, 24];
-                if(currentTierIndex.value === 3) return [12];
-                if(currentTierIndex.value === 2) return [6];
+                const tier = currentTierIndex.value;
+                if (tier === 4) return [18, 24];
+                if (tier === 3) return [12];
+                if (tier === 2) return [6];
                 return [3];
             });
 
             const syncFinancingTiers = () => {
                 const tier = currentTierIndex.value;
-                if(tier === 1) {
+                if (tier === 1) {
                     form.value.financingMonths = 3;
-                    form.value.financingSetupFee = 50;
                     form.value.downpaymentMode = 'percentage';
                     form.value.downpaymentPercent = 50;
-                } else if(tier === 2) {
+                    form.value.financingSetupFee = 150;
+                } else if (tier === 2) {
                     form.value.financingMonths = 6;
-                    form.value.financingSetupFee = 100;
                     form.value.downpaymentMode = 'percentage';
                     form.value.downpaymentPercent = 30;
-                } else if(tier === 3) {
+                    form.value.financingSetupFee = 250;
+                } else if (tier === 3) {
                     form.value.financingMonths = 12;
-                    form.value.financingSetupFee = 200;
                     form.value.downpaymentMode = 'fixed_per_unit';
-                    form.value.downpaymentFixedPerUnit = 1000;
-                } else if(tier === 4) {
+                    form.value.downpaymentFixedPerUnit = 1200;
+                    form.value.financingSetupFee = 400;
+                } else if (tier === 4) {
                     form.value.financingMonths = 18;
-                    form.value.financingSetupFee = 0;
                     form.value.downpaymentMode = 'percentage';
                     form.value.downpaymentPercent = 15;
+                    form.value.financingSetupFee = 600;
                 }
             };
 
-            // COMPUTED ARITHMETIC FINANCIAL VALUATIONS
+            // COMPUTED ACCOUNTING COMPUTATIONS
             const grossSubTotal = computed(() => {
-                return form.value.items.reduce((sum, item) => sum + ((Number(item.qty) || 0) * (Number(item.price) || 0)), 0);
+                return form.value.items.reduce((acc, curr) => acc + ((Number(curr.qty) || 0) * (Number(curr.price) || 0)), 0);
             });
 
             const computedFreight = computed(() => {
-                return form.value.shippingMethod === 'Self-pickup' ? 0 : (Number(form.value.freightInput) || 0);
+                if (form.value.shippingMethod === 'Self-pickup') return 0;
+                return Number(form.value.freightInput) || 0;
             });
 
             const computedTax = computed(() => {
-                return (grossSubTotal.value + computedFreight.value) * ((Number(form.value.taxRate) || 0) / 100);
+                const base = grossSubTotal.value + computedFreight.value;
+                return base * ((Number(form.value.taxRate) || 0) / 100);
             });
 
             const totalContractValue = computed(() => {
                 return grossSubTotal.value + computedFreight.value + computedTax.value + (Number(form.value.financingSetupFee) || 0);
             });
 
-            const hardwareDownpaymentShare = computed(() => {
-                if(form.value.downpaymentMode === 'percentage') {
-                    return grossSubTotal.value * ((Number(form.value.downpaymentPercent) || 0) / 100);
-                } else {
-                    return totalHardwareQty.value * (Number(form.value.downpaymentFixedPerUnit) || 0);
-                }
-            });
-
             const totalDownpaymentDue = computed(() => {
-                const total = hardwareDownpaymentShare.value + computedFreight.value + computedTax.value + (Number(form.value.financingSetupFee) || 0);
-                return Math.min(total, totalContractValue.value);
+                let downpaymentHardwareBase = 0;
+                if (form.value.downpaymentMode === 'percentage') {
+                    downpaymentHardwareBase = grossSubTotal.value * ((Number(form.value.downpaymentPercent) || 0) / 100);
+                } else {
+                    downpaymentHardwareBase = totalHardwareQty.value * (Number(form.value.downpaymentFixedPerUnit) || 0);
+                }
+                // Downpayment covers hardware part + 100% of ancillary logistics fees upfront
+                const value = downpaymentHardwareBase + computedFreight.value + computedTax.value + (Number(form.value.financingSetupFee) || 0);
+                return value > totalContractValue.value ? totalContractValue.value : value;
             });
 
             const totalFinancedBalance = computed(() => {
-                return Math.max(0, totalContractValue.value - totalDownpaymentDue.value);
+                const bal = totalContractValue.value - totalDownpaymentDue.value;
+                return bal < 0 ? 0 : bal;
             });
 
             const computedSchedules = computed(() => {
+                const months = form.value.financingMonths || 3;
+                const bal = totalFinancedBalance.value;
+                const installmentAmount = bal / months;
+                
                 const list = [];
-                const months = form.value.financingMonths || 1;
-                const baseFinanced = totalFinancedBalance.value;
-                if (baseFinanced <= 0) return list;
-
-                const baseInstallment = Math.floor((baseFinanced / months) * 100) / 100;
-                let accumulated = 0;
                 const baseDate = form.value.date ? new Date(form.value.date) : new Date();
 
                 for (let i = 1; i <= months; i++) {
-                    const dueDate = new Date(baseDate);
-                    dueDate.setMonth(baseDate.getMonth() + i);
+                    const nextDate = new Date(baseDate);
+                    nextDate.setMonth(baseDate.getMonth() + i);
                     
-                    let amount = baseInstallment;
-                    if (i === months) {
-                        amount = Math.round((baseFinanced - accumulated) * 100) / 100;
-                    } else {
-                        accumulated += baseInstallment;
-                    }
-
                     list.push({
                         term: i,
-                        dueDate: dueDate.toISOString().substring(0, 10),
-                        amount: amount
+                        dueDate: nextDate.toISOString().split('T')[0],
+                        amount: installmentAmount
                     });
                 }
                 return list;
@@ -650,8 +694,8 @@
             };
 
             return {
-                isLoggedIn, resellers, authForm, currentUser, productCatalog, form,
-                loadResellerMemory, saveResellerMemory, handleRegister, handleLogout,
+                isLoggedIn, resellers, authForm, currentUser, handleRegister, handleLogout,
+                productCatalog, form, loadResellerMemory, saveResellerMemory,
                 addItem, removeItem, onModelChange, totalHardwareQty, currentTierIndex,
                 validMonthsOptions, syncFinancingTiers, grossSubTotal, computedFreight,
                 computedTax, totalContractValue, totalDownpaymentDue, totalFinancedBalance,
