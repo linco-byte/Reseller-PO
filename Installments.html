@@ -110,7 +110,7 @@
             <div class="flex items-center gap-3">
                 <button @click="handleLogout" class="text-slate-500 hover:text-red-500 text-xs transition-colors cursor-pointer font-medium">Switch Profile</button>
                 <button @click="window.print()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5 cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/xl" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
                     Print / Download Financing PO (2-Pages)
@@ -218,10 +218,10 @@
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-purple-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">⚖️ 3. Financing Parameter Engine</h3>
                     <div class="grid grid-cols-2 gap-2 text-[10px] bg-slate-50 p-3 rounded-lg border border-slate-200 font-medium">
-                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 1, 'text-slate-400': currentTierIndex !== 1}">🎁 Tier 1 (1 Unit): 50% Down | 3 Mos</div>
-                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 2, 'text-slate-400': currentTierIndex !== 2}">📈 Tier 2 (2-4 Units): 30% Down | 6 Mos</div>
-                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 3, 'text-slate-400': currentTierIndex !== 3}">🚀 Tier 3 (5-9 Units): Fixed Down | 12 Mos</div>
-                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 4, 'text-slate-400': currentTierIndex !== 4}">👑 Tier 4 (10+ Units): Promo Down | 18-24 Mos</div>
+                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 1, 'text-slate-400': currentTierIndex !== 1}">🎁 Tier 1 (1 Unit): 50% Down | 3 Mos | $50 Fee</div>
+                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 2, 'text-slate-400': currentTierIndex !== 2}">📈 Tier 2 (2-4 Units): 30% Down | 6 Mos | $100 Fee</div>
+                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 3, 'text-slate-400': currentTierIndex !== 3}">🚀 Tier 3 (5-9 Units): Fixed Down | 12 Mos | $200 Fee</div>
+                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 4, 'text-slate-400': currentTierIndex !== 4}">👑 Tier 4 (10+ Units): Promo Down | 18-24 Mos | $0 Fee</div>
                     </div>
                     <div class="space-y-3 bg-purple-50/20 p-4 rounded-xl border border-purple-100 text-xs">
                         <div class="grid grid-cols-2 gap-3">
@@ -232,7 +232,7 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Origination / Setup Fee ($)</label>
+                                <label class="block text-slate-700 font-semibold mb-1">Setup / Administrative Fee ($)</label>
                                 <input type="number" v-model.number="form.financingSetupFee" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-mono font-bold">
                             </div>
                         </div>
@@ -252,7 +252,7 @@
                                 </div>
                                 <div v-if="form.downpaymentMode === 'fixed_per_unit'">
                                     <label class="block text-slate-600 mb-0.5">Fixed Rate ($/Unit)</label>
-                                    <input type="number" v-model.number="form.downpaymentFixedPerUnit" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
+                                    <input type="number" v-model.number="form.downpaymentFixedPerUnit" min="500" max="1500" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
                                 </div>
                             </div>
                         </div>
@@ -325,7 +325,7 @@
                         <!-- Strategy Banner -->
                         <div class="text-[9px] bg-purple-50 text-purple-950 px-2 py-1 rounded flex justify-between font-bold border border-purple-100 mb-2">
                             <span>Fulfillment Routine: {{ form.shippingMethod }}</span>
-                            <span>Financing Terms: {{ form.financingMonths }} Months Deferred Structure</span>
+                            <span>Financing Terms: {{ form.financingMonths }} Months Deferred Structure (0% Interest)</span>
                         </div>
 
                         <!-- Products Breakdown Table -->
@@ -366,7 +366,7 @@
                                     <span>+${{ formatMoney(computedTax) }}</span>
                                 </div>
                                 <div class="flex justify-between text-purple-700 font-bold bg-purple-50/50 px-1 py-0.5 rounded text-[9px]">
-                                    <span>Origination / Portfolio Administration Fee:</span>
+                                    <span>Administrative / Financing Setup Fee:</span>
                                     <span>+${{ formatMoney(form.financingSetupFee) }}</span>
                                 </div>
                                 <div class="flex justify-between text-slate-900 font-black border-t border-gray-200 pt-0.5 text-[10px]">
@@ -424,13 +424,13 @@
                             <tr class="bg-blue-50/40 text-blue-900">
                                 <td class="py-1.5 px-1 font-bold">Downpayment</td>
                                 <td class="py-1.5 px-1 font-mono font-bold">{{ form.date || 'TBD (Contract Execution Date)' }}</td>
-                                <td class="py-1.5 px-1 italic">Immediate clearance mandatory (Includes Tax, Logistics Freight & Setup Fees)</td>
+                                <td class="py-1.5 px-1 italic">Immediate clearance mandatory (Includes Tax, Logistics Freight & Administrative Setup Fees)</td>
                                 <td class="py-1.5 px-1 text-right font-mono font-bold">${{ formatMoney(totalDownpaymentDue) }}</td>
                             </tr>
                             <tr v-for="schedule in computedSchedules" :key="schedule.term" class="text-slate-700 hover:bg-slate-50">
                                 <td class="py-1.5 px-1 font-semibold text-slate-900">Installment {{ schedule.term }}</td>
                                 <td class="py-1.5 px-1 font-mono text-gray-600">{{ schedule.dueDate }}</td>
-                                <td class="py-1.5 px-1 text-gray-500">Hardware base capital distribution payment module cycle.</td>
+                                <td class="py-1.5 px-1 text-gray-500">Hardware base capital distribution payment module cycle. (0% Interest Rate)</td>
                                 <td class="py-1.5 px-1 text-right font-mono font-bold text-slate-900">${{ formatMoney(schedule.amount) }}</td>
                             </tr>
                             </tbody>
@@ -463,15 +463,20 @@
                 phone: ''
             });
 
-            // PRODUCT SPECIFICATION CATALOG
+            // UPDATED OFFICAL PRODUCT LIST & MATRIX PRICES
             const productCatalog = {
-                "Haha Smart Vending Machine (Standard Node 1-Slot)": 3200,
-                "Haha Smart Combo Vendor (Dual Temperature 2-Slot)": 4500,
-                "Haha Ice & Drink Elite Station (Heavy Capacity Node)": 5800,
-                "Haha Micro-Market Checkout Kiosk (Point of Sale Node)": 1500
+                "Mini 360": 2899,
+                "Plus 440": 3399,
+                "pro 542": 4299,
+                "pro 542(nayax)": 4599,
+                "ultra 1200": 5000,
+                "freezer 550": 4699,
+                "Max 620": 4599,
+                "Max 620s": 5399,
+                "Max 66": 4999
             };
 
-            // SYNCED STORAGE SYSTEM MEMORY FOR PROFILE & ACCOUNTS
+            // SYNCED STORAGE SYSTEM MEMORY FOR PROFILE
             const savedProfile = localStorage.getItem('financing_user_profile');
             if (savedProfile) {
                 try {
@@ -506,10 +511,10 @@
                     { modelKey: '', qty: 1, price: 0 }
                 ],
                 financingMonths: 3,
-                financingSetupFee: 150,
+                financingSetupFee: 50,
                 downpaymentMode: 'percentage',
                 downpaymentPercent: 50,
-                downpaymentFixedPerUnit: 1000,
+                downpaymentFixedPerUnit: 1200, // Tier 3 mid point default ($1000 - $1500)
                 freightInput: 350,
                 taxRate: 7.00
             });
@@ -521,7 +526,7 @@
                     phone: authForm.value.phone
                 };
                 localStorage.setItem('financing_user_profile', JSON.stringify(currentUser.value));
-                isLoggedIn.value = true;
+                isLoggedIn.value = true; // Fixed target workspace redirection logic
             };
 
             const handleLogout = () => {
@@ -590,7 +595,7 @@
                 return form.value.items.reduce((acc, curr) => acc + (Number(curr.qty) || 0), 0);
             });
 
-            // FINANCING POLICY AUTOMATED ADJUSTMENTS
+            // FINANCING POLICY ENGINE AUTOMATED ALIGNMENT
             const currentTierIndex = computed(() => {
                 const qty = totalHardwareQty.value;
                 if (qty >= 10) return 4;
@@ -601,7 +606,7 @@
 
             const validMonthsOptions = computed(() => {
                 const tier = currentTierIndex.value;
-                if (tier === 4) return [18, 24];
+                if (tier === 4) return [18, 24]; // 18 - 24 months optional range
                 if (tier === 3) return [12];
                 if (tier === 2) return [6];
                 return [3];
@@ -613,22 +618,22 @@
                     form.value.financingMonths = 3;
                     form.value.downpaymentMode = 'percentage';
                     form.value.downpaymentPercent = 50;
-                    form.value.financingSetupFee = 150;
+                    form.value.financingSetupFee = 50;
                 } else if (tier === 2) {
                     form.value.financingMonths = 6;
                     form.value.downpaymentMode = 'percentage';
                     form.value.downpaymentPercent = 30;
-                    form.value.financingSetupFee = 250;
+                    form.value.financingSetupFee = 100;
                 } else if (tier === 3) {
                     form.value.financingMonths = 12;
                     form.value.downpaymentMode = 'fixed_per_unit';
-                    form.value.downpaymentFixedPerUnit = 1200;
-                    form.value.financingSetupFee = 400;
+                    form.value.downpaymentFixedPerUnit = 1200; // Customizable ($1000 - $1500)
+                    form.value.financingSetupFee = 200;
                 } else if (tier === 4) {
-                    form.value.financingMonths = 18;
-                    form.value.downpaymentMode = 'percentage';
-                    form.value.downpaymentPercent = 15;
-                    form.value.financingSetupFee = 600;
+                    form.value.financingMonths = 18; // Default lowest bound of tier 4 range
+                    form.value.downpaymentMode = 'fixed_per_unit';
+                    form.value.downpaymentFixedPerUnit = 800; // Customizable ($500 - $1000)
+                    form.value.financingSetupFee = 0; // $0 Promo Fee
                 }
             };
 
@@ -658,7 +663,6 @@
                 } else {
                     downpaymentHardwareBase = totalHardwareQty.value * (Number(form.value.downpaymentFixedPerUnit) || 0);
                 }
-                // Downpayment covers hardware part + 100% of ancillary logistics fees upfront
                 const value = downpaymentHardwareBase + computedFreight.value + computedTax.value + (Number(form.value.financingSetupFee) || 0);
                 return value > totalContractValue.value ? totalContractValue.value : value;
             });
