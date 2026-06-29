@@ -44,8 +44,7 @@
                         <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Corporate Email *</label>
-                        <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Corporate Email *</label> <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
@@ -54,6 +53,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1.5">Assigned Reseller Accounts *</label>
                         <div class="bg-slate-50 border border-slate-300 rounded-lg p-3 max-h-40 overflow-y-auto space-y-2 text-xs">
+                            <!-- 修正点：确保这里循环遍历的是全局定义的新版 16 个 resellers -->
                             <label v-for="reseller in resellers" :key="reseller" class="flex items-center gap-2 text-slate-700 hover:text-blue-600 cursor-pointer font-medium">
                                 <input type="checkbox" :value="reseller" v-model="authForm.boundResellers" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
                                 <span>{{ reseller }}</span>
