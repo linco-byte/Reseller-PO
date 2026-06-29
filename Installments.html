@@ -13,10 +13,10 @@
         @media print {
             html, body { margin: 0 !important; padding: 0 !important; background: #ffffff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             @page { size: A4 portrait !important; margin: 0 !important; }
-            .no-print, button, select, input, textarea, .admin-trigger, .modal-mask { display: none !important; }
+            .no-print, button, select, input, textarea { display: none !important; }
             .main-workspace-grid { display: block !important; }
             .print-page-1 { page-break-after: always !important; break-after: page !important; }
-            .a4-print-sheet { width: 210mm !important; min-height: 294mm !important; max-height: 297mm !important; padding: 10mm 15mm !important; margin: 0 auto !important; box-shadow: none !important; border: none !important; background: #ffffff !important; color: #0f172a !important; display: flex !important; flex-direction: column !important; box-sizing: border-box !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+            .a4-print-sheet { width: 210mm !important; min-height: 294mm !important; padding: 10mm 15mm !important; margin: 0 auto !important; box-shadow: none !important; border: none !important; background: #ffffff !important; color: #0f172a !important; display: flex !important; flex-direction: column !important; box-sizing: border-box !important; page-break-inside: avoid !important; break-inside: avoid !important; }
             .print-footer-anchor { margin-top: auto !important; page-break-inside: avoid !important; break-inside: avoid !important; }
             table { font-size: 9.5px !important; }
         }
@@ -56,7 +56,9 @@
                         </label>
                     </div>
                 </div>
-                <button type="submit" :disabled="authForm.boundResellers.length === 0" class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer disabled:cursor-not-allowed"> Open Financing Workspace </button>
+                <button type="submit" :disabled="authForm.boundResellers.length === 0" class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer disabled:cursor-not-allowed">
+                    Open Financing Workspace
+                </button>
             </form>
         </div>
     </div>
@@ -70,12 +72,15 @@
                     <h1 class="text-md font-bold tracking-tight text-slate-900">PO Engine <span class="text-xs font-normal text-slate-300 mx-1.5">|</span> <span class="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded border border-purple-100">Structured Financing Mode</span></h1>
                     <p class="text-xs text-slate-500 mt-0.5">Active Rep: <span class="text-slate-800 font-bold">{{ currentUser.name }}</span></p>
                 </div>
-                <button @click="promptAdminAccess" class="admin-trigger text-xs text-slate-600 hover:text-purple-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer font-medium shadow-sm"> 🔒 Admin Portal </button>
+                <a href="index.html" class="text-xs text-blue-600 hover:text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg transition-colors font-medium shadow-sm flex items-center gap-1">
+                    🔄 Switch to Standard PO Mode
+                </a>
             </div>
             <div class="flex items-center gap-3">
                 <button @click="handleLogout" class="text-slate-500 hover:text-red-500 text-xs transition-colors cursor-pointer font-medium">Switch Profile</button>
-                <button @click="downloadPDF" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5 cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg> Download Financing PO (2-Pages)
+                <button @click="window.print()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                    Print / Download Financing PO (2-Pages)
                 </button>
             </div>
         </header>
@@ -93,6 +98,7 @@
                             <option v-for="reseller in currentUser.boundResellers" :key="reseller" :value="reseller">{{ reseller }}</option>
                         </select>
                     </div>
+                    
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 mb-1">PO Tracking ID (Auto)</label>
@@ -103,27 +109,24 @@
                             <input type="text" v-model="form.clientPoNumber" placeholder="e.g. PO-2026-FIN" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 font-mono text-xs focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
                         </div>
                     </div>
+
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">首付款预计日期 (Downpayment Date)</label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Estimated Downpayment Date</label>
                             <input type="date" v-model="form.date" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Fulfillment Mode</label>
-                            <select v-model="form.shippingMethod" @change="handleShippingMethodChange" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
+                            <select v-model="form.shippingMethod" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
                                 <option value="Logistics Shipping">Logistics Shipping</option>
                                 <option value="Self-pickup">Self-pickup</option>
                             </select>
                         </div>
                     </div>
-                    <div v-if="form.shippingMethod === 'Self-pickup'">
-                        <label class="block text-xs font-semibold text-purple-600 mb-1">Pickup Warehouse Location Box *</label>
-                        <textarea v-model="form.pickupWarehouseText" rows="2" class="w-full bg-slate-50 border border-purple-200 rounded-lg px-3 py-2 text-slate-800 text-xs"></textarea>
-                    </div>
 
-                    <!-- BILLING & SHIPPING MATRIX -->
+                    <!-- BILLING MATRIX -->
                     <div class="space-y-2.5 p-3.5 bg-slate-50/60 rounded-xl border border-slate-200">
-                        <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Billing To Information:</span>
+                        <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Billing Information (Reseller / Buyer):</span>
                         <div>
                             <input type="text" v-model="form.resellerContactName" @input="saveResellerMemory" placeholder="Billing Contact Name" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800">
                         </div>
@@ -133,27 +136,35 @@
                         </div>
                     </div>
 
-                    <div v-if="form.shippingMethod === 'Logistics Shipping'" class="space-y-2.5 p-3.5 bg-slate-50/60 rounded-xl border border-slate-200">
-                        <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Shipping To / Delivery Details:</span>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="text" v-model="form.shippingContactName" @input="saveResellerMemory" placeholder="Shipping Recipient" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
-                            <input type="tel" v-model="form.shippingPhone" @input="saveResellerMemory" placeholder="Shipping Phone" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
+                    <!-- SHIPPING DETAILS FIELD BLOCK -->
+                    <div class="space-y-2.5 p-3.5 bg-slate-50/60 rounded-xl border border-slate-200">
+                        <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Delivery & Shipping Address:</span>
+                        <div v-if="form.shippingMethod === 'Self-pickup'">
+                            <label class="block text-xs text-slate-500 mb-1">Pickup Warehouse Address</label>
+                            <textarea v-model="form.pickupWarehouseText" rows="2" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs"></textarea>
                         </div>
-                        <textarea v-model="form.shippingAddress" rows="2" @input="saveResellerMemory" placeholder="Full Delivery Address..." class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs"></textarea>
+                        <div v-else class="space-y-2">
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" v-model="form.shippingContactName" @input="saveResellerMemory" placeholder="Recipient Name" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
+                                <input type="tel" v-model="form.shippingPhone" @input="saveResellerMemory" placeholder="Recipient Phone" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
+                            </div>
+                            <textarea v-model="form.shippingAddress" rows="2" @input="saveResellerMemory" placeholder="Full Logistics Shipping Address..." class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs"></textarea>
+                        </div>
                     </div>
                 </div>
 
                 <!-- 2. Products Selection -->
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-purple-600 flex items-center gap-1.5">🛒 2. Products Selection (Total Qty Rules Tiers)</h3>
-                        <button @click="addItem" class="text-[11px] bg-purple-50 border border-purple-200 text-purple-600 font-bold px-2.5 py-1 rounded-md hover:bg-purple-100 transition-all克隆">+ Append SKU</button>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-purple-600 flex items-center gap-1.5">🛒 2. Hardware Allocation</h3>
+                        <button @click="addItem" class="text-[11px] bg-purple-50 border border-purple-200 text-purple-600 font-bold px-2.5 py-1 rounded-md hover:bg-purple-100 transition-all">+ Add SKU Line</button>
                     </div>
+                    
                     <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-slate-50/80 border border-slate-200 rounded-xl space-y-3 relative">
                         <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-3 text-red-500 text-xs font-medium">Remove</button>
                         <div>
                             <select v-model="item.modelKey" @change="onModelChange(index)" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 font-medium">
-                                <option value="">-- Choose Hardware SKU --</option>
+                                <option value="">-- Select Product SKU --</option>
                                 <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }} (${{ price }})</option>
                             </select>
                         </div>
@@ -163,102 +174,86 @@
                                 <input type="number" v-model.number="item.qty" min="1" @input="syncFinancingTiers" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
                             </div>
                             <div class="text-right text-xs text-slate-500 pt-1 font-mono">
-                                Price: <strong>${{ formatMoney(item.price) }}</strong>
+                                Base Price: <strong>${{ formatMoney(item.price) }}</strong>
                             </div>
-                        </div>
-                    </div>
-                    <!-- Live Quantity Badge Summary -->
-                    <div class="p-2.5 bg-purple-50 text-purple-900 rounded-lg text-xs font-bold flex justify-between items-center">
-                        <span>当前锁定总台数 (Total Nodes):</span>
-                        <span class="text-sm font-black">{{ totalHardwareQty }} 台</span>
-                    </div>
-                </div>
-<!-- 3. STRUCTURED FINANCING POLICY ENGINE -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-purple-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">⚖️ 3. Structured Financing Engine Matrix</h3>
-                    
-                    <!-- Policy Matrix Quick Viewer Checklist -->
-                    <div class="grid grid-cols-2 gap-2 text-[10px] bg-slate-50 p-3 rounded-lg border border-slate-200 font-medium">
-                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 1, 'text-slate-400': currentTierIndex !== 1}">
-                            🎁 Tier 1 (1台): 首付50% | 3期 | 费$50
-                        </div>
-                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 2, 'text-slate-400': currentTierIndex !== 2}">
-                            📈 Tier 2 (2-4台): 首付30% | 6期 | 费$100
-                        </div>
-                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 3, 'text-slate-400': currentTierIndex !== 3}">
-                            🚀 Tier 3 (5-9台): 首付定额 | 12期 | 费$200
-                        </div>
-                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 4, 'text-slate-400': currentTierIndex !== 4}">
-                            👑 Tier 4 (10台+): 首付更低 | 18-24期 | 费$0
                         </div>
                     </div>
 
-                    <!-- Interactive Configurator Overrides -->
+                    <div class="p-2.5 bg-purple-50 text-purple-900 rounded-lg text-xs font-bold flex justify-between items-center">
+                        <span>Total Hardware Fleet:</span>
+                        <span class="text-sm font-black">{{ totalHardwareQty }} Units</span>
+                    </div>
+                </div>
+
+                <!-- 3. Financing Policy Matrix -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-purple-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">⚖️ 3. Financing Parameter Engine</h3>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-[10px] bg-slate-50 p-3 rounded-lg border border-slate-200 font-medium">
+                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 1, 'text-slate-400': currentTierIndex !== 1}">🎁 Tier 1 (1 Unit): 50% Down | 3 Mos</div>
+                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 2, 'text-slate-400': currentTierIndex !== 2}">📈 Tier 2 (2-4 Units): 30% Down | 6 Mos</div>
+                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 3, 'text-slate-400': currentTierIndex !== 3}">🚀 Tier 3 (5-9 Units): Fixed Down | 12 Mos</div>
+                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 4, 'text-slate-400': currentTierIndex !== 4}">👑 Tier 4 (10+ Units): Promo Down | 18-24 Mos</div>
+                    </div>
+
                     <div class="space-y-3 bg-purple-50/20 p-4 rounded-xl border border-purple-100 text-xs">
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-slate-700 font-semibold mb-1">分期总期数 (Installment Months) *</label>
+                                <label class="block text-slate-700 font-semibold mb-1">Installment Schedule Term</label>
                                 <select v-model.number="form.financingMonths" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-bold text-purple-700">
-                                    <option v-for="m in validMonthsOptions" :key="m" :value="m">{{ m }} 期 (Months)</option>
+                                    <option v-for="m in validMonthsOptions" :key="m" :value="m">{{ m }} Months</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-slate-700 font-semibold mb-1">分期开户服务费 (Setup Fee) *</label>
+                                <label class="block text-slate-700 font-semibold mb-1">Origination / Setup Fee ($)</label>
                                 <input type="number" v-model.number="form.financingSetupFee" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-mono font-bold">
                             </div>
                         </div>
 
-                        <!-- Downpayment Mode Config -->
                         <div class="pt-1 border-t border-purple-100 mt-2">
-                            <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">首付款计算模式 (Downpayment Settings):</span>
+                            <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Downpayment Metric Adjustments:</span>
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-slate-600 mb-0.5">模式选择</label>
+                                    <label class="block text-slate-600 mb-0.5">Calculation Model</label>
                                     <select v-model="form.downpaymentMode" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
-                                        <option value="percentage">按设备总价百分比 (%)</option>
-                                        <option value="fixed_per_unit">按单台固定金额 ($/Unit)</option>
+                                        <option value="percentage">Percentage Allocation (%)</option>
+                                        <option value="fixed_per_unit">Fixed Rate per Node ($/Unit)</option>
                                     </select>
                                 </div>
                                 <div v-if="form.downpaymentMode === 'percentage'">
-                                    <label class="block text-slate-600 mb-0.5">硬件首付比例 (%)</label>
+                                    <label class="block text-slate-600 mb-0.5">Downpayment Matrix (%)</label>
                                     <input type="number" v-model.number="form.downpaymentPercent" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
                                 </div>
                                 <div v-if="form.downpaymentMode === 'fixed_per_unit'">
-                                    <label class="block text-slate-600 mb-0.5">单台硬件首付金 ($)</label>
+                                    <label class="block text-slate-600 mb-0.5">Fixed Rate ($/Unit)</label>
                                     <input type="number" v-model.number="form.downpaymentFixedPerUnit" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
                                 </div>
                             </div>
-                            <p class="text-[10px] text-purple-600 italic mt-1.5 font-medium">✨ 规则自动绑定：首付款总计 = 硬件首付金 + 100%运费 + 100%税费。</p>
                         </div>
                     </div>
 
-                    <!-- 4. FREIGHT & TAX INTEGRATION -->
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">运费金额 ($)</label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Freight Packaging Surcharge ($)</label>
                             <input type="number" v-model.number="form.freightInput" :disabled="form.shippingMethod === 'Self-pickup'" min="0" step="0.01" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">综合税率 (%)</label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Sales Tax Rate (%)</label>
                             <input type="number" v-model.number="form.taxRate" min="0" step="0.01" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5">
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Side: Printable Documents Frame -->
+            <!-- Right Side: Printable Document Sheets Container -->
             <div class="lg:col-span-7 space-y-8">
                 <!-- ==================== PAGE 1: PURCHASE ORDER SHEET ==================== -->
                 <div class="bg-white shadow-xl text-slate-900 border border-gray-200 a4-print-sheet print-page-1 mx-auto">
                     <div class="w-full flex-none">
-                        <!-- Top Head -->
                         <div class="flex justify-between items-start border-b-2 border-slate-900 pb-1">
                             <div>
-                                <div class="mb-1 max-w-[240px] max-h-[60px] overflow-hidden flex items-center">
-                                    <img src="logo.png" alt="Corporate Logo" onerror="this.style.display='none';" class="object-contain max-h-[55px] w-auto">
-                                </div>
-                                <h2 class="text-base font-black tracking-tight text-slate-900">STRUCTURED FINANCING PO</h2>
-                                <p class="text-[11px] font-extrabold text-purple-950 mt-0.5">Haha Vending</p>
+                                <h2 class="text-base font-black tracking-tight text-slate-900">STRUCTURED FINANCING PURCHASE ORDER</h2>
+                                <p class="text-[11px] font-extrabold text-purple-950 mt-0.5">Haha Vending Corporate Holding</p>
                                 <p class="text-[8.5px] text-gray-500 tracking-wide font-medium">1754 North Brown Rd suite 200, Lawrenceville, GA 30043</p>
                             </div>
                             <div class="text-right text-[9.5px] space-y-0.5 text-gray-600 pt-1">
@@ -268,57 +263,59 @@
                             </div>
                         </div>
 
-                        <!-- BILLING & SHIPPING MATRIX -->
+                        <!-- CREDITOR & DEBTOR MATRIX -->
                         <div class="grid grid-cols-2 gap-4 my-1.5 text-[9.5px]">
                             <div class="bg-slate-50 p-2 rounded border border-slate-150 flex flex-col justify-between">
                                 <div>
-                                    <h4 class="font-bold text-purple-950 uppercase tracking-wider text-[8px] mb-0.5">Reseller Billing Profile:</h4>
-                                    <p class="font-bold text-slate-900 mb-0.5">{{ form.resellerName || '[No Reseller Chosen]' }}</p>
-                                    <p v-if="form.resellerContactName" class="text-slate-800 font-medium">Attn: {{ form.resellerContactName }}</p>
-                                </div>
-                                <div class="text-gray-500 text-[8.5px] pt-0.5 border-t border-gray-100 mt-1 font-mono">
-                                    <p v-if="form.resellerEmail">Mail: {{ form.resellerEmail }}</p>
-                                    <p v-if="form.resellerPhone">Tel: {{ form.resellerPhone }}</p>
+                                    <h4 class="font-bold text-purple-950 uppercase tracking-wider text-[8px] mb-0.5">Seller / Issuing Creditor Framework:</h4>
+                                    <p class="font-black text-slate-900 mb-0.5">Haha Vending Corporate Holding</p>
+                                    <p class="text-gray-500 text-[8.5px]">Account Executive: {{ currentUser.name }}</p>
+                                    <p class="text-gray-500 text-[8.5px]">Email: {{ currentUser.email }}</p>
                                 </div>
                             </div>
                             <div class="bg-slate-50 p-2 rounded border border-slate-150 flex flex-col justify-between">
                                 <div>
-                                    <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[8px] mb-0.5">Fulfillment Endpoint:</h4>
-                                    <div v-if="form.shippingMethod === 'Self-pickup'">
-                                        <p class="text-[8.5px] text-purple-900 font-bold uppercase mb-0.5">[Self-Pickup Center Warehouse]</p>
-                                        <p class="text-gray-700 whitespace-pre-line leading-tight text-[8.5px]">{{ form.pickupWarehouseText }}</p>
-                                    </div>
-                                    <div v-else>
-                                        <p v-if="form.shippingContactName" class="font-semibold text-slate-900 mb-0.5">Attn: {{ form.shippingContactName }}</p>
-                                        <p class="text-gray-700 whitespace-pre-line leading-tight text-[8.5px]">{{ form.shippingAddress || 'No endpoint added.' }}</p>
-                                    </div>
-                                </div>
-                                <div v-if="form.shippingMethod === 'Logistics Shipping' && (form.shippingEmail || form.shippingPhone)" class="text-gray-500 text-[8.5px] pt-0.5 border-t border-gray-100 mt-1 font-mono">
-                                    <p v-if="form.shippingPhone">Tel: {{ form.shippingPhone }}</p>
+                                    <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[8px] mb-0.5">Buyer / Account Obligor Profile:</h4>
+                                    <p class="font-bold text-slate-900 mb-0.5">{{ form.resellerName || '[No Buyer Selected]' }}</p>
+                                    <p v-if="form.resellerContactName" class="text-slate-800 font-medium">Attn: {{ form.resellerContactName }}</p>
+                                    <p class="text-gray-500 text-[8.5px] font-mono">Mail: {{ form.resellerEmail || '--' }} | Tel: {{ form.resellerPhone || '--' }}</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Operational Term Status Ribbon -->
-                        <div class="text-[9px] bg-purple-50 text-purple-950 px-2 py-1 rounded flex justify-between font-bold border border-purple-100 mb-2">
-                            <span>Fulfillment Strategy: {{ form.shippingMethod }}</span>
-                            <span>Financing Terms: Structured Over {{ form.financingMonths }} Months</span>
-                            <span class="text-red-700">Downpayment Invoice Date: {{ form.date || '------' }}</span>
+                        <!-- DELIVERY MATRIX ENDPOINT -->
+                        <div class="bg-slate-50 p-2 rounded border border-slate-150 text-[9.5px] mb-2">
+                            <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[8px] mb-0.5">Fulfillment Strategies & Endpoint Location:</h4>
+                            <div v-if="form.shippingMethod === 'Self-pickup'">
+                                <p class="text-[8.5px] text-purple-900 font-bold uppercase">[Self-Pickup Center Depot Facility]</p>
+                                <p class="text-gray-700 font-medium">{{ form.pickupWarehouseText }}</p>
+                            </div>
+                            <div v-else>
+                                <p class="text-[8.5px] text-blue-900 font-bold uppercase">[Direct Logistics Fleet Dispatch Address]</p>
+                                <p v-if="form.shippingContactName" class="font-bold text-slate-900">Contact: {{ form.shippingContactName }} <span class="font-normal font-mono" v-if="form.shippingPhone">(Tel: {{ form.shippingPhone }})</span></p>
+                                <p class="text-gray-700 text-[8.5px] whitespace-pre-line leading-tight">{{ form.shippingAddress || 'No shipping location entered.' }}</p>
+                            </div>
                         </div>
 
-                        <!-- Hardware Products Table -->
+                        <!-- Strategy Banner -->
+                        <div class="text-[9px] bg-purple-50 text-purple-950 px-2 py-1 rounded flex justify-between font-bold border border-purple-100 mb-2">
+                            <span>Fulfillment Routine: {{ form.shippingMethod }}</span>
+                            <span>Financing Terms: {{ form.financingMonths }} Months Deferred Structure</span>
+                        </div>
+
+                        <!-- Products Breakdown Table -->
                         <table class="w-full text-left border-collapse my-1 text-[9.5px]">
                             <thead>
                                 <tr class="border-b border-slate-900 text-gray-400 font-bold uppercase tracking-wider text-[8px]">
-                                    <th class="py-0.5">Structured Hardware Model SKU</th>
+                                    <th class="py-0.5">Structured Hardware Allocation Item SKU</th>
                                     <th class="py-0.5 text-center w-14">Qty</th>
                                     <th class="py-0.5 text-right w-24">Wholesale Price</th>
-                                    <th class="py-0.5 text-right w-24">Extended Cost</th>
+                                    <th class="py-0.5 text-right w-24">Extended Base Cost</th>
                                 </tr>
-                            </thead>
+                            </table>
                             <tbody class="divide-y divide-gray-100">
                                 <tr v-for="(item, index) in form.items" :key="index" class="text-gray-700">
-                                    <td class="py-1 font-semibold text-slate-900">{{ item.modelKey || 'Awaiting Hardware Selection...' }}</td>
+                                    <td class="py-1 font-semibold text-slate-900">{{ item.modelKey || 'Awaiting Hardware Allocation Line...' }}</td>
                                     <td class="py-1 text-center font-bold text-slate-900">{{ item.qty }}</td>
                                     <td class="py-1 text-right text-gray-600">${{ formatMoney(item.price) }}</td>
                                     <td class="py-1 text-right font-bold text-slate-900">${{ formatMoney(item.qty * item.price) }}</td>
@@ -327,55 +324,55 @@
                         </table>
                     </div>
 
-                    <!-- Financial Bottom Calculations Alignment Container -->
+                    <!-- Bottom Accounting Math Ledger -->
                     <div class="print-footer-anchor w-full">
                         <div class="flex justify-end text-[9.5px] pt-1">
-                            <div class="w-64 space-y-0.5 border-t-2 border-slate-900 pt-1">
+                            <div class="w-72 space-y-0.5 border-t-2 border-slate-900 pt-1">
                                 <div class="flex justify-between text-gray-500 font-medium">
-                                    <span>Hardware Gross Base:</span>
+                                    <span>Hardware Fleet Base Valuation:</span>
                                     <span class="font-semibold text-slate-900">${{ formatMoney(grossSubTotal) }}</span>
                                 </div>
                                 <div class="flex justify-between text-gray-500 font-medium">
-                                    <span>Freight Packing Line:</span>
+                                    <span>Logistics & Freight Packing Base:</span>
                                     <span>+${{ formatMoney(computedFreight) }}</span>
                                 </div>
                                 <div class="flex justify-between text-gray-500 font-medium">
-                                    <span>Integrated State Tax ({{ form.taxRate }}%):</span>
+                                    <span>Consolidated Sales Tax ({{ form.taxRate }}%):</span>
                                     <span>+${{ formatMoney(computedTax) }}</span>
                                 </div>
                                 <div class="flex justify-between text-purple-700 font-bold bg-purple-50/50 px-1 py-0.5 rounded text-[9px]">
-                                    <span>分期开户行政管理费:</span>
+                                    <span>Origination / Portfolio Administration Fee:</span>
                                     <span>+${{ formatMoney(form.financingSetupFee) }}</span>
                                 </div>
                                 <div class="flex justify-between text-slate-900 font-black border-t border-gray-200 pt-0.5 text-[10px]">
-                                    <span>订单合同合并总值 (Gross Contract Value):</span>
+                                    <span>Gross Structural Contract Valuation (GCV):</span>
                                     <span>${{ formatMoney(totalContractValue) }}</span>
                                 </div>
                                 <div class="flex justify-between text-blue-800 bg-blue-50 font-bold px-1 py-1 rounded text-[10px] border border-blue-100">
-                                    <span>今日应付首付款合计 (Downpayment Due):</span>
+                                    <span>Initial Downpayment Due Immediately:</span>
                                     <span>${{ formatMoney(totalDownpaymentDue) }}</span>
                                 </div>
                                 <div class="flex justify-between text-red-600 font-black border-b border-gray-200 pb-0.5 text-[10px]">
-                                    <span>进入分期资金融通余额 (Financed Balance):</span>
+                                    <span>Total Financed Deferred Portfolio Balance:</span>
                                     <span>${{ formatMoney(totalFinancedBalance) }}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Signature Binding Rows -->
+                        <!-- Policy Lockout Terms Clause -->
                         <div class="mt-4 border-t border-slate-200 pt-1.5 text-[7px] text-slate-400 leading-normal">
-                            <p class="font-bold text-slate-500 uppercase tracking-wider mb-0.5">Financing Contract Acknowledgement Terms:</p>
-                            <p>This document acts as an explicit structural modification rider to the standard reseller policy framework. The Financed Balance will be disbursed over installments detailed strictly in Annex B attached on Page 2. Failure to honor sequential installment windows constitutes a total operational breach, enabling instant cellular engine lockout blocks on live distributed nodes.</p>
+                            <p class="font-bold text-slate-500 uppercase tracking-wider mb-0.5">Structured Portfolio Financing Terms & Warranties:</p>
+                            <p>This document constitutes a formal rider to the master business structure between the parties. The Financed Balance outlined here will be parsed into consecutive installment cycles detailed on Annex B (Page 2). Failure to settle obligations within established windows triggers automated cellular lockout mechanisms on all distributed node systems.</p>
                         </div>
 
                         <div class="grid grid-cols-2 gap-8 mt-4 text-[9px]">
                             <div class="border-t border-slate-400 pt-1">
-                                <p class="font-bold text-slate-800">Haha Vending Executive Representative</p>
-                                <p class="text-[8px] font-medium text-slate-500 mt-2">Rep Name: {{ currentUser.name }}</p>
+                                <p class="font-bold text-slate-800">Haha Vending Corporate Authorization</p>
+                                <p class="text-[8px] font-medium text-slate-500 mt-2">Executive Agent: {{ currentUser.name }}</p>
                             </div>
                             <div class="border-t border-slate-400 pt-1">
-                                <p class="font-bold text-slate-800">Reseller Obligor Authority Acceptance</p>
-                                <p class="text-[8px] text-slate-500 mt-2">Authorized Signature Date: ____ / ____ / ________</p>
+                                <p class="font-bold text-slate-800">Buyer Account Bound Obligor Acceptance</p>
+                                <p class="text-[8px] text-slate-500 mt-2">Authorized Officer Signature Date: ____ / ____ / ________</p>
                             </div>
                         </div>
                     </div>
@@ -384,60 +381,37 @@
                 <!-- ==================== PAGE 2: DETAILED FINANCING MATRIX AGENDA ==================== -->
                 <div class="bg-white shadow-xl text-slate-900 border border-gray-200 a4-print-sheet mx-auto">
                     <div class="w-full flex-none border-b-2 border-slate-900 pb-1">
-                        <div class="flex justify-between items-end">
-                            <div>
-                                <h3 class="text-sm font-black tracking-tight text-slate-900">ANNEX B: DETAILED REPAYMENT INSTALLMENT SCHEDULE</h3>
-                                <p class="text-[9px] text-gray-500">Structured Financing Core Attachment linked to PO Tracking ID: <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span></p>
-                            </div>
-                        </div>
+                        <h3 class="text-sm font-black tracking-tight text-slate-900">ANNEX B: ITEMIZED REPAYMENT RUN MATRIX</h3>
+                        <p class="text-[9px] text-gray-500">Core Financial Rider Reference tied to Financing PO ID: <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span></p>
                     </div>
 
                     <div class="mt-3 text-[9.5px] text-gray-700 flex-grow space-y-4">
-                        <p class="leading-relaxed font-medium">Following successful clearance of the Initial Downpayment Invoice (<span class="font-bold text-blue-700">${{ formatMoney(totalDownpaymentDue) }}</span>), the Financed Balance (<span class="font-bold text-red-600">${{ formatMoney(totalFinancedBalance) }}</span>) is structured into exactly <span class="font-bold text-purple-700">{{ form.financingMonths }}</span> consecutive billing intervals without additional interest accrual:</p>
+                        <p class="leading-relaxed font-medium">Upon verified processing of the Initial Downpayment Invoice (<span class="font-bold text-blue-700">${{ formatMoney(totalDownpaymentDue) }}</span>), the outstanding Financed Balance (<span class="font-bold text-red-600">${{ formatMoney(totalFinancedBalance) }}</span>) is structured into <span class="font-bold text-purple-700">{{ form.financingMonths }}</span> periodic billing cycles:</p>
 
-                        <!-- Dynamic Milestone Schedule Calendar Table -->
                         <table class="w-full text-left border-collapse text-[9.5px]">
                             <thead>
                                 <tr class="border-b-2 border-slate-800 text-slate-500 font-bold uppercase tracking-wider text-[7.5px]">
-                                    <th class="py-1 w-20">期数 (Billing Term)</th>
-                                    <th class="py-1 w-36">应付款日期 (Due Date Target)</th>
-                                    <th class="py-1">还款条件与宽限说明 (Payment Terms Metrics)</th>
-                                    <th class="py-1 text-right w-28">应还款金额 (Amount Due)</th>
+                                    <th class="py-1 w-24">Cycle Interval</th>
+                                    <th class="py-1 w-36">Target Maturity Date</th>
+                                    <th class="py-1">Operational Portfolio Standing Guidance</th>
+                                    <th class="py-1 text-right w-28">Installment Due</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 font-medium">
                                 <tr class="bg-blue-50/40 text-blue-900">
                                     <td class="py-1.5 px-1 font-bold">Downpayment</td>
-                                    <td class="py-1.5 px-1 font-mono font-bold">{{ form.date || 'TBD (Contract Date)' }}</td>
-                                    <td class="py-1.5 px-1 italic">Immediate due upon signing (Includes 100% Tax, Freight & Setup Fee)</td>
+                                    <td class="py-1.5 px-1 font-mono font-bold">{{ form.date || 'TBD (Contract Execution Date)' }}</td>
+                                    <td class="py-1.5 px-1 italic">Immediate clearance mandatory (Includes Tax, Logistics Freight & Setup Fees)</td>
                                     <td class="py-1.5 px-1 text-right font-mono font-bold">${{ formatMoney(totalDownpaymentDue) }}</td>
                                 </tr>
                                 <tr v-for="schedule in computedSchedules" :key="schedule.term" class="text-slate-700 hover:bg-slate-50">
-                                    <td class="py-1.5 px-1 font-mono font-bold text-purple-700">第 {{ schedule.term }} 期</td>
-                                    <td class="py-1.5 px-1 font-mono font-bold text-slate-900">{{ schedule.dueDate }}</td>
-                                    <td class="py-1.5 px-1 text-gray-500 text-[8.5px]"> {{ schedule.term === 1 ? '🌟 首期宽限账期 (Downpayment + 45 Days Margin)' : '标准自动转账结算账期 (Standard +30 Days Rollover Cycle)' }} </td>
+                                    <td class="py-1.5 px-1 font-semibold text-slate-900">Installment {{ schedule.term }}</td>
+                                    <td class="py-1.5 px-1 font-mono text-gray-600">{{ schedule.dueDate }}</td>
+                                    <td class="py-1.5 px-1 text-gray-500">Hardware base capital distribution payment module cycle.</td>
                                     <td class="py-1.5 px-1 text-right font-mono font-bold text-slate-900">${{ formatMoney(schedule.amount) }}</td>
-                                </tr>
-                                <tr class="border-t-2 border-slate-900 font-black text-slate-900 text-[10px]">
-                                    <td colspan="3" class="py-2 text-right uppercase">所有期次合计总额 (Combined Cash Liquidation Sum):</td>
-                                    <td class="py-2 text-right font-mono text-purple-700">${{ formatMoney(totalContractValue) }}</td>
                                 </tr>
                             </tbody>
                         </table>
-
-                        <!-- Security Lockout Rider Descriptor Block -->
-                        <div class="bg-rose-50/50 p-3 rounded-lg border border-rose-100 mt-4 text-[8.5px] text-rose-950 space-y-1.5">
-                            <p class="font-extrabold text-rose-800 uppercase tracking-wide">⚠️ HARDWARE LOCKOUT POLICIES & TELEMETRY ACCESS SUSPENSION RIDER:</p>
-                            <p class="leading-normal">Each individual hardware node bound by Page 1 possesses an active software gateway switch directly coupled into the cloud infrastructure. If any installment value mapped above fails automated processing gate criteria within **five (5) business days** past its documented target date, Haha Vending retains unilateral authority to restrict point-of-sale customer credit terminals, freeze physical vending internal coils, and terminate active cellular M2M telemetry SIM links without legal notice. Access restores purely upon full clearance of past-due balances plus a late compliance collection assessment surcharge.</p>
-                        </div>
-                    </div>
-
-                    <div class="w-full mt-auto pt-4 border-t border-gray-100">
-                        <div class="grid grid-cols-2 gap-8 text-[8.5px] font-bold text-slate-500">
-                            <div><p>Haha Vending Representative Sign-off: ____________</p></div>
-                            <div><p>Reseller Obligor Sign-off Verification: ____________</p></div>
-                        </div>
-                        <p class="text-center text-[7px] text-gray-300 mt-3">Page 2 of 2 — Annex B Balanced Allocation Summary Matrix Frame End</p>
                     </div>
                 </div>
             </div>
@@ -446,133 +420,243 @@
 </div>
 
 <script>
-    const { createApp } = Vue;
+    const { createApp, ref, computed } = Vue;
 
     createApp({
-        data() {
-            return {
-                isLoggedIn: false, isAdminModalOpen: false,
-                authForm: { name: '', email: '', phone: '', boundResellers: [] },
-                currentUser: { name: '', email: '', phone: '', boundResellers: [] },
-                resellers: ['Twelve 28 vending', 'Vend Guys Local', 'PBS vending', 'Vending Pro LLC', 'Global Matrix', 'Apex Smart Retail'],
-                productCatalog: {
-                    'Mini360': 2199.00,
-                    'Pro 542': 3450.00,
-                    'Combo V3': 4199.00
-                },
-                form: {
-                    resellerName: '', poNumber: '', clientPoNumber: '',
-                    date: new Date().toISOString().substr(0, 10), shippingMethod: 'Logistics Shipping',
-                    pickupWarehouseText: 'Haha Vending Logistical Hub, 1754 North Brown Rd, Lawrenceville, GA 30043',
-                    resellerContactName: '', resellerEmail: '', resellerPhone: '',
-                    shippingContactName: '', shippingEmail: '', shippingPhone: '', shippingAddress: '',
-                    freightInput: 0, taxRate: 0,
-                    items: [{ modelKey: '', qty: 1, price: 0 }],
-                    
-                    // Structured Financing Core Schema Extension
-                    financingMonths: 3,
-                    financingSetupFee: 50,
-                    downpaymentMode: 'percentage', // 'percentage' or 'fixed_per_unit'
-                    downpaymentPercent: 50,
-                    downpaymentFixedPerUnit: 0
-                },
-                currentTierIndex: 1,
-                validMonthsOptions: [3, 6, 12, 24]
+        setup() {
+            // AUTH PROFILE SETUP
+            const isLoggedIn = ref(false);
+            const resellers = ["Vending Edge LLC", "Apex Distributing Group", "Nova Automation Inc", "Titan Retail Solutions"];
+            
+            const authForm = ref({
+                name: '',
+                email: '',
+                phone: '',
+                boundResellers: []
+            });
+            const currentUser = ref(null);
+
+            // COMPREHENSIVE PRODUCT CATALOG DATABASE
+            const productCatalog = {
+                "Haha Smart Vending Pro V4": 3499.00,
+                "Haha Ice & Beverage Center Combo": 4850.00,
+                "Haha Slimline Snack Dispenser Lite": 1899.00,
+                "Haha Interactive Touchscreen Locker Node": 2650.00
             };
-        },
-        computed: {
-            totalHardwareQty() { return this.form.items.reduce((sum, item) => sum + (Number(item.qty) || 0), 0); },
-            grossSubTotal() { return this.form.items.reduce((sum, item) => sum + ((Number(item.price) || 0) * (Number(item.qty) || 0)), 0); },
-            computedFreight() { return this.form.shippingMethod === 'Self-pickup' ? 0 : (Number(this.form.freightInput) || 0); },
-            computedTax() { return (this.grossSubTotal + this.computedFreight) * ((Number(this.form.taxRate) || 0) / 100); },
-            
-            // Total Aggregate Contract Value including the Setup Administration Fee
-            totalContractValue() { return this.grossSubTotal + this.computedFreight + this.computedTax + (Number(this.form.financingSetupFee) || 0); },
-            
-            // Core Logic: Compute the Downpayment Core Value for Hardware Component
-            hardwareDownpaymentComponent() {
-                if (this.form.downpaymentMode === 'fixed_per_unit') {
-                    return (Number(this.form.downpaymentFixedPerUnit) || 0) * this.totalHardwareQty;
+
+            // CORE PO CONFIGURATORS
+            const form = ref({
+                poNumber: 'PO-FIN-' + Math.floor(100000 + Math.random() * 900000),
+                clientPoNumber: '',
+                resellerName: '',
+                date: new Date().toISOString().substring(0, 10),
+                shippingMethod: 'Logistics Shipping',
+                pickupWarehouseText: 'Haha Atlanta Regional Consolidation Hub\n4405 International Blvd, Norcross, GA 30093',
+                
+                // Billing Info
+                resellerContactName: '',
+                resellerEmail: '',
+                resellerPhone: '',
+
+                // Shipping Info (Fulfillment Address Block)
+                shippingContactName: '',
+                shippingPhone: '',
+                shippingAddress: '',
+
+                items: [{ modelKey: '', qty: 1, price: 0 }],
+
+                // Financing parameters
+                financingMonths: 3,
+                financingSetupFee: 50,
+                downpaymentMode: 'percentage',
+                downpaymentPercent: 50,
+                downpaymentFixedPerUnit: 1500,
+
+                freightInput: 150,
+                taxRate: 7.00
+            });
+
+            // LIFECYCLE MEMORY MANAGEMENT
+            const loadResellerMemory = () => {
+                if(!form.value.resellerName) return;
+                const cache = localStorage.getItem(`fin_cache_${form.value.resellerName}`);
+                if(cache) {
+                    const data = JSON.parse(cache);
+                    form.value.resellerContactName = data.contactName || '';
+                    form.value.resellerEmail = data.email || '';
+                    form.value.resellerPhone = data.phone || '';
+                    form.value.shippingContactName = data.shipContact || '';
+                    form.value.shippingPhone = data.shipPhone || '';
+                    form.value.shippingAddress = data.shipAddress || '';
+                } else {
+                    form.value.resellerContactName = '';
+                    form.value.resellerEmail = '';
+                    form.value.resellerPhone = '';
+                    form.value.shippingContactName = '';
+                    form.value.shippingPhone = '';
+                    form.value.shippingAddress = '';
                 }
-                return this.grossSubTotal * ((Number(this.form.downpaymentPercent) || 0) / 100);
-            },
-            // Total Downpayment Due Today = 100% Tax + 100% Freight + Admin Fee + Calculated Hardware Percentage Base
-            totalDownpaymentDue() {
-                return this.hardwareDownpaymentComponent + this.computedFreight + this.computedTax + (Number(this.form.financingSetupFee) || 0);
-            },
-            // Financed Balance that enters installments
-            totalFinancedBalance() {
-                let diff = this.totalContractValue - this.totalDownpaymentDue;
-                return diff < 0 ? 0 : diff;
-            },
-            
-            // Dynamic Sequential Repayment Timeline Schedule Array Generation Engine
-            computedSchedules() {
-                let schedules = [];
-                let months = Number(this.form.financingMonths) || 1;
-                if (months <= 0) return schedules;
-                
-                let perInstallmentValue = this.totalFinancedBalance / months;
-                let anchorDateStr = this.form.date || new Date().toISOString().substr(0, 10);
-                
+            };
+
+            const saveResellerMemory = () => {
+                if(!form.value.resellerName) return;
+                const data = {
+                    contactName: form.value.resellerContactName,
+                    email: form.value.resellerEmail,
+                    phone: form.value.resellerPhone,
+                    shipContact: form.value.shippingContactName,
+                    shipPhone: form.value.shippingPhone,
+                    shipAddress: form.value.shippingAddress
+                };
+                localStorage.setItem(`fin_cache_${form.value.resellerName}`, JSON.stringify(data));
+            };
+
+            const handleRegister = () => {
+                currentUser.value = { ...authForm.value };
+                isLoggedIn.value = true;
+            };
+
+            const handleLogout = () => {
+                isLoggedIn.value = false;
+            };
+
+            // PRODUCTS MODIFIERS
+            const addItem = () => {
+                form.value.items.push({ modelKey: '', qty: 1, price: 0 });
+            };
+
+            const removeItem = (idx) => {
+                form.value.items.splice(idx, 1);
+                syncFinancingTiers();
+            };
+
+            const onModelChange = (idx) => {
+                const key = form.value.items[idx].modelKey;
+                form.value.items[idx].price = productCatalog[key] || 0;
+                syncFinancingTiers();
+            };
+
+            // AUTO RULES POLICY MATRIX ENGINE
+            const totalHardwareQty = computed(() => {
+                return form.value.items.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+            });
+
+            const currentTierIndex = computed(() => {
+                const qty = totalHardwareQty.value;
+                if(qty >= 10) return 4;
+                if(qty >= 5) return 3;
+                if(qty >= 2) return 2;
+                return 1;
+            });
+
+            const validMonthsOptions = computed(() => {
+                if(currentTierIndex.value === 4) return [18, 24];
+                if(currentTierIndex.value === 3) return [12];
+                if(currentTierIndex.value === 2) return [6];
+                return [3];
+            });
+
+            const syncFinancingTiers = () => {
+                const tier = currentTierIndex.value;
+                if(tier === 1) {
+                    form.value.financingMonths = 3;
+                    form.value.financingSetupFee = 50;
+                    form.value.downpaymentMode = 'percentage';
+                    form.value.downpaymentPercent = 50;
+                } else if(tier === 2) {
+                    form.value.financingMonths = 6;
+                    form.value.financingSetupFee = 100;
+                    form.value.downpaymentMode = 'percentage';
+                    form.value.downpaymentPercent = 30;
+                } else if(tier === 3) {
+                    form.value.financingMonths = 12;
+                    form.value.financingSetupFee = 200;
+                    form.value.downpaymentMode = 'fixed_per_unit';
+                    form.value.downpaymentFixedPerUnit = 1000;
+                } else if(tier === 4) {
+                    form.value.financingMonths = 18;
+                    form.value.financingSetupFee = 0;
+                    form.value.downpaymentMode = 'percentage';
+                    form.value.downpaymentPercent = 15;
+                }
+            };
+
+            // COMPUTED ARITHMETIC FINANCIAL VALUATIONS
+            const grossSubTotal = computed(() => {
+                return form.value.items.reduce((sum, item) => sum + ((Number(item.qty) || 0) * (Number(item.price) || 0)), 0);
+            });
+
+            const computedFreight = computed(() => {
+                return form.value.shippingMethod === 'Self-pickup' ? 0 : (Number(form.value.freightInput) || 0);
+            });
+
+            const computedTax = computed(() => {
+                return (grossSubTotal.value + computedFreight.value) * ((Number(form.value.taxRate) || 0) / 100);
+            });
+
+            const totalContractValue = computed(() => {
+                return grossSubTotal.value + computedFreight.value + computedTax.value + (Number(form.value.financingSetupFee) || 0);
+            });
+
+            const hardwareDownpaymentShare = computed(() => {
+                if(form.value.downpaymentMode === 'percentage') {
+                    return grossSubTotal.value * ((Number(form.value.downpaymentPercent) || 0) / 100);
+                } else {
+                    return totalHardwareQty.value * (Number(form.value.downpaymentFixedPerUnit) || 0);
+                }
+            });
+
+            const totalDownpaymentDue = computed(() => {
+                const total = hardwareDownpaymentShare.value + computedFreight.value + computedTax.value + (Number(form.value.financingSetupFee) || 0);
+                return Math.min(total, totalContractValue.value);
+            });
+
+            const totalFinancedBalance = computed(() => {
+                return Math.max(0, totalContractValue.value - totalDownpaymentDue.value);
+            });
+
+            const computedSchedules = computed(() => {
+                const list = [];
+                const months = form.value.financingMonths || 1;
+                const baseFinanced = totalFinancedBalance.value;
+                if (baseFinanced <= 0) return list;
+
+                const baseInstallment = Math.floor((baseFinanced / months) * 100) / 100;
+                let accumulated = 0;
+                const baseDate = form.value.date ? new Date(form.value.date) : new Date();
+
                 for (let i = 1; i <= months; i++) {
-                    let d = new Date(anchorDateStr + 'T12:00:00'); // Prevent UTC local midnight offset shifts
-                    if (i === 1) {
-                        d.setDate(d.getDate() + 45); // First milestone threshold gap is +45 Days
+                    const dueDate = new Date(baseDate);
+                    dueDate.setMonth(baseDate.getMonth() + i);
+                    
+                    let amount = baseInstallment;
+                    if (i === months) {
+                        amount = Math.round((baseFinanced - accumulated) * 100) / 100;
                     } else {
-                        d.setDate(d.getDate() + 45 + ((i - 1) * 30)); // Subsequent monthly checks follow +30 Day steps
+                        accumulated += baseInstallment;
                     }
-                    schedules.push({
+
+                    list.push({
                         term: i,
-                        dueDate: d.toISOString().substr(0, 10),
-                        amount: perInstallmentValue
+                        dueDate: dueDate.toISOString().substring(0, 10),
+                        amount: amount
                     });
                 }
-                return schedules;
-            }
-        },
-        mounted() {
-            this.regeneratePoNumber();
-        },
-        methods: {
-            regeneratePoNumber() { this.form.poNumber = 'PO-FIN-' + Math.floor(100000 + Math.random() * 900000); },
-            handleRegister() { this.currentUser = { ...this.authForm }; this.isLoggedIn = true; if (this.currentUser.boundResellers.length > 0) { this.form.resellerName = this.currentUser.boundResellers[0]; this.loadResellerMemory(); } },
-            handleLogout() { this.isLoggedIn = false; this.authForm = { name: '', email: '', phone: '', boundResellers: [] }; },
-            handleShippingMethodChange() { if (this.form.shippingMethod === 'Self-pickup') { this.form.freightInput = 0; } },
-            addItem() { this.form.items.push({ modelKey: '', qty: 1, price: 0 }); this.syncFinancingTiers(); },
-            removeItem(index) { this.form.items.splice(index, 1); this.syncFinancingTiers(); },
-            onModelChange(index) { this.form.items[index].price = this.productCatalog[this.form.items[index].modelKey] || 0; this.syncFinancingTiers(); },
-            formatMoney(v) { return (Number(v) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); },
-            
-            // Intelligent Business Workflow Automation Strategy Engine: Auto-Sync Tiers based on Qty Input
-            syncFinancingTiers() {
-                let qty = this.totalHardwareQty;
-                if (qty <= 1) {
-                    this.currentTierIndex = 1; this.form.financingMonths = 3; this.form.financingSetupFee = 50;
-                    this.form.downpaymentMode = 'percentage'; this.form.downpaymentPercent = 50; this.validMonthsOptions = [3];
-                } else if (qty >= 2 && qty <= 4) {
-                    this.currentTierIndex = 2; this.form.financingMonths = 6; this.form.financingSetupFee = 100;
-                    this.form.downpaymentMode = 'percentage'; this.form.downpaymentPercent = 30; this.validMonthsOptions = [3, 6];
-                } else if (qty >= 5 && qty <= 9) {
-                    this.currentTierIndex = 3; this.form.financingMonths = 12; this.form.financingSetupFee = 200;
-                    this.form.downpaymentMode = 'fixed_per_unit'; this.form.downpaymentFixedPerUnit = 1250; this.validMonthsOptions = [3, 6, 12]; // Initial middle bounds default picker
-                } else {
-                    this.currentTierIndex = 4; this.form.financingMonths = 24; this.form.financingSetupFee = 0;
-                    this.form.downpaymentMode = 'fixed_per_unit'; this.form.downpaymentFixedPerUnit = 750; this.validMonthsOptions = [3, 6, 12, 18, 24];
-                }
-            },
-            loadResellerMemory() {
-                const memory = localStorage.getItem(`reseller_mem_fin_${this.form.resellerName}`);
-                if (memory) { Object.assign(this.form, JSON.parse(memory)); }
-                else { this.form.resellerContactName = ''; this.form.resellerEmail = ''; this.form.resellerPhone = ''; this.form.shippingContactName = ''; this.form.shippingPhone = ''; this.form.shippingAddress = ''; }
-            },
-            saveResellerMemory() {
-                if (!this.form.resellerName) return;
-                const payload = { resellerContactName: this.form.resellerContactName, resellerEmail: this.form.resellerEmail, resellerPhone: this.form.resellerPhone, shippingContactName: this.form.shippingContactName, shippingPhone: this.form.shippingPhone, shippingAddress: this.form.shippingAddress };
-                localStorage.setItem(`reseller_mem_fin_${this.form.resellerName}`, JSON.stringify(payload));
-            },
-            promptAdminAccess() { alert("Financing master auditing log matrix is sealed under localized compliance laws."); },
-            downloadPDF() { if (!this.form.resellerName) { alert("Reseller Account Required."); return; } window.print(); }
+                return list;
+            });
+
+            const formatMoney = (val) => {
+                return (Number(val) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            };
+
+            return {
+                isLoggedIn, resellers, authForm, currentUser, productCatalog, form,
+                loadResellerMemory, saveResellerMemory, handleRegister, handleLogout,
+                addItem, removeItem, onModelChange, totalHardwareQty, currentTierIndex,
+                validMonthsOptions, syncFinancingTiers, grossSubTotal, computedFreight,
+                computedTax, totalContractValue, totalDownpaymentDue, totalFinancedBalance,
+                computedSchedules, formatMoney
+            };
         }
     }).mount('#app');
 </script>
