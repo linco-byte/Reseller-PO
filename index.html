@@ -27,6 +27,21 @@
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 antialiased">
+    <!-- ================= 顶部导航栏：新增切换按钮（开始） ================= -->
+    <div class="no-print bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center shadow-sm">
+        <div class="flex items-center space-x-2">
+            <span class="text-lg font-bold text-slate-700">采购订单系统</span>
+            <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">v1.0</span>
+        </div>
+        <a href="installments.html" 
+           class="inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg shadow-sm text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 group">
+            <svg class="-ml-1 mr-2 h-4 w-4 text-slate-500 group-hover:text-indigo-600 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+            切换到分期付款 (Installments)
+        </a>
+    </div>
+    <!-- ================= 顶部导航栏：新增切换按钮（结束） ================= -->
     <div id="app">
         <!-- SYSTEM GATEKEEPER: SALES REP REGISTRATION -->
         <div v-if="!isLoggedIn" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 no-print">
