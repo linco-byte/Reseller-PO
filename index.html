@@ -12,29 +12,30 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         /* STRICT PRINT CONSTRAINTS: FIXED LATERAL BREAK PROTECTION */
         @media print {
-            html, body { margin: 0 !important; padding: 0 !important; background: #ffffff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            html, body { margin: 0 !important; padding: 0 !important; background: #ffffff !important; }
             @page { size: A4 portrait !important; margin: 0 !important; }
             .no-print, button, select, input, textarea, .admin-trigger, .modal-mask { display: none !important; }
             .main-workspace-grid { display: block !important; }
             /* FORCE PAGE BREAK ON DESIRED CONTAINER BOUNDARIES */
             .print-page-1 { page-break-after: always !important; break-after: page !important; }
             /* FLEX DYNAMIC COMPRESSION FRAME FOR A4 */
-            .a4-print-sheet { width: 210mm !important; min-height: 294mm !important; max-height: 297mm !important; padding: 10mm 15mm !important; margin: 0 auto !important; box-shadow: none !important; border: none !important; background: #ffffff !important; color: #0f172a !important; display: flex !important; flex-direction: column !important; box-sizing: border-box !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+            .a4-print-sheet { width: 210mm !important; min-height: 294mm !important; max-height: 297mm !important; }
             /* Push totals & footer strictly to the bottom of page 1 without causing split */
-            .print-footer-anchor { margin-top: auto !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+            .print-footer-anchor { margin-top: auto !important; page-break-inside: avoid !important; }
             table { font-size: 10px !important; }
         }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 antialiased">
-    <!-- ================= 顶部导航栏：新增切换按钮（开始） ================= -->
+
+    <!-- ================= 顶部导航栏：切换按钮（兼容 Tailwind v4） ================= -->
     <div class="no-print bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center shadow-sm">
         <div class="flex items-center space-x-2">
             <span class="text-lg font-bold text-slate-700">采购订单系统</span>
             <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">v1.0</span>
         </div>
         <a href="installments.html" 
-           class="inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg shadow-sm text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 group">
+           class="inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg shadow-xs text-slate-700 bg-white hover:bg-slate-50 focus:outline-hidden transition-all duration-200 group">
             <svg class="-ml-1 mr-2 h-4 w-4 text-slate-500 group-hover:text-indigo-600 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
             </svg>
