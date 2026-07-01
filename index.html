@@ -11,15 +11,16 @@
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         /* STRICT PRINT CONSTRAINTS: FIXED LATERAL BREAK PROTECTION */
-        @media print {
+      @media print {
             html, body { margin: 0 !important; padding: 0 !important; background: #ffffff !important; }
-            @page { size: A4 portrait !important; margin: 0 !important; }
+            /* 1. 给 A4 页面四周留出 12mm 的物理边距，防止贴边 */
+            @page { size: A4 portrait !important; margin: 12mm !important; }
             .no-print, button, select, input, textarea, .admin-trigger, .modal-mask { display: none !important; }
             .main-workspace-grid { display: block !important; }
             /* FORCE PAGE BREAK ON DESIRED CONTAINER BOUNDARIES */
             .print-page-1 { page-break-after: always !important; break-after: page !important; }
-            /* FLEX DYNAMIC COMPRESSION FRAME FOR A4 */
-            .a4-print-sheet { width: 210mm !important; min-height: 294mm !important; max-height: 297mm !important; }
+            /* 2. 减去左右边距后，将主容器宽度从 210mm 缩减至 186mm，完美适配 A4 比例 */
+            .a4-print-sheet { width: 186mm !important; min-height: 270mm !important; max-height: 277mm !important; box-shadow: none !important; }
             /* Push totals & footer strictly to the bottom of page 1 without causing split */
             .print-footer-anchor { margin-top: auto !important; page-break-inside: avoid !important; }
             table { font-size: 10px !important; }
