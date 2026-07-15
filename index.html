@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>采购订单工作台</title>
+    <title>Purchase Order Workspace</title>
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Vue 3 Framework -->
@@ -55,209 +55,290 @@
     <div class="no-print bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center shadow-sm">
         <div class="flex items-center space-x-2">
             <span class="text-lg font-bold text-slate-700">采购订单系统</span>
-            <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">v1.2</span>
+            <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">v1.1</span>
         </div>
     </div>
 
     <div id="app">
-        <!-- 销售代表注册弹窗 -->
+        <!-- SYSTEM GATEKEEPER: SALES这里是为您全面修改后的完整 `index.html` 代码。已完美整合您的所有需求：
+
+1. **条款位置转移**：将 `Mandatory Operational Compliance Notice` 从第一页彻底移除，并精准放置在第二页（DISTRIBUTOR AGREEMENT）的最底部。
+2. **第一页增加签名与日期**：在第一页右侧的打印预览区域（PO Sheet）底部，添加了专用的 `Authorized Signature` 和 `Date Signed` 签署区。
+3. **注册页面增加手机与邮箱**：登录/注册弹窗已确保全面绑定 `email` 和 `phone`。
+4. **文案替换**：将原有的 `Fulfillment & Delivery:` 统一修改为 `Shipping to:`。
+5. **Billing Information 记忆功能**：扩展了现有的 `localStorage` 机制。当切换经销商账号、输入数据、或者首次进入系统时，自动读取并安全缓存您的账单信息（`Billing Contact Name`, `Billing Email`, `Billing Phone`）。
+
+您可以直接**全选并覆盖**您现有的 `index.html` 文件：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Order Workspace</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="[https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4](https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4)"></script>
+    <!-- Vue 3 Framework -->
+    <script src="[https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js](https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js)"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        /* STRICT PRINT CONSTRAINTS: FIXED LATERAL BREAK PROTECTION */
+        @media print {
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+            }
+            @page {
+                size: A4 portrait !important;
+                margin: 12mm !important;
+            }
+            .no-print, button, select, input, textarea, .admin-trigger, .modal-mask {
+                display: none !important;
+            }
+            .main-workspace-grid {
+                display: block !important;
+            }
+            .print-page-1 {
+                page-break-after: always !important;
+                break-after: page !important;
+            }
+            .a4-print-sheet {
+                width: 186mm !important;
+                min-height: 270mm !important;
+                max-height: 277mm !important;
+                box-shadow: none !important;
+            }
+            .print-footer-anchor {
+                margin-top: auto !important;
+                page-break-inside: avoid !important;
+            }
+            table {
+                font-size: 10px !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased">
+
+    <!-- ================= 顶部导航栏 ================= -->
+    <div class="no-print bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center shadow-sm">
+        <div class="flex items-center space-x-2">
+            <span class="text-lg font-bold text-slate-700">采购订单系统</span>
+            <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">v1.1</span>
+        </div>
+    </div>
+
+    <div id="app">
+        <!-- SYSTEM GATEKEEPER: SALES REP REGISTRATION -->
         <div v-if="!isLoggedIn" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 no-print">
             <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 border border-slate-200">
                 <div class="text-center mb-6">
-                    <h2 class="text-xl font-bold text-slate-900 tracking-tight">销售员登记中心</h2>
-                    <p class="text-xs text-slate-500 mt-1">请输入您的个人信息以初始化工作台</p>
+                    <div class="h-12 w-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3 border border-blue-100 shadow-sm">
+                        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M19.242 18.274A13.916 13.916 0 0021 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M12 11a13.942 13.942 0 00-2.316-5.074" /></svg>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900 tracking-tight">Sales Representative Registry</h2>
+                    <p class="text-xs text-slate-500 mt-1">Identify yourself to initialize the PO engine.</p>
                 </div>
                 <form @submit.prevent="handleRegister" class="space-y-4 text-sm">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">销售员姓名 *</label>
-                        <input type="text" v-model="authForm.name" required placeholder="例如：张三" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Sales Rep Full Name *</label>
+                        <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">企业电子邮箱 *</label>
-                        <input type="email" v-model="authForm.email" required placeholder="username@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Corporate Email *</label>
+                        <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">手机号码 *</label>
-                        <input type="tel" v-model="authForm.phone" required placeholder="请输入您的联系电话" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
+                        <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                     </div>
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer">
-                        进入工作台
+                        Initialize Workspace
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- 主工作台结构 -->
+        <!-- MAIN PO WORKSPACE -->
         <div v-if="isLoggedIn" class="container mx-auto px-4 py-6 max-w-7xl">
-            <!-- 顶部控制面板 -->
+            <!-- Control Navbar -->
             <header class="mb-6 no-print flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex items-center gap-4">
                     <div>
-                        <h1 class="text-md font-bold tracking-tight text-slate-900">订单生成引擎 <span class="text-xs font-normal text-slate-300 mx-1.5">|</span> <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">销售模式</span></h1>
-                        <p class="text-xs text-slate-500 mt-0.5">当前销售员：<span class="text-slate-800 font-bold">{{ currentUser.name }}</span></p>
+                        <h1 class="text-md font-bold tracking-tight text-slate-900">PO Engine <span class="text-xs font-normal text-slate-300 mx-1.5">|</span> <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Sales Mode</span></h1>
+                        <p class="text-xs text-slate-500 mt-0.5">Active Rep: <span class="text-slate-800 font-bold">{{ currentUser.name }}</span></p>
                     </div>
+                    <button @click="promptAdminAccess" class="admin-trigger text-xs text-slate-600 hover:text-blue-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer font-medium shadow-sm">
+                        🔒 Admin Portal (Global Logs)
+                    </button>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button @click="handleLogout" class="text-slate-500 hover:text-red-500 text-xs transition-colors cursor-pointer font-medium">切换账号</button>
+                    <button @click="handleLogout" class="text-slate-500 hover:text-red-500 text-xs transition-colors cursor-pointer font-medium">Switch Profile</button>
                     <button @click="downloadPDF" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5 cursor-pointer">
-                        打印 / 下载订单 (A4 两页)
+                        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                        Download PO (2-Pages A4)
                     </button>
                 </div>
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start main-workspace-grid">
-                <!-- 左侧：参数配置区域 -->
+                <!-- Left Side: Configurator Controls -->
                 <div class="lg:col-span-5 space-y-5 no-print text-sm">
-                    <!-- 1. 物流与账户对齐 -->
+                    <!-- 1. Metadata Block -->
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">1. 客户账户与物流选择</h3>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">📦 1. Logistics & Account Alignment</h3>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">选择 resale 账户 *</label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Target Reseller Account *</label>
                             <select v-model="form.resellerName" @change="loadResellerMemory" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                                <option value="">-- 请选择此订单的账户 --</option>
+                                <option value="">-- Choose Account for This PO --</option>
                                 <option v-for="reseller in resellers" :key="reseller" :value="reseller">{{ reseller }}</option>
                             </select>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">PO 系统流水号 (自动生成)</label>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">PO Tracking ID (Auto)</label>
                                 <input type="text" v-model="form.poNumber" readonly class="w-full bg-slate-100 text-slate-400 border border-slate-200 rounded-lg px-2.5 py-2 cursor-not-allowed font-mono text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">客户参考 PO 号 (手动输入)</label>
-                                <input type="text" v-model="form.clientPoNumber" placeholder="例如：PO-2026-889" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 font-mono text-xs focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Client Ref PO # (Manual)</label>
+                                <input type="text" v-model="form.clientPoNumber" placeholder="e.g. PO-2026-889" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 font-mono text-xs focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">订单日期</label>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Order Date</label>
                                 <input type="date" v-model="form.date" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">交货履约模式</label>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Fulfillment Mode</label>
                                 <select v-model="form.shippingMethod" @change="handleShippingMethodChange" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                                    <option value="Logistics Shipping">Logistics Shipping (物流配送)</option>
-                                    <option value="Self-pickup">Self-pickup (自提)</option>
+                                    <option value="Logistics Shipping">Logistics Shipping</option>
+                                    <option value="Self-pickup">Self-pickup</option>
                                 </select>
                             </div>
                         </div>
 
                         <div v-if="form.shippingMethod === 'Self-pickup'">
-                            <label class="block text-xs font-semibold text-blue-600 mb-1">自提仓库地址配置 *</label>
-                            <textarea v-model="form.pickupWarehouseText" rows="2" placeholder="请输入特定的公司仓库地址..." class="w-full bg-slate-50 border border-blue-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white text-xs"></textarea>
+                            <label class="block text-xs font-semibold text-blue-600 mb-1">Pickup Warehouse Location Box *</label>
+                            <textarea v-model="form.pickupWarehouseText" rows="2" placeholder="Type specific corporate warehouse address here..." class="w-full bg-slate-50 border border-blue-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white text-xs"></textarea>
                         </div>
 
-                        <!-- 账单信息模块 -->
+                        <!-- BILLING TO DETAILED MATRIX -->
                         <div class="space-y-2.5 p-3.5 bg-slate-50/60 rounded-xl border border-slate-200">
-                            <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Billing To (账单接收信息):</span>
+                            <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Billing To Information:</span>
                             <div>
-                                <label class="block text-[11px] font-medium text-slate-600 mb-0.5">账单联系人姓名</label>
-                                <input type="text" v-model="form.resellerContactName" @input="saveResellerMemory" placeholder="请输入联系人姓名" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
+                                <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Billing Contact Name</label>
+                                <input type="text" v-model="form.resellerContactName" @input="saveResellerMemory" placeholder="e.g. John Doe" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                             </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">账单接收邮箱</label>
-                                    <input type="email" v-model="form.resellerEmail" @input="saveResellerMemory" placeholder="billing@company.com" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
+                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Billing Email</label>
+                                    <input type="email" v-model="form.resellerEmail" @input="saveResellerMemory" placeholder="billing@reseller.com" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">账单联系电话</label>
-                                    <input type="tel" v-model="form.resellerPhone" @input="saveResellerMemory" placeholder="联系电话" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
+                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Billing Phone</label>
+                                    <input type="tel" v-model="form.resellerPhone" @input="saveResellerMemory" placeholder="(555) 123-4567" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 物流寄送地址模块 -->
+                        <!-- SHIPPING TO COMPREHENSIVE INPUT MATRIX -->
                         <div v-if="form.shippingMethod === 'Logistics Shipping'" class="space-y-2.5 p-3.5 bg-slate-50/60 rounded-xl border border-slate-200">
-                            <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Shipping To (收货及物流目的地):</span>
+                            <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Shipping To / Delivery Details:</span>
                             <div>
-                                <label class="block text-[11px] font-medium text-slate-600 mb-0.5">收货联系人姓名</label>
-                                <input type="text" v-model="form.shippingContactName" @input="saveResellerMemory" placeholder="请输入收货人姓名" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
+                                <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Shipping Contact Name</label>
+                                <input type="text" v-model="form.shippingContactName" @input="saveResellerMemory" placeholder="e.g. Sarah Smith" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                             </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">收货通知邮箱</label>
-                                    <input type="email" v-model="form.shippingEmail" @input="saveResellerMemory" placeholder="shipping@company.com" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
+                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Shipping Email</label>
+                                    <input type="email" v-model="form.shippingEmail" @input="saveResellerMemory" placeholder="shipping@client.com" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">收货联系电话</label>
-                                    <input type="tel" v-model="form.shippingPhone" @input="saveResellerMemory" placeholder="收货电话" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
+                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Shipping Phone</label>
+                                    <input type="tel" v-model="form.shippingPhone" @input="saveResellerMemory" placeholder="(555) 987-6543" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[11px] font-medium text-slate-600 mb-0.5">详细收货地址</label>
-                                <textarea v-model="form.shippingAddress" rows="2" @input="saveResellerMemory" placeholder="请填写完整的街道、城市、州及邮编地址..." class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 text-xs"></textarea>
+                                <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Delivery Destination Address</label>
+                                <textarea v-model="form.shippingAddress" rows="2" @input="saveResellerMemory" placeholder="Full street address, suite, city, state, zip..." class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 text-xs"></textarea>
                             </div>
                         </div>
 
-                        <!-- 签名生成输入 -->
+                        <!-- INTERACTIVE SIGNATURE INPUT IN CONFIGURATOR -->
                         <div class="space-y-2.5 p-3.5 bg-blue-50/40 rounded-xl border border-blue-100">
-                            <span class="text-[11px] font-bold text-blue-900 block uppercase tracking-wide">订单签署栏:</span>
+                            <span class="text-[11px] font-bold text-blue-900 block uppercase tracking-wide">PO Validation & Signature:</span>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">授权签名 *</label>
-                                    <input type="text" v-model="form.signature" placeholder="输入名字以确认签名" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 italic font-serif focus:outline-none focus:border-blue-500">
+                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Authorized Signature *</label>
+                                    <input type="text" v-model="form.signature" placeholder="Type name to sign" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 italic font-serif focus:outline-none focus:border-blue-500">
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">签署日期 *</label>
+                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Date Signed *</label>
                                     <input type="date" v-model="form.dateSigned" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 2. 分期条款付款配置 -->
+                    <!-- 2. Payment Terms Block -->
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">2. 付款条款配置</h3>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">💰 2. Payment Terms Configuration</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">总分期期数</label>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Total Installments (期数)</label>
                                 <input type="number" v-model.number="form.paymentTermsType" min="1" max="12" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">每期间隔天数 (Net Term)</label>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Net Term Interval (每期间隔天数)</label>
                                 <input type="number" v-model.number="form.netDays" min="0" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                             </div>
                         </div>
                         
+                        <!-- 当期数大于 1 时，输入首付款金额 -->
                         <div v-if="form.paymentTermsType > 1" class="p-3 bg-purple-50/50 rounded-lg border border-purple-100 transition-all">
-                            <label class="block text-xs font-semibold text-purple-700 mb-1">第一期首付款金额 ($) *</label>
-                            <input type="number" v-model.number="form.downPayment" min="0" step="0.01" placeholder="请输入首付总金额" class="w-full bg-white border border-purple-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-purple-500 transition-all font-bold">
-                            <p class="text-[10px] text-purple-600 mt-1">注：扣除首付后的剩余金额将自动在剩余的 {{ form.paymentTermsType - 1 }} 期中均匀分摊。</p>
+                            <label class="block text-xs font-semibold text-purple-700 mb-1">1st Installment (Down Payment) ($) *</label>
+                            <input type="number" v-model.number="form.downPayment" min="0" step="0.01" placeholder="Enter down payment amount" class="w-full bg-white border border-purple-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-purple-500 transition-all font-bold">
+                            <p class="text-[10px] text-purple-600 mt-1">注：剩余金额将自动在剩余的 {{ form.paymentTermsType - 1 }} 期中均匀分摊。</p>
                         </div>
                     </div>
 
-                    <!-- 3. 产品 SKU 选择栏 -->
+                    <!-- 3. Products Selection -->
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">3. 选购硬件 SKU</h3>
-                            <button @click="addItem" class="text-[11px] bg-blue-50 border border-blue-200 text-blue-600 font-bold px-2.5 py-1 rounded-md hover:bg-blue-100 transition-all cursor-pointer shadow-sm">+ 添加新单项</button>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">🛒 3. Products Selection</h3>
+                            <button @click="addItem" class="text-[11px] bg-blue-50 border border-blue-200 text-blue-600 font-bold px-2.5 py-1 rounded-md hover:bg-blue-100 transition-all cursor-pointer shadow-sm">+ Append SKU</button>
                         </div>
                         <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-slate-50/80 border border-slate-200 rounded-xl space-y-3 relative">
-                            <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-3 text-red-500 hover:text-red-700 text-xs font-medium cursor-pointer">删除</button>
+                            <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-3 text-red-500 hover:text-red-700 text-xs font-medium cursor-pointer">Remove</button>
                             <div>
-                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">硬件型号选择</label>
+                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Hardware Model</label>
                                 <select v-model="item.modelKey" @change="onModelChange(index)" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-blue-500">
-                                    <option value="">-- 请选择硬件型号 --</option>
+                                    <option value="">-- Choose Hardware SKU --</option>
                                     <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }} (${{ price }})</option>
                                 </select>
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[11px] font-semibold text-slate-500">数量:</span>
+                                    <span class="text-[11px] font-semibold text-slate-500">Qty:</span>
                                     <input type="number" v-model.number="item.qty" min="1" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-bold focus:outline-none focus:border-blue-500">
                                 </div>
                                 <div class="text-right text-xs text-slate-500 pt-1">
-                                    单价: <span class="font-mono font-bold text-slate-700">${{ formatMoney(item.price) }}</span>
+                                    Price: <span class="font-mono font-bold text-slate-700">${{ formatMoney(item.price) }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 4. 运费与税率矩阵 -->
+                    <!-- 4. FREIGHT & TAX CONFIGURATOR -->
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">4. 运费及税率计算</h3>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">🚚 4. Freight & Tax Matrix</h3>
                         <div class="grid grid-cols-2 gap-3 text-sm">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-700 mb-1">运费计费模式</label>
@@ -273,61 +354,61 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">税率 (%)</label>
-                            <input type="number" v-model.number="form.taxRate" min="0" step="0.01" placeholder="例如：8.25" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+                            <input type="number" v-model.number="form.taxRate" min="0" step="0.01" placeholder="e.g. 8.25" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                         </div>
                     </div>
 
-                    <!-- 5. 优惠折扣矩阵 -->
+                    <!-- 5. DISCOUNT CONFIGURATOR MATRIX -->
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-600 flex items-center gap-1.5">5. 折扣优惠扣减</h3>
-                            <button @click="addDiscount" class="text-[11px] bg-purple-50 border border-purple-200 text-purple-600 font-bold px-2.5 py-1 rounded-md hover:bg-purple-100 transition-all cursor-pointer shadow-sm">+ 添加新折扣</button>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-600 flex items-center gap-1.5">🏷️ 5. Discount Matrix</h3>
+                            <button @click="addDiscount" class="text-[11px] bg-purple-50 border border-purple-200 text-purple-600 font-bold px-2.5 py-1 rounded-md hover:bg-purple-100 transition-all cursor-pointer shadow-sm">+ Add New Discount</button>
                         </div>
                         <div v-for="(discount, dIdx) in form.discounts" :key="dIdx" class="p-4 bg-purple-50/30 border border-purple-100 rounded-xl space-y-3 relative text-xs">
-                            <button @click="removeDiscount(dIdx)" class="absolute top-2 right-3 text-red-500 hover:text-red-700 font-medium cursor-pointer">移除</button>
+                            <button @click="removeDiscount(dIdx)" class="absolute top-2 right-3 text-red-500 hover:text-red-700 font-medium cursor-pointer">Remove</button>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">折扣适用范围</label>
+                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Target Scope</label>
                                     <select v-model="discount.scope" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
-                                        <option value="unit">按单台设备扣减</option>
-                                        <option value="total">按总订单金额扣减</option>
+                                        <option value="unit">Per Item Discount</option>
+                                        <option value="total">Total Order Discount</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">计算扣减模式</label>
+                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Calculation Method</label>
                                     <select v-model="discount.type" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
-                                        <option value="amount">固定金额扣减 ($)</option>
-                                        <option value="percent">百分比比例扣减 (%)</option>
+                                        <option value="amount">Fixed Amount ($)</option>
+                                        <option value="percent">Percentage (%)</option>
                                     </select>
                                 </div>
                             </div>
                             <div v-if="discount.scope === 'unit'">
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">应用至指定硬件型号 *</label>
+                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Apply To Hardware Model *</label>
                                 <select v-model="discount.targetModel" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-medium">
-                                    <option value="">-- 请选择关联的产品型号 --</option>
+                                    <option value="">-- Choose target product model --</option>
                                     <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }}</option>
                                 </select>
                             </div>
                             <div class="grid grid-cols-3 gap-2 items-end">
                                 <div>
-                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">让利数值 <span>({{ discount.type === 'amount' ? '$' : '%' }})</span></label>
+                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Value <span>({{ discount.type === 'amount' ? '$' : '%' }})</span></label>
                                     <input type="number" v-model.number="discount.value" min="0" step="0.01" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold text-slate-800">
                                 </div>
                                 <div class="col-span-2">
-                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">折扣事由说明 *</label>
-                                    <input type="text" v-model="discount.reason" placeholder="如：大客户批量采购优惠" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
+                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Reason / Motivation *</label>
+                                    <input type="text" v-model="discount.reason" placeholder="e.g. Bulk promotion discount" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 右侧：打印文档标准 A4 页面预览框架 -->
+                <!-- Right Side: Printable Documents Frame -->
                 <div class="lg:col-span-7 space-y-8">
                     <!-- ==================== PAGE 1: PURCHASE ORDER SHEET ==================== -->
                     <div class="bg-white shadow-xl text-slate-900 border border-gray-200 a4-print-sheet print-page-1 mx-auto p-6 flex flex-col justify-between">
                         <div class="w-full flex-none">
-                            <!-- 顶部企业标头 (无图标) -->
+                            <!-- Top Corporate Head -->
                             <div class="flex justify-between items-start border-b-2 border-slate-900 pb-1">
                                 <div>
                                     <h2 class="text-base font-black tracking-tight text-slate-900">PURCHASE ORDER</h2>
@@ -341,12 +422,12 @@
                                 </div>
                             </div>
 
-                            <!-- 账单及物流收货矩阵 -->
+                            <!-- BILLING TO & SHIPPING TO MATRIX -->
                             <div class="grid grid-cols-2 gap-4 my-1.5 text-[10px]">
                                 <div class="bg-slate-50 p-2 rounded border border-slate-150 flex flex-col justify-between">
                                     <div>
                                         <h4 class="font-bold text-blue-950 uppercase tracking-wider text-[8px] mb-0.5">Billing To:</h4>
-                                        <p class="font-bold text-xs text-slate-900 mb-0.5">{{ form.resellerName || '[未选择账户]' }}</p>
+                                        <p class="font-bold text-xs text-slate-900 mb-0.5">{{ form.resellerName || '[No Account Chosen]' }}</p>
                                         <p v-if="form.resellerContactName" class="text-slate-800 font-semibold text-[10px]">Attn: {{ form.resellerContactName }}</p>
                                         <p v-if="form.resellerEmail" class="text-slate-600 font-mono">{{ form.resellerEmail }}</p>
                                         <p v-if="form.resellerPhone" class="text-slate-600">{{ form.resellerPhone }}</p>
@@ -362,13 +443,13 @@
                                         </div>
                                         <div v-else>
                                             <p class="text-slate-500 font-semibold text-[9px]">Pickup Location Target:</p>
-                                            <p class="text-blue-900 font-bold bg-blue-50/50 p-1 rounded border border-blue-100 whitespace-pre-line leading-tight text-[9px] mt-0.5">{{ form.pickupWarehouseText || '[未指定自提仓库地址]' }}</p>
+                                            <p class="text-blue-900 font-bold bg-blue-50/50 p-1 rounded border border-blue-100 whitespace-pre-line leading-tight text-[9px] mt-0.5">{{ form.pickupWarehouseText || '[No Pickup Address Specified]' }}</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- 硬件产品 SKU 表格 -->
+                            <!-- PRODUCTS SKU TABLE MATRIX -->
                             <div class="my-2 text-[10px]">
                                 <table class="w-full text-left border-collapse">
                                     <thead>
@@ -384,7 +465,7 @@
                                         <tr v-for="(item, idx) in form.items" :key="idx" class="border-b border-slate-200 text-[10px] hover:bg-slate-50/50">
                                             <td class="p-1.5 text-center font-mono text-slate-400">{{ idx + 1 }}</td>
                                             <td class="p-1.5 font-bold text-slate-900">
-                                                {{ item.modelKey || '[未关联产品]' }}
+                                                {{ item.modelKey || '[No SKU Selected]' }}
                                             </td>
                                             <td class="p-1.5 text-center font-mono">${{ formatMoney(item.price) }}</td>
                                             <td class="p-1.5 text-center font-bold text-slate-800">{{ item.qty || 0 }}</td>
@@ -394,9 +475,9 @@
                                 </table>
                             </div>
 
-                            <!-- 动态分期付款时间表结构 -->
+                            <!-- DYNAMIC CUSTOM PAYMENT TERMS & SCHEDULE BLOCK -->
                             <div class="my-3 border border-slate-200 rounded p-2 bg-slate-50/50">
-                                <h4 class="text-[9px] font-bold text-slate-900 uppercase tracking-wider mb-1">Payment Terms & Schedule</h4>
+                                <h4 class="text-[9px] font-bold text-slate-900 uppercase tracking-wider mb-1">📋 Payment Terms & Schedule</h4>
                                 <table class="w-full text-left text-[9px] border-collapse">
                                     <thead>
                                         <tr class="border-b border-slate-300 text-slate-500 font-semibold">
@@ -411,6 +492,7 @@
                                             <td class="py-1 text-center font-mono font-bold text-red-600">{{ phase.dueDate }}</td>
                                             <td class="py-1 text-right font-mono font-bold text-slate-900">${{ formatMoney(phase.amount) }}</td>
                                         </tr>
+                                        <!-- 在表格底部加入汇总行 -->
                                         <tr class="border-t border-slate-300 font-bold bg-slate-100/50">
                                             <td class="py-1 text-slate-900">Total Scheduled Payment</td>
                                             <td class="py-1 text-center text-slate-400">--</td>
@@ -421,9 +503,9 @@
                             </div>
                         </div>
 
-                        <!-- 第一页底部签名与最终费用计算矩阵 -->
+                        <!-- PAGE 1 BOTTOM SIGNATURE BLOCK & FISCAL CALCULATION -->
                         <div class="print-footer-anchor w-full mt-4 border-t border-slate-300 pt-3">
-                            <!-- 第一页独立绑定的签名盖章及日期区 -->
+                            <!-- Page 1 Signatures & Date -->
                             <div class="grid grid-cols-2 gap-4 text-[9px] mb-3 bg-slate-50 p-2 rounded border border-slate-200">
                                 <div>
                                     <p class="text-slate-500 font-semibold">Authorized Signature:</p>
@@ -482,8 +564,29 @@
                             </div>
                         </div>
 
-                        <!-- 移除底部的各种手写区域，仅放置强制合规性文本通告 -->
                         <div>
+                            <!-- Structural Authorized Signatures Block -->
+                            <div class="w-full border-t border-slate-300 pt-6">
+                                <h4 class="text-[9px] font-bold text-slate-900 uppercase tracking-wider mb-6">EXECUTION OF CONTRACT / CORPORATE VALIDATION</h4>
+                                <div class="grid grid-cols-2 gap-8 text-[10px]">
+                                    <div class="space-y-4">
+                                        <div class="border-b border-slate-400 h-8 flex items-end font-mono text-slate-400 text-[9px]">[Digitally Recorded Logins]</div>
+                                        <div>
+                                            <p class="font-bold text-slate-800">Authorized Sales Representative Signature</p>
+                                            <p class="text-slate-500 text-[9px]">Rep: {{ currentUser.name }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-4">
+                                        <div class="border-b border-slate-400 h-8 flex items-end font-serif italic text-slate-900 text-sm pl-1">{{ form.signature }}</div>
+                                        <div>
+                                            <p class="font-bold text-slate-800">Reseller Corporate Officer Binding Stamp</p>
+                                            <p class="text-slate-500 text-[9px]">Account: {{ form.resellerName || '[No Account Chosen]' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- MANDATORY OPERATIONAL COMPLIANCE NOTICE AT THE VERY BOTTOM OF PAGE 2 -->
                             <div class="mt-8 pt-4 border-t border-slate-200 text-[9px] text-slate-500 leading-relaxed text-center">
                                 <p><strong>Mandatory Operational Compliance Notice:</strong> Payments made by physical check are subject to an automatic hold of 5–7 banking business days for document verification and final confirmation of funds before warehouse release procedures begin. For expedited or priority dispatch, please use an electronic wire transfer.</p>
                             </div>
@@ -501,12 +604,12 @@
             data() {
                 return {
                     resellers: [
-                        "Twelve 28 vending", "Vend Guys Local", "PBS vending", 
-                        "Ai Vend Solution", "Genius Vend", "Mod Brands", 
-                        "NC vending LLC", "vendx", "The vending center", 
-                        "Vital Vending Sales LLC", "The Venders", "VP-Modern-Amenities LLC", 
-                        "Vend Guys Internet", "Nayax", "Century vending", 
-                        "Aloha Smart Vending", "Culinary Ventures Vending"
+                        "经销商 - Twelve 28 vending", "经销商-Vend Guys Local", "经销商-PBS vending", 
+                        "经销商-Ai Vend Solution", "经销商-Genius Vend", "经销商-Mod Brands", 
+                        "经销商-NC vending LLC", "经销商-vendx", "经销商-The vending center", 
+                        "经销商-Vital Vending Sales LLC", "经销商-The Venders", "经销商-VP-Modern-Amenities LLC", 
+                        "经销商 -Vend Guys Internet", "经销商 -Nayax", "经销商-Century vending", 
+                        "经销商-Aloha Smart Vending", "大客户-Culinary Ventures Vending"
                     ],
                     productCatalog: {
                         "Mini 360": 2400.00,
@@ -696,15 +799,6 @@
                     if (localData) {
                         const parsed = JSON.parse(localData);
                         Object.assign(this.form, parsed);
-                    } else {
-                        // 清空旧数据防混淆
-                        this.form.resellerContactName = '';
-                        this.form.resellerEmail = '';
-                        this.form.resellerPhone = '';
-                        this.form.shippingContactName = '';
-                        this.form.shippingEmail = '';
-                        this.form.shippingPhone = '';
-                        this.form.shippingAddress = '';
                     }
                 },
                 saveResellerMemory() {
