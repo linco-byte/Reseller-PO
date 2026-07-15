@@ -23,7 +23,7 @@
                 size: A4 portrait !important;
                 margin: 12mm !important;
             }
-            .no-print, button, select, input, textarea, .admin-trigger, .modal-mask {
+            .no-print, button, select, input, textarea, .admin-trigger, .modal-mask, svg {
                 display: none !important;
             }
             .main-workspace-grid {
@@ -51,84 +51,11 @@
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 antialiased">
 
-    <!-- ================= 顶部导航栏 ================= -->
+    <!-- ================= TOP NAVIGATION BAR ================= -->
     <div class="no-print bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center shadow-sm">
         <div class="flex items-center space-x-2">
-            <span class="text-lg font-bold text-slate-700">采购订单系统</span>
-            <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">v1.1</span>
-        </div>
-    </div>
-
-    <div id="app">
-        <!-- SYSTEM GATEKEEPER: SALES这里是为您全面修改后的完整 `index.html` 代码。已完美整合您的所有需求：
-
-1. **条款位置转移**：将 `Mandatory Operational Compliance Notice` 从第一页彻底移除，并精准放置在第二页（DISTRIBUTOR AGREEMENT）的最底部。
-2. **第一页增加签名与日期**：在第一页右侧的打印预览区域（PO Sheet）底部，添加了专用的 `Authorized Signature` 和 `Date Signed` 签署区。
-3. **注册页面增加手机与邮箱**：登录/注册弹窗已确保全面绑定 `email` 和 `phone`。
-4. **文案替换**：将原有的 `Fulfillment & Delivery:` 统一修改为 `Shipping to:`。
-5. **Billing Information 记忆功能**：扩展了现有的 `localStorage` 机制。当切换经销商账号、输入数据、或者首次进入系统时，自动读取并安全缓存您的账单信息（`Billing Contact Name`, `Billing Email`, `Billing Phone`）。
-
-您可以直接**全选并覆盖**您现有的 `index.html` 文件：
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purchase Order Workspace</title>
-    <!-- Tailwind CSS for styling -->
-    <script src="[https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4](https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4)"></script>
-    <!-- Vue 3 Framework -->
-    <script src="[https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js](https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js)"></script>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-        /* STRICT PRINT CONSTRAINTS: FIXED LATERAL BREAK PROTECTION */
-        @media print {
-            html, body {
-                margin: 0 !important;
-                padding: 0 !important;
-                background: #ffffff !important;
-            }
-            @page {
-                size: A4 portrait !important;
-                margin: 12mm !important;
-            }
-            .no-print, button, select, input, textarea, .admin-trigger, .modal-mask {
-                display: none !important;
-            }
-            .main-workspace-grid {
-                display: block !important;
-            }
-            .print-page-1 {
-                page-break-after: always !important;
-                break-after: page !important;
-            }
-            .a4-print-sheet {
-                width: 186mm !important;
-                min-height: 270mm !important;
-                max-height: 277mm !important;
-                box-shadow: none !important;
-            }
-            .print-footer-anchor {
-                margin-top: auto !important;
-                page-break-inside: avoid !important;
-            }
-            table {
-                font-size: 10px !important;
-            }
-        }
-    </style>
-</head>
-<body class="bg-slate-50 min-h-screen text-slate-800 antialiased">
-
-    <!-- ================= 顶部导航栏 ================= -->
-    <div class="no-print bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center shadow-sm">
-        <div class="flex items-center space-x-2">
-            <span class="text-lg font-bold text-slate-700">采购订单系统</span>
-            <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">v1.1</span>
+            <span class="text-lg font-bold text-slate-700">Purchase Order System</span>
+            <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">v1.2</span>
         </div>
     </div>
 
@@ -137,8 +64,8 @@
         <div v-if="!isLoggedIn" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 no-print">
             <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 border border-slate-200">
                 <div class="text-center mb-6">
-                    <div class="h-12 w-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3 border border-blue-100 shadow-sm">
-                        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M19.242 18.274A13.916 13.916 0 0021 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M12 11a13.942 13.942 0 00-2.316-5.074" /></svg>
+                    <div class="h-12 w-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3 border border-blue-100 shadow-sm no-print">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M19.242 18.274A13.916 13.916 0 0021 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M12 11a13.942 13.942 0 00-2.316-5.074" /></svg>
                     </div>
                     <h2 class="text-xl font-bold text-slate-900 tracking-tight">Sales Representative Registry</h2>
                     <p class="text-xs text-slate-500 mt-1">Identify yourself to initialize the PO engine.</p>
@@ -179,7 +106,7 @@
                 <div class="flex items-center gap-3">
                     <button @click="handleLogout" class="text-slate-500 hover:text-red-500 text-xs transition-colors cursor-pointer font-medium">Switch Profile</button>
                     <button @click="downloadPDF" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5 cursor-pointer">
-                        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                         Download PO (2-Pages A4)
                     </button>
                 </div>
@@ -292,20 +219,20 @@
                         <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">💰 2. Payment Terms Configuration</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Total Installments (期数)</label>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Total Installments</label>
                                 <input type="number" v-model.number="form.paymentTermsType" min="1" max="12" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Net Term Interval (每期间隔天数)</label>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Net Term Interval (Days)</label>
                                 <input type="number" v-model.number="form.netDays" min="0" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                             </div>
                         </div>
                         
-                        <!-- 当期数大于 1 时，输入首付款金额 -->
+                        <!-- Down payment entry if installments > 1 -->
                         <div v-if="form.paymentTermsType > 1" class="p-3 bg-purple-50/50 rounded-lg border border-purple-100 transition-all">
                             <label class="block text-xs font-semibold text-purple-700 mb-1">1st Installment (Down Payment) ($) *</label>
                             <input type="number" v-model.number="form.downPayment" min="0" step="0.01" placeholder="Enter down payment amount" class="w-full bg-white border border-purple-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-purple-500 transition-all font-bold">
-                            <p class="text-[10px] text-purple-600 mt-1">注：剩余金额将自动在剩余的 {{ form.paymentTermsType - 1 }} 期中均匀分摊。</p>
+                            <p class="text-[10px] text-purple-600 mt-1">Note: The remaining balance will be distributed evenly among the remaining {{ form.paymentTermsType - 1 }} phases.</p>
                         </div>
                     </div>
 
@@ -341,19 +268,19 @@
                         <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">🚚 4. Freight & Tax Matrix</h3>
                         <div class="grid grid-cols-2 gap-3 text-sm">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">运费计费模式</label>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Freight Calculation Mode</label>
                                 <select v-model="form.freightType" :disabled="form.shippingMethod === 'Self-pickup'" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <option value="total">按总运费 (Total)</option>
-                                    <option value="per_unit">按单台运费 (Per Unit)</option>
+                                    <option value="total">By Total Freight</option>
+                                    <option value="per_unit">Per Unit Freight</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">{{ form.freightType === 'per_unit' ? '单台运费金额 ($)' : '总运费金额 ($)' }}</label>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">{{ form.freightType === 'per_unit' ? 'Per Unit Freight ($)' : 'Total Freight Amount ($)' }}</label>
                                 <input type="number" v-model.number="form.freightInput" :disabled="form.shippingMethod === 'Self-pickup'" min="0" step="0.01" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">税率 (%)</label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tax Rate (%)</label>
                             <input type="number" v-model.number="form.taxRate" min="0" step="0.01" placeholder="e.g. 8.25" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                         </div>
                     </div>
@@ -492,7 +419,7 @@
                                             <td class="py-1 text-center font-mono font-bold text-red-600">{{ phase.dueDate }}</td>
                                             <td class="py-1 text-right font-mono font-bold text-slate-900">${{ formatMoney(phase.amount) }}</td>
                                         </tr>
-                                        <!-- 在表格底部加入汇总行 -->
+                                        <!-- Total accumulation at table footer -->
                                         <tr class="border-t border-slate-300 font-bold bg-slate-100/50">
                                             <td class="py-1 text-slate-900">Total Scheduled Payment</td>
                                             <td class="py-1 text-center text-slate-400">--</td>
@@ -565,29 +492,8 @@
                         </div>
 
                         <div>
-                            <!-- Structural Authorized Signatures Block -->
-                            <div class="w-full border-t border-slate-300 pt-6">
-                                <h4 class="text-[9px] font-bold text-slate-900 uppercase tracking-wider mb-6">EXECUTION OF CONTRACT / CORPORATE VALIDATION</h4>
-                                <div class="grid grid-cols-2 gap-8 text-[10px]">
-                                    <div class="space-y-4">
-                                        <div class="border-b border-slate-400 h-8 flex items-end font-mono text-slate-400 text-[9px]">[Digitally Recorded Logins]</div>
-                                        <div>
-                                            <p class="font-bold text-slate-800">Authorized Sales Representative Signature</p>
-                                            <p class="text-slate-500 text-[9px]">Rep: {{ currentUser.name }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="space-y-4">
-                                        <div class="border-b border-slate-400 h-8 flex items-end font-serif italic text-slate-900 text-sm pl-1">{{ form.signature }}</div>
-                                        <div>
-                                            <p class="font-bold text-slate-800">Reseller Corporate Officer Binding Stamp</p>
-                                            <p class="text-slate-500 text-[9px]">Account: {{ form.resellerName || '[No Account Chosen]' }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- MANDATORY OPERATIONAL COMPLIANCE NOTICE AT THE VERY BOTTOM OF PAGE 2 -->
-                            <div class="mt-8 pt-4 border-t border-slate-200 text-[9px] text-slate-500 leading-relaxed text-center">
+                            <div class="pt-4 border-t border-slate-200 text-[9px] text-slate-500 leading-relaxed text-center">
                                 <p><strong>Mandatory Operational Compliance Notice:</strong> Payments made by physical check are subject to an automatic hold of 5–7 banking business days for document verification and final confirmation of funds before warehouse release procedures begin. For expedited or priority dispatch, please use an electronic wire transfer.</p>
                             </div>
                         </div>
@@ -604,12 +510,12 @@
             data() {
                 return {
                     resellers: [
-                        "经销商 - Twelve 28 vending", "经销商-Vend Guys Local", "经销商-PBS vending", 
-                        "经销商-Ai Vend Solution", "经销商-Genius Vend", "经销商-Mod Brands", 
-                        "经销商-NC vending LLC", "经销商-vendx", "经销商-The vending center", 
-                        "经销商-Vital Vending Sales LLC", "经销商-The Venders", "经销商-VP-Modern-Amenities LLC", 
-                        "经销商 -Vend Guys Internet", "经销商 -Nayax", "经销商-Century vending", 
-                        "经销商-Aloha Smart Vending", "大客户-Culinary Ventures Vending"
+                        "Twelve 28 vending", "Vend Guys Local", "PBS vending", 
+                        "Ai Vend Solution", "Genius Vend", "Mod Brands", 
+                        "NC vending LLC", "vendx", "The vending center", 
+                        "Vital Vending Sales LLC", "The Venders", "VP-Modern-Amenities LLC", 
+                        "Vend Guys Internet", "Nayax", "Century vending", 
+                        "Aloha Smart Vending", "Culinary Ventures Vending"
                     ],
                     productCatalog: {
                         "Mini 360": 2400.00,
