@@ -70,30 +70,43 @@
                     <h2 class="text-xl font-bold text-slate-900 tracking-tight">Sales Representative Registry</h2>
                     <p class="text-xs text-slate-500 mt-1">Identify yourself to initialize the PO engine.</p>
                 </div>
-                <form @submit.prevent="handleRegister" class="space-y-4 text-sm">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Sales Rep Full Name *</label>
-                        <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Corporate Email *</label>
-                        <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
-                        <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Assigned Reseller Accounts (Multiple) *</label>
-                        <select v-model="authForm.assignedResellers" multiple required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[120px]">
-                            <option v-for="reseller in resellersCatalog" :key="reseller" :value="reseller">{{ reseller }}</option>
-                        </select>
-                        <p class="text-[10px] text-slate-400 mt-1">Hold Ctrl (Windows) or Cmd (Mac) to select multiple accounts.</p>
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer">
-                        Initialize Workspace
-                    </button>
-                </form>
+               <form @submit.prevent="handleRegister" class="space-y-4 text-sm">
+    <!-- 名字输入框 -->
+    <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Sales Rep Full Name *</label>
+        <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+    </div>
+    
+    <!-- 电话输入框 -->
+    <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
+        <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+    </div>
+
+    <!-- 邮箱输入框 -->
+    <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Corporate Email *</label>
+        <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+    </div>
+
+    <!-- 负责的客户多选（复选框样式优化） -->
+    <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Assigned Reseller Accounts (Select Multiple) *</label>
+        <div class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 max-h-[160px] overflow-y-auto space-y-2">
+            <div v-for="reseller in resellersCatalog" :key="reseller" class="flex items-center">
+                <input type="checkbox" :id="reseller" :value="reseller" v-model="authForm.assignedResellers" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                <label :for="reseller" class="ml-2 text-xs text-slate-700 select-none cursor-pointer">{{ reseller }}</label>
+            </div>
+        </div>
+        <!-- 必填提示：当没有勾选时显示 -->
+        <p v-if="authForm.assignedResellers.length === 0" class="text-[10px] text-red-500 mt-1">Please select at least one assigned account.</p>
+    </div>
+
+    <!-- 提交按钮 -->
+    <button type="submit" :disabled="authForm.assignedResellers.length === 0" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+        Initialize Workspace
+    </button>
+</form>
             </div>
         </div>
 
