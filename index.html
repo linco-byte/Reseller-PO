@@ -19,7 +19,6 @@
                 padding: 0 !important;
                 background: #ffffff !important;
             }
-            /* 1. 给 A4 页面四周留出 12mm 的物理边距，防止贴边 */
             @page {
                 size: A4 portrait !important;
                 margin: 12mm !important;
@@ -30,19 +29,16 @@
             .main-workspace-grid {
                 display: block !important;
             }
-            /* FORCE PAGE BREAK ON DESIRED CONTAINER BOUNDARIES */
             .print-page-1 {
                 page-break-after: always !important;
                 break-after: page !important;
             }
-            /* 2. 减去左右边距后，将主容器宽度从 210mm 缩减至 186mm，完美适配 A4 比例 */
             .a4-print-sheet {
                 width: 186mm !important;
                 min-height: 270mm !important;
                 max-height: 277mm !important;
                 box-shadow: none !important;
             }
-            /* Push totals & footer strictly to the bottom of page 1 without causing split */
             .print-footer-anchor {
                 margin-top: auto !important;
                 page-break-inside: avoid !important;
@@ -59,14 +55,8 @@
     <div class="no-print bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center shadow-sm">
         <div class="flex items-center space-x-2">
             <span class="text-lg font-bold text-slate-700">采购订单系统</span>
-            <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">v1.0</span>
+            <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">v1.1</span>
         </div>
-        <a href="installments.html" class="inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg shadow-xs text-slate-700 bg-white hover:bg-slate-50 focus:outline-hidden transition-all duration-200 group">
-            <svg class="-ml-1 mr-2 h-4 w-4 text-slate-500 group-hover:text-indigo-600 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-            </svg>
-            切换到分期付款 (Installments)
-        </a>
     </div>
 
     <div id="app">
@@ -93,16 +83,7 @@
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
                         <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">Assigned Reseller Accounts *</label>
-                        <div class="bg-slate-50 border border-slate-300 rounded-lg p-3 max-h-40 overflow-y-auto space-y-2 text-xs">
-                            <label v-for="reseller in resellers" :key="reseller" class="flex items-center gap-2 text-slate-700 hover:text-blue-600 cursor-pointer font-medium">
-                                <input type="checkbox" :value="reseller" v-model="authForm.boundResellers" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                                <span>{{ reseller }}</span>
-                            </label>
-                        </div>
-                    </div>
-                    <button type="submit" :disabled="authForm.boundResellers.length === 0" class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer disabled:cursor-not-allowed">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer">
                         Initialize Workspace
                     </button>
                 </form>
@@ -141,11 +122,10 @@
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Target Reseller Account *</label>
                             <select v-model="form.resellerName" @change="loadResellerMemory" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                                 <option value="">-- Choose Account for This PO --</option>
-                                <option v-for="reseller in currentUser.boundResellers" :key="reseller" :value="reseller">{{ reseller }}</option>
+                                <option v-for="reseller in resellers" :key="reseller" :value="reseller">{{ reseller }}</option>
                             </select>
                         </div>
                         
-                        <!-- DUAL PO ID CONFIGURATION BLOCK -->
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 mb-1">PO Tracking ID (Auto)</label>
@@ -219,27 +199,25 @@
                         </div>
                     </div>
 
-                    <!-- 2. Payment Terms Block (已根据需求重构) -->
+                    <!-- 2. Payment Terms Block (升级：自定义任意期数) -->
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">💰 2. Payment Terms Configuration</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Payment Terms</label>
-                                <select v-model.number="form.paymentTermsType" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                                    <option :value="1">1期 (100% Full Payment)</option>
-                                    <option :value="2">2期 (Down Payment + Balance)</option>
-                                </select>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Total Installments (期数)</label>
+                                <input type="number" v-model.number="form.paymentTermsType" min="1" max="12" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Net Term (Final Balance Days)</label>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Net Term Interval (每期间隔天数)</label>
                                 <input type="number" v-model.number="form.netDays" min="0" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                             </div>
                         </div>
                         
-                        <!-- 当选择 2 期时显示首付款金额输入框 -->
-                        <div v-if="form.paymentTermsType === 2" class="p-3 bg-purple-50/50 rounded-lg border border-purple-100 transition-all">
+                        <!-- 当期数大于 1 时，输入首付款金额 -->
+                        <div v-if="form.paymentTermsType > 1" class="p-3 bg-purple-50/50 rounded-lg border border-purple-100 transition-all">
                             <label class="block text-xs font-semibold text-purple-700 mb-1">1st Installment (Down Payment) ($) *</label>
                             <input type="number" v-model.number="form.downPayment" min="0" step="0.01" placeholder="Enter down payment amount" class="w-full bg-white border border-purple-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-purple-500 transition-all font-bold">
+                            <p class="text-[10px] text-purple-600 mt-1">注：剩余金额将自动在剩余的 {{ form.paymentTermsType - 1 }} 期中均匀分摊。</p>
                         </div>
                     </div>
 
@@ -264,7 +242,7 @@
                                     <input type="number" v-model.number="item.qty" min="1" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-bold focus:outline-none focus:border-blue-500">
                                 </div>
                                 <div class="text-right text-xs text-slate-500 pt-1">
-                                    Distributor Price: <span class="font-mono font-bold text-slate-700">${{ formatMoney(item.price) }}</span>
+                                    Price: <span class="font-mono font-bold text-slate-700">${{ formatMoney(item.price) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -297,9 +275,6 @@
                         <div class="flex justify-between items-center border-b border-slate-100 pb-2">
                             <h3 class="text-xs font-bold uppercase tracking-wider text-purple-600 flex items-center gap-1.5">🏷️ 5. Discount Matrix</h3>
                             <button @click="addDiscount" class="text-[11px] bg-purple-50 border border-purple-200 text-purple-600 font-bold px-2.5 py-1 rounded-md hover:bg-purple-100 transition-all cursor-pointer shadow-sm">+ Add New Discount</button>
-                        </div>
-                        <div v-if="form.discounts.length === 0" class="text-xs text-slate-400 italic text-center py-4 bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                            No discounts applied to this order yet. Click button above to fill discounts.
                         </div>
                         <div v-for="(discount, dIdx) in form.discounts" :key="dIdx" class="p-4 bg-purple-50/30 border border-purple-100 rounded-xl space-y-3 relative text-xs">
                             <button @click="removeDiscount(dIdx)" class="absolute top-2 right-3 text-red-500 hover:text-red-700 font-medium cursor-pointer">Remove</button>
@@ -348,9 +323,6 @@
                             <!-- Top Corporate Head -->
                             <div class="flex justify-between items-start border-b-2 border-slate-900 pb-1">
                                 <div>
-                                    <div class="mb-1 max-w-[240px] max-h-[70px] overflow-hidden flex items-center">
-                                        <img src="logo.png" alt="Corporate Logo" onerror="this.style.display='none';" class="object-contain max-h-[65px] w-auto">
-                                    </div>
                                     <h2 class="text-base font-black tracking-tight text-slate-900">PURCHASE ORDER</h2>
                                     <p class="text-[11px] font-extrabold text-blue-950 mt-0.5">Haha Vending</p>
                                     <p class="text-[9px] text-gray-500 tracking-wide font-medium">1754 North Brown Rd suite 200, Lawrenceville, GA 30043</p>
@@ -359,7 +331,6 @@
                                     <p><strong class="text-slate-900 uppercase font-bold text-[8px] tracking-wider block">PO Tracking ID:</strong> <span class="font-mono text-[11px] font-bold text-slate-900">{{ form.poNumber }}</span></p>
                                     <p v-if="form.clientPoNumber"><strong class="text-blue-900 uppercase font-bold text-[8px] tracking-wider block mt-0.5">Client Ref PO #:</strong> <span class="font-mono text-[11px] font-bold text-blue-900">{{ form.clientPoNumber }}</span></p>
                                     <p class="pt-0.5"><strong class="text-slate-900 font-semibold">Order Date:</strong> {{ form.date || '------' }}</p>
-                                    <p><strong class="text-red-700 font-bold">Payment Due Date:</strong> <span class="font-bold text-red-600 border-b border-red-200">{{ computedDueDate }}</span></p>
                                 </div>
                             </div>
 
@@ -368,7 +339,7 @@
                                 <div class="bg-slate-50 p-2 rounded border border-slate-150 flex flex-col justify-between">
                                     <div>
                                         <h4 class="font-bold text-blue-950 uppercase tracking-wider text-[8px] mb-0.5">Billing To:</h4>
-                                        <p class="font-bold text-xs text-slate-900 mb-0.5">{{ form.resellerName || '[No Reseller Chosen]' }}</p>
+                                        <p class="font-bold text-xs text-slate-900 mb-0.5">{{ form.resellerName || '[No Account Chosen]' }}</p>
                                         <p v-if="form.resellerContactName" class="text-slate-800 font-semibold text-[10px]">Attn: {{ form.resellerContactName }}</p>
                                         <p v-if="form.resellerEmail" class="text-slate-600 font-mono">{{ form.resellerEmail }}</p>
                                         <p v-if="form.resellerPhone" class="text-slate-600">{{ form.resellerPhone }}</p>
@@ -381,7 +352,6 @@
                                         <div v-if="form.shippingMethod === 'Logistics Shipping'">
                                             <p v-if="form.shippingContactName" class="text-slate-800 font-semibold">Attn: {{ form.shippingContactName }}</p>
                                             <p v-if="form.shippingAddress" class="text-slate-700 font-medium leading-tight whitespace-pre-line mt-0.5 bg-white p-1 rounded border border-slate-200 text-[9px]">{{ form.shippingAddress }}</p>
-                                            <p class="text-slate-500 font-mono mt-0.5 text-[9px]">{{ form.shippingEmail }} <span class="text-slate-300mx-1">|</span> {{ form.shippingPhone }}</p>
                                         </div>
                                         <div v-else>
                                             <p class="text-slate-500 font-semibold text-[9px]">Pickup Location Target:</p>
@@ -397,7 +367,7 @@
                                     <thead>
                                         <tr class="bg-slate-900 text-white uppercase text-[8px] tracking-wider font-bold">
                                             <th class="p-1.5 rounded-l text-center w-8">#</th>
-                                            <th class="p-1.5">Hardware SKU Model / Description</th>
+                                            <th class="p-1.5">Hardware SKU Model</th>
                                             <th class="p-1.5 text-center w-16">Unit Price</th>
                                             <th class="p-1.5 text-center w-12">Qty</th>
                                             <th class="p-1.5 text-right rounded-r w-20">Ext Amount</th>
@@ -408,11 +378,6 @@
                                             <td class="p-1.5 text-center font-mono text-slate-400">{{ idx + 1 }}</td>
                                             <td class="p-1.5 font-bold text-slate-900">
                                                 {{ item.modelKey || '[No SKU Selected]' }}
-                                                <div v-if="getItemDiscounts(item.modelKey).length > 0" class="mt-0.5 space-y-0.5">
-                                                    <div v-for="d in getItemDiscounts(item.modelKey)" class="text-[9px] text-purple-600 font-medium flex items-center gap-1">
-                                                        <span>🏷️ {{ d.reason }}: -${{ formatMoney(d.calculatedTotal / item.qty) }}/unit</span>
-                                                    </div>
-                                                </div>
                                             </td>
                                             <td class="p-1.5 text-center font-mono">${{ formatMoney(item.price) }}</td>
                                             <td class="p-1.5 text-center font-bold text-slate-800">{{ item.qty || 0 }}</td>
@@ -422,7 +387,7 @@
                                 </table>
                             </div>
 
-                            <!-- NEW: PAYMENT TERMS & SCHEDULE BLOCK (分期排班列表) -->
+                            <!-- DYNAMIC CUSTOM PAYMENT TERMS & SCHEDULE BLOCK -->
                             <div class="my-3 border border-slate-200 rounded p-2 bg-slate-50/50">
                                 <h4 class="text-[9px] font-bold text-slate-900 uppercase tracking-wider mb-1">📋 Payment Terms & Schedule</h4>
                                 <table class="w-full text-left text-[9px] border-collapse">
@@ -439,6 +404,12 @@
                                             <td class="py-1 text-center font-mono font-bold text-red-600">{{ phase.dueDate }}</td>
                                             <td class="py-1 text-right font-mono font-bold text-slate-900">${{ formatMoney(phase.amount) }}</td>
                                         </tr>
+                                        <!-- 在表格底部加入汇总行 -->
+                                        <tr class="border-t border-slate-300 font-bold bg-slate-100/50">
+                                            <td class="py-1 text-slate-900">Total Scheduled Payment</td>
+                                            <td class="py-1 text-center text-slate-400">--</td>
+                                            <td class="py-1 text-right font-mono text-blue-900">${{ formatMoney(computedTotalAmount) }}</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -449,10 +420,8 @@
                             <div class="w-7/12 space-y-1 pr-4">
                                 <div class="p-1.5 bg-blue-50/60 rounded border border-blue-100 text-[9px] text-slate-700 leading-normal">
                                     <strong class="text-blue-900 uppercase font-bold text-[8px] block tracking-wide mb-0.5">Wire Transfer Remittance:</strong>
-                                    Please route all corporate corporate payments exclusively to:
-                                    <span class="block font-mono font-bold text-slate-900 mt-0.5">Bank: JPMorgan Chase | A/C: 9845723049 | Routing: 021000021</span>
+                                    Bank: JPMorgan Chase | A/C: 9845723049 | Routing: 021000021
                                 </div>
-                                <p class="text-[8px] text-gray-400 italic mt-1 leading-tight">This purchase agreement contains definitive dealer pricing. Signed copies constitutes a binding execution contract between Haha Vending & the distributor listed.</p>
                             </div>
                             <div class="w-5/12 bg-slate-900 text-white p-2.5 rounded-lg shadow-sm space-y-1 font-medium">
                                 <div class="flex justify-between text-[9px] text-slate-400">
@@ -464,12 +433,8 @@
                                     <span class="font-mono">-${{ formatMoney(computedTotalDiscount) }}</span>
                                 </div>
                                 <div class="flex justify-between text-[9px] text-slate-400 border-b border-slate-700 pb-1">
-                                    <span>Freight Charge ({{ form.shippingMethod }}):</span>
+                                    <span>Freight Charge:</span>
                                     <span class="font-mono">${{ formatMoney(computedFreight) }}</span>
-                                </div>
-                                <div class="flex justify-between text-[9px] text-slate-400">
-                                    <span>Sales Tax Amount ({{ form.taxRate }}%):</span>
-                                    <span class="font-mono">${{ formatMoney(computedTax) }}</span>
                                 </div>
                                 <div class="flex justify-between items-center text-xs font-black pt-1 border-t border-dashed border-slate-600 text-yellow-400">
                                     <span>GRAND TOTAL (USD):</span>
@@ -489,10 +454,7 @@
                             
                             <div class="space-y-2 text-slate-700 text-justify leading-relaxed">
                                 <p><strong>1. Scope of Agreement.</strong> This attachment establishes the baseline legal definitions governing hardware procurement and warranty allocation under corporate tracking identity {{ form.poNumber }}. The ordering reseller ({{ form.resellerName || '[Target Account]' }}) agrees to enforce standard retail activation matrices upon deployment of hardware units.</p>
-                                <p><strong>2. Pricing Architecture.</strong> All financial numbers listed inside page 1 include definitive volume discounts approved by executive leadership. Hardware pricing remains locked solely against this physical batch shipment and does not guarantee matching terms on future procurement pipelines.</p>
-                                <p><strong>3. Shipping, Logistics & Acceptance Criteria.</strong> For orders utilizing <strong>{{ form.shippingMethod }}</strong>, liability structures pivot immediately upon delivery to destination or hand-off to local carriers. Missing component metrics or transit cosmetic defects must be logged directly into corporate tickets within 72 calendar hours.</p>
-                                <p><strong>4. Payment Enforcement.</strong> Complete fulfillment remains tethered directly to the defined terms: <span class="text-red-600 font-bold">Net {{ form.netDays || 0 }} Days</span> framework. Late payments trigger immediate suspension of cloud backend APIs on hardware nodes until settlement profiles return to active parameters.</p>
-                                <p><strong>5. Technical Warranties.</strong> Hardware units include a standard 12-month manufacturer repair guarantee covering terminal controller cards and coin acceptor modules. Damage derived from local power surges or improper vandalism vectors remains excluded.</p>
+                                <p><strong>2. Payment Enforcement.</strong> Complete fulfillment remains tethered directly to the custom scheduled installments. Late payments trigger immediate suspension of cloud backend APIs on hardware nodes until settlement profiles return to active parameters.</p>
                             </div>
                         </div>
 
@@ -504,8 +466,7 @@
                                     <div class="border-b border-slate-400 h-8 flex items-end font-mono text-slate-400 text-[9px]">[Digitally Recorded Logins]</div>
                                     <div>
                                         <p class="font-bold text-slate-800">Authorized Sales Representative Signature</p>
-                                        <p class="text-slate-500 text-[9px]">Rep: {{ currentUser.name }} ({{ currentUser.email }})</p>
-                                        <p class="text-slate-400 text-[8px] font-mono mt-0.5">Date: {{ form.date || '------' }}</p>
+                                        <p class="text-slate-500 text-[9px]">Rep: {{ currentUser.name }}</p>
                                     </div>
                                 </div>
                                 <div class="space-y-4">
@@ -513,38 +474,11 @@
                                     <div>
                                         <p class="font-bold text-slate-800">Reseller Corporate Officer Binding Stamp</p>
                                         <p class="text-slate-500 text-[9px]">Account: {{ form.resellerName || '[No Account Chosen]' }}</p>
-                                        <p class="text-slate-400 text-[8px] font-mono mt-0.5">Authorized Signature Title: __________________</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- AUDIT LOGS MODAL PORTAL -->
-        <div v-if="showAdminModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 no-print modal-mask">
-            <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6 border border-slate-200 flex flex-col max-h-[85vh]">
-                <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
-                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">📜 Global Administrative Audit Logs</h3>
-                    <button @click="showAdminModal = false" class="text-slate-400 hover:text-slate-600 text-lg font-bold cursor-pointer">&times;</button>
-                </div>
-                <div class="overflow-y-auto space-y-2 text-xs flex-1 pr-1">
-                    <div v-if="adminLogs.length === 0" class="text-slate-400 italic text-center py-8">No action logs tracked in this deployment instance.</div>
-                    <div v-for="log in adminLogs" :key="log.id" class="p-2.5 rounded-lg border border-slate-100 bg-slate-50 font-mono text-[11px] space-y-1">
-                        <div class="flex justify-between font-bold">
-                            <span class="text-blue-600">[{{ log.repName }}]</span>
-                            <span class="text-slate-400">{{ log.timestamp }}</span>
-                        </div>
-                        <p class="text-slate-700">{{ log.action }}</p>
-                        <p class="text-[10px] text-slate-400">Target PO Target ID: {{ log.poTarget }}</p>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 text-right">
-                    <button @click="showAdminModal = false" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold px-4 py-1.5 rounded-lg text-xs cursor-pointer shadow-md">
-                        Dismiss Portal
-                    </button>
                 </div>
             </div>
         </div>
@@ -556,35 +490,30 @@
         createApp({
             data() {
                 return {
-                    // 全局 16 个经销商矩阵数据分配
+                    // 1. 新增加的 16 家经销商与 1 家大客户名单
                     resellers: [
-                        "AAA Vending LLC", "Apex Vending Solutions", "Beacon Distribution Inc", "Blue Horizon automated",
-                        "Capital Vending Supply", "Cascade Vending Group", "Coastal Automatics LLC", "Desert Sky Vending",
-                        "Empire Vending Supply", "Frontier automated Corp", "Interstate Vending Logistics", "Liberty Distribution LLC",
-                        "Summit Vending Supply", "Tri-State Vending Corp", "Vanguard Automation Inc", "Western Vending Logistics"
+                        "经销商 - Twelve 28 vending", "经销商-Vend Guys Local", "经销商-PBS vending", 
+                        "经销商-Ai Vend Solution", "经销商-Genius Vend", "经销商-Mod Brands", 
+                        "经销商-NC vending LLC", "经销商-vendx", "经销商-The vending center", 
+                        "经销商-Vital Vending Sales LLC", "经销商-The Venders", "经销商-VP-Modern-Amenities LLC", 
+                        "经销商 -Vend Guys Internet", "经销商 -Nayax", "经销商-Century vending", 
+                        "经销商-Aloha Smart Vending", "大客户-Culinary Ventures Vending"
                     ],
-                    // 硬件销售SKU分布式基础定价表
+                    // 3. 新产品 SKU 及对应价格矩阵
                     productCatalog: {
-                        "Haha Smart Vending Machine - Classic (Model V1)": 2800.00,
-                        "Haha Smart Vending Machine - Premium (Model V2)": 3500.00,
-                        "Haha Smart Vending Machine - Max (Model V3)": 4800.00,
-                        "Haha Ice Maker Pro (Model I1)": 1500.00,
-                        "Haha Coffee Brewer Station (Model C1)": 2200.00
+                        "Mini 360": 2400.00,
+                        "Plus 440": 2600.00,
+                        "Pro 542": 3200.00,
+                        "Pro 542 - NAYAX": 3500.00,
+                        "US542S": 3700.00,
+                        "Ultra 1200": 5000.00,
+                        "Freezer 550": 3500.00,
+                        "Max 660s": 4000.00,
+                        "Max 660": 3600.00
                     },
                     isLoggedIn: false,
-                    showAdminModal: false,
-                    authForm: {
-                        name: '',
-                        email: '',
-                        phone: '',
-                        boundResellers: []
-                    },
-                    currentUser: {
-                        name: '',
-                        email: '',
-                        phone: '',
-                        boundResellers: []
-                    },
+                    authForm: { name: '', email: '', phone: '' },
+                    currentUser: { name: '', email: '', phone: '' },
                     form: {
                         poNumber: '',
                         clientPoNumber: '',
@@ -592,9 +521,9 @@
                         date: new Date().toISOString().split('T')[0],
                         shippingMethod: 'Logistics Shipping',
                         pickupWarehouseText: 'Haha Vending Corporate Warehouse East,\n1754 North Brown Rd suite 200, Lawrenceville, GA 30043',
-                        netDays: 0,
-                        downPayment: 0,
-                        paymentTermsType: 1, // 默认为 1 期，可选 2 期
+                        netDays: 30,         // 自定义间隔天数，例如每 30 天为一期
+                        downPayment: 0,      // 首付款金额
+                        paymentTermsType: 1, // 可填写的任意期数，默认 1 期全部付完
                         freightType: 'total',
                         freightInput: 0,
                         taxRate: 0,
@@ -609,66 +538,69 @@
                             { modelKey: '', price: 0, qty: 1 }
                         ],
                         discounts: []
-                    },
-                    adminLogs: []
+                    }
                 }
             },
             computed: {
-                // 原有的单一 Due Date 计算，为兼容性保留，指代尾款或全部付款日
-                computedDueDate() {
-                    if (!this.form.date) return '------';
-                    const base = new Date(this.form.date);
-                    base.setDate(base.getDate() + (this.form.netDays || 0));
-                    return base.toISOString().split('T')[0];
-                },
-                // 核心：Payment Terms 期数排班联动计算
+                // 2. 完美的自定义任意期数动态计算与分摊排班逻辑
                 computedPaymentSchedule() {
                     const schedule = [];
                     const baseDate = this.form.date ? new Date(this.form.date) : new Date();
                     const totalAmount = this.computedTotalAmount;
+                    const termsCount = Math.max(1, parseInt(this.form.paymentTermsType) || 1);
+                    const intervalDays = parseInt(this.form.netDays) || 0;
 
                     const formatDate = (dateObj) => {
                         return dateObj.toISOString().split('T')[0];
                     };
 
-                    if (this.form.paymentTermsType === 1) {
-                        // 1期全部付清
+                    if (termsCount === 1) {
+                        // 1 期：100% 全部付清
                         const dueDate = new Date(baseDate);
-                        dueDate.setDate(dueDate.getDate() + (this.form.netDays || 0));
+                        dueDate.setDate(dueDate.getDate() + intervalDays);
                         schedule.push({
                             term: "100% Full Payment",
                             dueDate: formatDate(dueDate),
                             amount: totalAmount
                         });
-                    } else if (this.form.paymentTermsType === 2) {
-                        // 2期：首付 + 尾款
-                        const downPaymentAmount = this.form.downPayment || 0;
+                    } else {
+                        // 多期分期付款逻辑
+                        const downPaymentAmount = Math.min(totalAmount, this.form.downPayment || 0);
                         
-                        // 第1期：首付款（默认订单当日支付）
+                        // 第一期：首付款金额（默认下单当日支付）
                         schedule.push({
                             term: "1st Installment (Down Payment)",
                             dueDate: this.form.date || formatDate(baseDate),
                             amount: downPaymentAmount
                         });
 
-                        // 第2期：尾款金额（总额 - 首付）
-                        const balanceAmount = Math.max(0, totalAmount - downPaymentAmount);
-                        const balanceDate = new Date(baseDate);
-                        balanceDate.setDate(balanceDate.getDate() + (this.form.netDays || 0));
-                        
-                        schedule.push({
-                            term: "2nd Installment (Balance)",
-                            dueDate: formatDate(balanceDate),
-                            amount: balanceAmount
-                        });
+                        // 剩余金额在剩下期数均匀平摊
+                        const remainingAmount = Math.max(0, totalAmount - downPaymentAmount);
+                        const remainingTerms = termsCount - 1;
+                        const averageAmount = remainingAmount / remainingTerms;
+
+                        for (let i = 1; i <= remainingTerms; i++) {
+                            const nextDate = new Date(baseDate);
+                            // 根据间隔天数自动往后推算各期账单日
+                            nextDate.setDate(nextDate.getDate() + (i * intervalDays));
+                            
+                            // 转换序数后缀
+                            let suffix = "th";
+                            if ((i + 1) === 2) suffix = "nd";
+                            if ((i + 1) === 3) suffix = "rd";
+
+                            schedule.push({
+                                term: `${i + 1}${suffix} Installment`,
+                                dueDate: formatDate(nextDate),
+                                amount: averageAmount
+                            });
+                        }
                     }
                     return schedule;
                 },
-                // 计算纯商品的原始总价
                 computedSubtotal() {
                     return this.form.items.reduce((sum, item) => sum + (item.price * (item.qty || 0)), 0);
                 },
-                // 计算所有折扣扣减的累加额
                 computedTotalDiscount() {
                     let total = 0;
                     this.form.discounts.forEach(d => {
@@ -677,25 +609,15 @@
                             const matchedItem = this.form.items.find(i => i.modelKey === d.targetModel);
                             if (matchedItem) {
                                 const itemSubtotal = matchedItem.price * matchedItem.qty;
-                                if (d.type === 'amount') {
-                                    currentDiscount = d.value * matchedItem.qty;
-                                } else {
-                                    currentDiscount = itemSubtotal * (d.value / 100);
-                                }
+                                currentDiscount = d.type === 'amount' ? d.value * matchedItem.qty : itemSubtotal * (d.value / 100);
                             }
                         } else {
-                            if (d.type === 'amount') {
-                                currentDiscount = d.value;
-                            } else {
-                                currentDiscount = this.computedSubtotal * (d.value / 100);
-                            }
+                            currentDiscount = d.type === 'amount' ? d.value : this.computedSubtotal * (d.value / 100);
                         }
-                        d.calculatedTotal = currentDiscount;
                         total += currentDiscount;
                     });
                     return total;
                 },
-                // 获取当前设置的实际总运费
                 computedFreight() {
                     if (this.form.shippingMethod === 'Self-pickup') return 0;
                     if (this.form.freightType === 'per_unit') {
@@ -704,28 +626,21 @@
                     }
                     return this.form.freightInput || 0;
                 },
-                // 计算销售税金额 (应税额 = 商品总价 - 折扣 + 运费)
                 computedTax() {
                     const taxableBase = Math.max(0, this.computedSubtotal - this.computedTotalDiscount + this.computedFreight);
                     return taxableBase * ((this.form.taxRate || 0) / 100);
                 },
-                // 计算最终应付的 Grand Total 金额
                 computedTotalAmount() {
                     const value = this.computedSubtotal - this.computedTotalDiscount + this.computedFreight + this.computedTax;
                     return Math.max(0, value);
                 }
             },
             created() {
-                // 初始化加载本地可能残留的 Profile 缓存
                 const cachedUser = localStorage.getItem('po_engine_active_rep');
                 if (cachedUser) {
                     this.currentUser = JSON.parse(cachedUser);
                     this.isLoggedIn = true;
                     this.generateTrackingPoNumber();
-                }
-                const cachedLogs = localStorage.getItem('po_engine_audit_logs');
-                if (cachedLogs) {
-                    this.adminLogs = JSON.parse(cachedLogs);
                 }
             },
             methods: {
@@ -740,13 +655,11 @@
                     localStorage.setItem('po_engine_active_rep', JSON.stringify(this.currentUser));
                     this.isLoggedIn = true;
                     this.generateTrackingPoNumber();
-                    this.logAdminAction("初始化登录环境，绑定关联 Reseller 数量: " + this.currentUser.boundResellers.length);
                 },
                 handleLogout() {
-                    this.logAdminAction("注销当前工作环境退出 Profile 转换账户");
                     localStorage.removeItem('po_engine_active_rep');
                     this.isLoggedIn = false;
-                    this.authForm = { name: '', email: '', phone: '', boundResellers: [] };
+                    this.authForm = { name: '', email: '', phone: '' };
                 },
                 handleShippingMethodChange() {
                     if (this.form.shippingMethod === 'Self-pickup') {
@@ -768,41 +681,23 @@
                     this.form.items.splice(index, 1);
                 },
                 addDiscount() {
-                    this.form.discounts.push({ scope: 'unit', type: 'amount', targetModel: '', value: 0, reason: '', calculatedTotal: 0 });
+                    this.form.discounts.push({ scope: 'total', type: 'amount', targetModel: '', value: 0, reason: '' });
                 },
                 removeDiscount(index) {
                     this.form.discounts.splice(index, 1);
                 },
-                getItemDiscounts(modelKey) {
-                    return this.form.discounts.filter(d => d.scope === 'unit' && d.targetModel === modelKey);
-                },
                 loadResellerMemory() {
                     if (!this.form.resellerName) return;
-                    const memoryKey = `po_mem_${this.currentUser.name}_${this.form.resellerName}`;
+                    const memoryKey = `po_mem_${this.currentUser.name}_${this.form.resellerName.replace(/\s+/g, '_')}`;
                     const localData = localStorage.getItem(memoryKey);
                     if (localData) {
                         const parsed = JSON.parse(localData);
-                        this.form.resellerContactName = parsed.resellerContactName || '';
-                        this.form.resellerEmail = parsed.resellerEmail || '';
-                        this.form.resellerPhone = parsed.resellerPhone || '';
-                        this.form.shippingContactName = parsed.shippingContactName || '';
-                        this.form.shippingEmail = parsed.shippingEmail || '';
-                        this.form.shippingPhone = parsed.shippingPhone || '';
-                        this.form.shippingAddress = parsed.shippingAddress || '';
-                    } else {
-                        this.form.resellerContactName = '';
-                        this.form.resellerEmail = '';
-                        this.form.resellerPhone = '';
-                        this.form.shippingContactName = '';
-                        this.form.shippingEmail = '';
-                        this.form.shippingPhone = '';
-                        this.form.shippingAddress = '';
+                        Object.assign(this.form, parsed);
                     }
-                    this.logAdminAction(`加载或切换 Reseller 记忆缓存: ${this.form.resellerName}`);
                 },
                 saveResellerMemory() {
                     if (!this.form.resellerName) return;
-                    const memoryKey = `po_mem_${this.currentUser.name}_${this.form.resellerName}`;
+                    const memoryKey = `po_mem_${this.currentUser.name}_${this.form.resellerName.replace(/\s+/g, '_')}`;
                     const payload = {
                         resellerContactName: this.form.resellerContactName,
                         resellerEmail: this.form.resellerEmail,
@@ -814,23 +709,7 @@
                     };
                     localStorage.setItem(memoryKey, JSON.stringify(payload));
                 },
-                logAdminAction(actionText) {
-                    const newLog = {
-                        id: Date.now() + Math.random(),
-                        repName: this.currentUser.name || "System",
-                        timestamp: new Date().toLocaleString(),
-                        action: actionText,
-                        poTarget: this.form.poNumber || "N/A"
-                    };
-                    this.adminLogs.unshift(newLog);
-                    localStorage.setItem('po_engine_audit_logs', JSON.stringify(this.adminLogs));
-                },
-                promptAdminAccess() {
-                    this.showAdminModal = true;
-                    this.logAdminAction("查阅了全局行政审计日志管理看板");
-                },
                 downloadPDF() {
-                    this.logAdminAction(`触发下达打印或生成PDF指令: 应收总计 $${this.computedTotalAmount.toFixed(2)}`);
                     window.print();
                 },
                 formatMoney(val) {
