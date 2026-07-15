@@ -83,6 +83,13 @@
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
                         <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                     </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Assigned Reseller Accounts (Multiple) *</label>
+                        <select v-model="authForm.assignedResellers" multiple required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[120px]">
+                            <option v-for="reseller in resellersCatalog" :key="reseller" :value="reseller">{{ reseller }}</option>
+                        </select>
+                        <p class="text-[10px] text-slate-400 mt-1">Hold Ctrl (Windows) or Cmd (Mac) to select multiple accounts.</p>
+                    </div>
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer">
                         Initialize Workspace
                     </button>
@@ -119,10 +126,10 @@
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">📦 1. Logistics & Account Alignment</h3>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Target Reseller Account *</label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Target Reseller Account * (Restricted to Assigned)</label>
                             <select v-model="form.resellerName" @change="loadResellerMemory" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                                <option value="">-- Choose Account for This PO --</option>
-                                <option v-for="reseller in resellers" :key="reseller" :value="reseller">{{ reseller }}</option>
+                                <option value="">-- Choose Account from Your Assigned Clients --</option>
+                                <option v-for="reseller in currentUser.assignedResellers" :key="reseller" :value="reseller">{{ reseller }}</option>
                             </select>
                         </div>
                         
@@ -491,6 +498,7 @@
                                 <div>
                                     <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">OFFICIAL REVENUE REMITTANCE CHANNELS</h3>
                                     <p class="text-[8px] text-slate-400 mt-0.5">Attachment Reference: PO #{{ form.poNumber }}</p>
+                                }
                                 </div>
                                 <div class="text-right text-[8px] text-slate-500 font-mono">
                                     Phone: +1 323-847-6151<br>www.hahavending.com
@@ -572,7 +580,8 @@
         createApp({
             data() {
                 return {
-                    resellers: [
+                    // 全量绑定的客户清单列表，用于注册时勾选
+                    resellersCatalog: [
                         "Twelve 28 vending", "Vend Guys Local", "PBS vending", 
                         "Ai Vend Solution", "Genius Vend", "Mod Brands", 
                         "NC vending LLC", "vendx", "The vending center", 
@@ -592,8 +601,8 @@
                         "Max 660": 3600.00
                     },
                     isLoggedIn: false,
-                    authForm: { name: '', email: '', phone: '' },
-                    currentUser: { name: '', email: '', phone: '' },
+                    authForm: { name: '', email: '', phone: '', assignedResellers: [] },
+                    currentUser: { name: '', email: '', phone: '', assignedResellers: [] },
                     form: {
                         poNumber: '',
                         clientPoNumber: '',
@@ -639,114 +648,120 @@
                         const dueDate = new Date(baseDate);
                         dueDate.setDate(dueDate.getDate() + intervalDays);
                         schedule.push({
-                            term: "100% Full Payment",
+                            term: "100% Net Payment",
                             dueDate: formatDate(dueDate),
                             amount: totalAmount
                         });
                     } else {
-                        const downPaymentAmount = Math.min(totalAmount, this.form.downPayment || 0);
-                        
+                        let downPayment = parseFloat(this.form.downPayment) || 0;
+                        if (downPayment > totalAmount) downPayment = totalAmount;
+
                         schedule.push({
-                            term: "1st Installment (Down Payment)",
-                            dueDate: this.form.date || formatDate(baseDate),
-                            amount: downPaymentAmount
+                            term: "Phase 1: Down Payment",
+                            dueDate: formatDate(new Date(baseDate)),
+                            amount: downPayment
                         });
 
-                        const remainingAmount = Math.max(0, totalAmount - downPaymentAmount);
-                        const remainingTerms = termsCount - 1;
-                        const averageAmount = remainingAmount / remainingTerms;
+                        const remainingAmount = totalAmount - downPayment;
+                        const remainingPhases = termsCount - 1;
+                        const phaseSlice = remainingPhases > 0 ? (remainingAmount / remainingPhases) : 0;
 
-                        for (let i = 1; i <= remainingTerms; i++) {
+                        for (let i = 1; i <= remainingPhases; i++) {
                             const nextDate = new Date(baseDate);
                             nextDate.setDate(nextDate.getDate() + (i * intervalDays));
-                            
-                            let suffix = "th";
-                            if ((i + 1) === 2) suffix = "nd";
-                            if ((i + 1) === 3) suffix = "rd";
-
                             schedule.push({
-                                term: `${i + 1}${suffix} Installment`,
+                                term: `Phase ${i + 1}: Term Split`,
                                 dueDate: formatDate(nextDate),
-                                amount: averageAmount
+                                amount: phaseSlice
                             });
                         }
                     }
                     return schedule;
                 },
                 computedSubtotal() {
-                    return this.form.items.reduce((sum, item) => sum + (item.price * (item.qty || 0)), 0);
+                    return this.form.items.reduce((acc, item) => {
+                        return acc + ((parseFloat(item.price) || 0) * (parseInt(item.qty) || 0));
+                    }, 0);
                 },
                 computedTotalDiscount() {
-                    let total = 0;
+                    let totalD = 0;
                     this.form.discounts.forEach(d => {
-                        let currentDiscount = 0;
-                        if (d.scope === 'unit') {
-                            const matchedItem = this.form.items.find(i => i.modelKey === d.targetModel);
-                            if (matchedItem) {
-                                const itemSubtotal = matchedItem.price * matchedItem.qty;
-                                currentDiscount = d.type === 'amount' ? d.value * matchedItem.qty : itemSubtotal * (d.value / 100);
+                        const val = parseFloat(d.value) || 0;
+                        if (d.scope === 'total') {
+                            if (d.type === 'percent') {
+                                totalD += this.computedSubtotal * (val / 100);
+                            } else {
+                                totalD += val;
                             }
-                        } else {
-                            currentDiscount = d.type === 'amount' ? d.value : this.computedSubtotal * (d.value / 100);
+                        } else if (d.scope === 'unit' && d.targetModel) {
+                            const matchedItems = this.form.items.filter(i => i.modelKey === d.targetModel);
+                            matchedItems.forEach(item => {
+                                const qty = parseInt(item.qty) || 0;
+                                if (d.type === 'percent') {
+                                    totalD += (parseFloat(item.price) || 0) * qty * (val / 100);
+                                } else {
+                                    totalD += val * qty;
+                                }
+                            });
                         }
-                        total += currentDiscount;
                     });
-                    return total;
+                    return Math.min(totalD, this.computedSubtotal);
                 },
                 computedFreight() {
                     if (this.form.shippingMethod === 'Self-pickup') return 0;
+                    const val = parseFloat(this.form.freightInput) || 0;
                     if (this.form.freightType === 'per_unit') {
-                        const totalUnits = this.form.items.reduce((sum, item) => sum + (item.qty || 0), 0);
-                        return (this.form.freightInput || 0) * totalUnits;
+                        const totalQty = this.form.items.reduce((acc, item) => acc + (parseInt(item.qty) || 0), 0);
+                        return val * totalQty;
                     }
-                    return this.form.freightInput || 0;
-                },
-                computedTax() {
-                    const taxableBase = Math.max(0, this.computedSubtotal - this.computedTotalDiscount + this.computedFreight);
-                    return taxableBase * ((this.form.taxRate || 0) / 100);
+                    return val;
                 },
                 computedTotalAmount() {
-                    const value = this.computedSubtotal - this.computedTotalDiscount + this.computedFreight + this.computedTax;
-                    return Math.max(0, value);
+                    const balance = this.computedSubtotal - this.computedTotalDiscount + this.computedFreight;
+                    const tax = Math.max(0, balance) * ((parseFloat(this.form.taxRate) || 0) / 100);
+                    return Math.max(0, balance + tax);
                 }
             },
             created() {
-                const cachedUser = localStorage.getItem('po_engine_active_rep');
-                if (cachedUser) {
-                    this.currentUser = JSON.parse(cachedUser);
-                    this.isLoggedIn = true;
-                    this.generateTrackingPoNumber();
-                }
+                this.generatePoTrackingID();
+                this.checkSavedSession();
             },
             methods: {
-                generateTrackingPoNumber() {
-                    const prefix = "PO-HAHA";
+                generatePoTrackingID() {
+                    const prefix = "PO-HAHAvending-";
                     const timestamp = Date.now().toString().slice(-6);
-                    const random = Math.floor(100 + Math.random() * 900);
-                    this.form.poNumber = `${prefix}-${timestamp}-${random}`;
+                    const random = Math.floor(1000 + Math.random() * 9000);
+                    this.form.poNumber = `${prefix}${timestamp}-${random}`;
                 },
-                handleRegister() {
-                    this.currentUser = { ...this.authForm };
-                    localStorage.setItem('po_engine_active_rep', JSON.stringify(this.currentUser));
-                    this.isLoggedIn = true;
-                    this.generateTrackingPoNumber();
-                },
-                handleLogout() {
-                    localStorage.removeItem('po_engine_active_rep');
-                    this.isLoggedIn = false;
-                    this.authForm = { name: '', email: '', phone: '' };
-                },
-                handleShippingMethodChange() {
-                    if (this.form.shippingMethod === 'Self-pickup') {
-                        this.form.freightInput = 0;
+                checkSavedSession() {
+                    const cached = localStorage.getItem('po_rep_profile');
+                    if (cached) {
+                        try {
+                            const profile = JSON.parse(cached);
+                            if (profile && profile.name && profile.assignedResellers) {
+                                this.currentUser = profile;
+                                this.isLoggedIn = true;
+                            }
+                        } catch(e) {
+                            localStorage.removeItem('po_rep_profile');
+                        }
                     }
                 },
-                onModelChange(index) {
-                    const item = this.form.items[index];
-                    if (item.modelKey && this.productCatalog[item.modelKey]) {
-                        item.price = this.productCatalog[item.modelKey];
-                    } else {
-                        item.price = 0;
+                handleRegister() {
+                    if (!this.authForm.name || !this.authForm.email || !this.authForm.phone || this.authForm.assignedResellers.length === 0) {
+                        alert("Please accurately fill out all registry matrices.");
+                        return;
+                    }
+                    this.currentUser = { ...this.authForm };
+                    localStorage.setItem('po_rep_profile', JSON.stringify(this.currentUser));
+                    this.isLoggedIn = true;
+                },
+                handleLogout() {
+                    if(confirm("Confirm logging out of this profile?")) {
+                        localStorage.removeItem('po_rep_profile');
+                        this.isLoggedIn = false;
+                        this.authForm = { name: '', email: '', phone: '', assignedResellers: [] };
+                        this.form.resellerName = '';
                     }
                 },
                 addItem() {
@@ -755,24 +770,49 @@
                 removeItem(index) {
                     this.form.items.splice(index, 1);
                 },
+                onModelChange(index) {
+                    const key = this.form.items[index].modelKey;
+                    this.form.items[index].price = this.productCatalog[key] || 0;
+                },
                 addDiscount() {
                     this.form.discounts.push({ scope: 'total', type: 'amount', targetModel: '', value: 0, reason: '' });
                 },
                 removeDiscount(index) {
                     this.form.discounts.splice(index, 1);
                 },
+                handleShippingMethodChange() {
+                    if (this.form.shippingMethod === 'Self-pickup') {
+                        this.form.freightInput = 0;
+                    }
+                },
                 loadResellerMemory() {
                     if (!this.form.resellerName) return;
-                    const memoryKey = `po_mem_${this.currentUser.name}_${this.form.resellerName.replace(/\s+/g, '_')}`;
-                    const localData = localStorage.getItem(memoryKey);
-                    if (localData) {
-                        const parsed = JSON.parse(localData);
-                        Object.assign(this.form, parsed);
+                    const key = `reseller_mem_${this.form.resellerName.replace(/\s+/g, '_')}`;
+                    const mem = localStorage.getItem(key);
+                    if (mem) {
+                        try {
+                            const data = JSON.parse(mem);
+                            this.form.resellerContactName = data.resellerContactName || '';
+                            this.form.resellerEmail = data.resellerEmail || '';
+                            this.form.resellerPhone = data.resellerPhone || '';
+                            this.form.shippingContactName = data.shippingContactName || '';
+                            this.form.shippingEmail = data.shippingEmail || '';
+                            this.form.shippingPhone = data.shippingPhone || '';
+                            this.form.shippingAddress = data.shippingAddress || '';
+                        } catch (e) {}
+                    } else {
+                        this.form.resellerContactName = '';
+                        this.form.resellerEmail = '';
+                        this.form.resellerPhone = '';
+                        this.form.shippingContactName = '';
+                        this.form.shippingEmail = '';
+                        this.form.shippingPhone = '';
+                        this.form.shippingAddress = '';
                     }
                 },
                 saveResellerMemory() {
                     if (!this.form.resellerName) return;
-                    const memoryKey = `po_mem_${this.currentUser.name}_${this.form.resellerName.replace(/\s+/g, '_')}`;
+                    const key = `reseller_mem_${this.form.resellerName.replace(/\s+/g, '_')}`;
                     const payload = {
                         resellerContactName: this.form.resellerContactName,
                         resellerEmail: this.form.resellerEmail,
@@ -782,14 +822,16 @@
                         shippingPhone: this.form.shippingPhone,
                         shippingAddress: this.form.shippingAddress
                     };
-                    localStorage.setItem(memoryKey, JSON.stringify(payload));
+                    localStorage.setItem(key, JSON.stringify(payload));
+                },
+                promptAdminAccess() {
+                    alert("Verification Required: Active directory sync path is locked under external IAM authority control panels.");
                 },
                 downloadPDF() {
                     window.print();
                 },
                 formatMoney(val) {
-                    if (isNaN(val)) return '0.00';
-                    return val.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    return (parseFloat(val) || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
             }
         }).mount('#app');
