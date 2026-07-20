@@ -25,8 +25,8 @@
                 margin: 0 !important;
             }
             body {
-                /* 使用 padding 代替 page margin，确保内容留出 A4 边距且不打印页眉页脚 */
-                padding: 12mm !important;
+                /* 缩减 padding，释放垂直空间以防跨页 */
+                padding: 6mm !important;
             }
             .no-print, button, select, input, textarea, .admin-trigger, .modal-mask, svg {
                 display: none !important;
@@ -35,21 +35,21 @@
                 display: block !important;
             }
             .print-page-1 {
-                page-break-after: always !important;
-                break-after: page !important;
+                page-break-after: avoid !important;
+                break-after: avoid !important;
             }
             .a4-print-sheet {
-                width: 186mm !important;
-                min-height: 270mm !important;
-                max-height: 277mm !important;
+                width: 100% !important;
+                min-height: auto !important;
+                max-height: none !important;
                 box-shadow: none !important;
             }
             .print-footer-anchor {
-                margin-top: auto !important;
+                margin-top: 6px !important;
                 page-break-inside: avoid !important;
             }
             table {
-                font-size: 10px !important;
+                font-size: 9px !important;
             }
         }
     </style>
@@ -358,7 +358,7 @@
                 <!-- Right Side: Printable Documents Frame -->
                 <div class="lg:col-span-7 space-y-8">
                     <!-- ==================== PAGE 1: PURCHASE ORDER SHEET ==================== -->
-                    <div class="bg-white shadow-xl text-slate-900 border border-gray-200 a4-print-sheet print-page-1 mx-auto p-6 flex flex-col justify-between">
+                    <div class="bg-white shadow-xl text-slate-900 border border-gray-200 a4-print-sheet print-page-1 mx-auto p-4 flex flex-col justify-between">
                         <div class="w-full flex-none">
                             <!-- Top Corporate Head -->
                             <div class="flex justify-between items-start border-b-2 border-slate-900 pb-1">
@@ -375,8 +375,8 @@
                             </div>
 
                             <!-- BILLING TO & SHIPPING TO MATRIX -->
-                            <div class="grid grid-cols-2 gap-4 my-1.5 text-[10px]">
-                                <div class="bg-slate-50 p-2 rounded border border-slate-150 flex flex-col justify-between">
+                            <div class="grid grid-cols-2 gap-3 my-1 text-[10px]">
+                                <div class="bg-slate-50 p-1.5 rounded border border-slate-150 flex flex-col justify-between">
                                     <div>
                                         <h4 class="font-bold text-blue-950 uppercase tracking-wider text-[8px] mb-0.5">Billing To:</h4>
                                         <p class="font-bold text-xs text-slate-900 mb-0.5">{{ form.resellerName || '[No Account Chosen]' }}</p>
@@ -385,7 +385,7 @@
                                         <p v-if="form.resellerPhone" class="text-slate-600">{{ form.resellerPhone }}</p>
                                     </div>
                                 </div>
-                                <div class="bg-slate-50 p-2 rounded border border-slate-150 flex flex-col justify-between">
+                                <div class="bg-slate-50 p-1.5 rounded border border-slate-150 flex flex-col justify-between">
                                     <div>
                                         <h4 class="font-bold text-blue-950 uppercase tracking-wider text-[8px] mb-0.5">Shipping to:</h4>
                                         <p class="font-bold text-slate-900 text-[11px] mb-0.5">Mode: <span class="text-blue-700 font-extrabold">{{ form.shippingMethod }}</span></p>
@@ -402,33 +402,33 @@
                             </div>
 
                             <!-- PRODUCTS SKU TABLE MATRIX -->
-                            <div class="my-2 text-[10px]">
+                            <div class="my-1 text-[10px]">
                                 <table class="w-full text-left border-collapse">
                                     <thead>
                                         <tr class="bg-slate-900 text-white uppercase text-[8px] tracking-wider font-bold">
-                                            <th class="p-1.5 rounded-l text-center w-8">#</th>
-                                            <th class="p-1.5">Hardware SKU Model</th>
-                                            <th class="p-1.5 text-center w-16">Unit Price</th>
-                                            <th class="p-1.5 text-center w-12">Qty</th>
-                                            <th class="p-1.5 text-right rounded-r w-20">Ext Amount</th>
+                                            <th class="p-1 rounded-l text-center w-8">#</th>
+                                            <th class="p-1">Hardware SKU Model</th>
+                                            <th class="p-1 text-center w-16">Unit Price</th>
+                                            <th class="p-1 text-center w-12">Qty</th>
+                                            <th class="p-1 text-right rounded-r w-20">Ext Amount</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="(item, idx) in form.items" :key="idx" class="border-b border-slate-200 text-[10px] hover:bg-slate-50/50">
-                                            <td class="p-1.5 text-center font-mono text-slate-400">{{ idx + 1 }}</td>
-                                            <td class="p-1.5 font-bold text-slate-900">
+                                            <td class="p-1 text-center font-mono text-slate-400">{{ idx + 1 }}</td>
+                                            <td class="p-1 font-bold text-slate-900">
                                                 {{ item.modelKey || '[No SKU Selected]' }}
                                             </td>
-                                            <td class="p-1.5 text-center font-mono">${{ formatMoney(item.price) }}</td>
-                                            <td class="p-1.5 text-center font-bold text-slate-800">{{ item.qty || 0 }}</td>
-                                            <td class="p-1.5 text-right font-mono font-bold text-slate-900">${{ formatMoney(item.price * (item.qty || 0)) }}</td>
+                                            <td class="p-1 text-center font-mono">${{ formatMoney(item.price) }}</td>
+                                            <td class="p-1 text-center font-bold text-slate-800">{{ item.qty || 0 }}</td>
+                                            <td class="p-1 text-right font-mono font-bold text-slate-900">${{ formatMoney(item.price * (item.qty || 0)) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
 
-                            <!-- 新调整位置的结构：GRAND TOTAL 统计卡片被整体移到这里（分期板块上面），并修改了 Hardware Subtotal 的名称 -->
-                            <div class="my-3 bg-slate-900 text-white p-3 rounded-lg shadow-sm space-y-1 font-medium">
+                            <!-- GRAND TOTAL 统计卡片 -->
+                            <div class="my-1.5 bg-slate-900 text-white p-2 rounded-lg shadow-sm space-y-0.5 font-medium">
                                 <div class="flex justify-between text-[10px] text-slate-400">
                                     <span>Device Total:</span>
                                     <span class="font-mono">${{ formatMoney(computedSubtotal) }}</span>
@@ -437,38 +437,38 @@
                                     <span>Total Applied Discounts:</span>
                                     <span class="font-mono">-${{ formatMoney(computedTotalDiscount) }}</span>
                                 </div>
-                                <div class="flex justify-between text-[10px] text-slate-400 border-b border-slate-700 pb-1.5">
+                                <div class="flex justify-between text-[10px] text-slate-400 border-b border-slate-700 pb-1">
                                     <span>Freight Charge:</span>
                                     <span class="font-mono">${{ formatMoney(computedFreight) }}</span>
                                 </div>
-                                <div class="flex justify-between items-center text-xs font-black pt-1.5 text-yellow-400">
+                                <div class="flex justify-between items-center text-xs font-black pt-1 text-yellow-400">
                                     <span>GRAND TOTAL (USD):</span>
-                                    <span class="font-mono text-base">${{ formatMoney(computedTotalAmount) }}</span>
+                                    <span class="font-mono text-sm">${{ formatMoney(computedTotalAmount) }}</span>
                                 </div>
                             </div>
 
                             <!-- DYNAMIC CUSTOM PAYMENT TERMS & SCHEDULE BLOCK -->
-                            <div class="my-3 border border-slate-200 rounded p-2 bg-slate-50/50">
-                                <h4 class="text-[9px] font-bold text-slate-900 uppercase tracking-wider mb-1">📋 Payment Terms & Schedule</h4>
+                            <div class="my-1.5 border border-slate-200 rounded p-1.5 bg-slate-50/50">
+                                <h4 class="text-[9px] font-bold text-slate-900 uppercase tracking-wider mb-0.5">📋 Payment Terms & Schedule</h4>
                                 <table class="w-full text-left text-[9px] border-collapse">
                                     <thead>
                                         <tr class="border-b border-slate-300 text-slate-500 font-semibold">
-                                            <th class="py-1">Payment Phase</th>
-                                            <th class="py-1 text-center">Payment Due Date</th>
-                                            <th class="py-1 text-right">Payment Amount</th>
+                                            <th class="py-0.5">Payment Phase</th>
+                                            <th class="py-0.5 text-center">Payment Due Date</th>
+                                            <th class="py-0.5 text-right">Payment Amount</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="(phase, index) in computedPaymentSchedule" :key="index" class="border-b border-slate-100 last:border-none">
-                                            <td class="py-1 font-medium text-slate-800">{{ phase.term }}</td>
-                                            <td class="py-1 text-center font-mono font-bold text-red-600">{{ phase.dueDate }}</td>
-                                            <td class="py-1 text-right font-mono font-bold text-slate-900">${{ formatMoney(phase.amount) }}</td>
+                                            <td class="py-0.5 font-medium text-slate-800">{{ phase.term }}</td>
+                                            <td class="py-0.5 text-center font-mono font-bold text-red-600">{{ phase.dueDate }}</td>
+                                            <td class="py-0.5 text-right font-mono font-bold text-slate-900">${{ formatMoney(phase.amount) }}</td>
                                         </tr>
                                         <!-- Total accumulation at table footer -->
                                         <tr class="border-t border-slate-300 font-bold bg-slate-100/50">
-                                            <td class="py-1 text-slate-900">Total Scheduled Payment</td>
-                                            <td class="py-1 text-center text-slate-400">--</td>
-                                            <td class="py-1 text-right font-mono text-blue-900">${{ formatMoney(computedTotalAmount) }}</td>
+                                            <td class="py-0.5 text-slate-900">Total Scheduled Payment</td>
+                                            <td class="py-0.5 text-center text-slate-400">--</td>
+                                            <td class="py-0.5 text-right font-mono text-blue-900">${{ formatMoney(computedTotalAmount) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -476,25 +476,25 @@
                         </div>
 
                         <!-- PAGE 1 BOTTOM SIGNATURE BLOCK & FISCAL CALCULATION -->
-                        <div class="print-footer-anchor w-full mt-2 border-t border-slate-300 pt-2">
+                        <div class="print-footer-anchor w-full mt-1 border-t border-slate-300 pt-1">
                             
-                            <!-- LEGAL AGREEMENT CLAUSE BOX (PLACED DIRECTLY ABOVE SIGNATURES) -->
-                            <div class="mb-3 p-2 bg-slate-50 rounded border border-slate-200 text-[9px] text-slate-700 leading-normal space-y-1.5">
+                            <!-- LEGAL AGREEMENT CLAUSE BOX -->
+                            <div class="mb-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 text-[8.5px] text-slate-700 leading-normal space-y-1">
                                 <p><strong>1. Scope of Agreement.</strong> This attachment establishes the baseline legal definitions governing hardware procurement and warranty allocation under corporate tracking identity <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span>. The ordering reseller ({{ form.resellerName || '[Target Account]' }}) agrees to enforce standard retail activation matrices upon deployment of hardware units.</p>
                                 <p><strong>2. Payment Enforcement.</strong> Complete fulfillment remains tethered directly to the custom scheduled installments. Late payments trigger immediate suspension of cloud backend APIs on hardware nodes until settlement profiles return to active parameters.</p>
                             </div>
 
                             <!-- Page 1 Signatures & Date -->
-                            <div class="grid grid-cols-2 gap-4 text-[9px] mb-3 bg-slate-50 p-2 rounded border border-slate-200">
+                            <div class="grid grid-cols-2 gap-3 text-[9px] mb-1.5 bg-slate-50 p-1.5 rounded border border-slate-200">
                                 <div>
                                     <p class="text-slate-500 font-semibold">Authorized Signature:</p>
-                                    <div class="h-6 border-b border-slate-300 flex items-end font-serif italic text-slate-900 text-sm pl-1">
+                                    <div class="h-5 border-b border-slate-300 flex items-end font-serif italic text-slate-900 text-xs pl-1">
                                         {{ form.signature || '_______________________' }}
                                     </div>
                                 </div>
                                 <div>
                                     <p class="text-slate-500 font-semibold">Date Signed:</p>
-                                    <div class="h-6 border-b border-slate-300 flex items-end font-mono text-slate-900 pl-1">
+                                    <div class="h-5 border-b border-slate-300 flex items-end font-mono text-slate-900 pl-1">
                                         {{ form.dateSigned || '_______________________' }}
                                     </div>
                                 </div>
@@ -502,12 +502,11 @@
 
                             <div class="flex justify-between items-end text-[10px]">
                                 <div class="w-full space-y-1">
-                                    <div class="p-1.5 bg-blue-50/60 rounded border border-blue-100 text-[8px] text-slate-700 leading-normal">
+                                    <div class="p-1 bg-blue-50/60 rounded border border-blue-100 text-[8px] text-slate-700 leading-normal">
                                         <strong class="text-blue-900 uppercase font-bold text-[8px] block tracking-wide mb-0.5">Quick Reference Remittance:</strong>
                                         Please consult Page 2 for verified structural bank routing records (JPMorgan Chase / Bank of America / Zelle network pathways).
                                     </div>
                                 </div>
-                                <!-- 右下角原本的黑色卡片已被彻底移走并删除，确保不再显示 GRAND TOTAL -->
                             </div>
                         </div>
                     </div>
