@@ -221,6 +221,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Shipping Phone</label>
+                                    <!-- 【修正点 1】：改为绑定 form.shippingPhone -->
                                     <input type="tel" v-model="form.shippingPhone" @input="saveResellerMemory" placeholder="(555) 987-6543" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                                 </div>
                             </div>
@@ -401,6 +402,9 @@
                                         <p class="font-bold text-slate-900 text-[11px] mb-0.5">Mode: <span class="text-blue-700 font-extrabold">{{ form.shippingMethod }}</span></p>
                                         <div v-if="form.shippingMethod === 'Logistics Shipping'">
                                             <p v-if="form.shippingContactName" class="text-slate-800 font-semibold">Attn: {{ form.shippingContactName }}</p>
+                                            <!-- 【修正点 2】：补充渲染 Shipping Email 和 Shipping Phone -->
+                                            <p v-if="form.shippingEmail" class="text-slate-600 font-mono">{{ form.shippingEmail }}</p>
+                                            <p v-if="form.shippingPhone" class="text-slate-600">{{ form.shippingPhone }}</p>
                                             <p v-if="form.shippingAddress" class="text-slate-700 font-medium leading-tight whitespace-pre-line mt-0.5 bg-white p-1 rounded border border-slate-200 text-[9px]">{{ form.shippingAddress }}</p>
                                         </div>
                                         <div v-else>
