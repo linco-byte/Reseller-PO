@@ -858,7 +858,19 @@
                     alert("Verification Required: Active directory sync path is locked under external IAM authority control panels.");
                 },
                 downloadPDF() {
+                    const originalTitle = document.title;
+                    const reseller = this.form.resellerName ? this.form.resellerName.trim() : 'Purchase Order';
+                    const poNum = this.form.poNumber ? this.form.poNumber.trim() : '';
+                    
+                    // 动态修改页面标题，浏览器另存为 PDF 时会自动将该标题作为默认文件名
+                    document.title = `${reseller} - ${poNum}`;
+                    
                     window.print();
+                    
+                    // 打印窗口关闭后恢复原页面标题
+                    setTimeout(() => {
+                        document.title = originalTitle;
+                    }, 1000);
                 },
                 formatMoney(val) {
                     return (parseFloat(val) || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
