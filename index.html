@@ -147,6 +147,21 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start main-workspace-grid">
                 <!-- Left Side: Configurator Controls -->
                 <div class="lg:col-span-5 space-y-5 no-print text-sm">
+
+                    <!-- 新增：左侧配置面板最上方的文本框与解析按钮 -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
+                                ✨ 智能信息粘贴解析
+                            </h3>
+                            <button @click="smartInputText = ''" class="text-[11px] text-slate-400 hover:text-slate-600">清空</button>
+                        </div>
+                        <textarea v-model="smartInputText" rows="3" placeholder="粘贴含客户名称、联系人、电话、邮箱、设备机型、数量及地址的任意文本..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"></textarea>
+                        <button @click="parseSmartInput" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm cursor-pointer">
+                            🚀 自动识别并填充
+                        </button>
+                    </div>
+
                     <!-- 1. Metadata Block -->
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">📦 1. Logistics & Account Alignment</h3>
@@ -614,6 +629,7 @@
         createApp({
             data() {
                 return {
+                    smartInputText: '', // 智能解析绑定的文本
                     // 全量绑定的客户清单列表，用于注册时勾选
                     resellersCatalog: [
                         "Twelve 28 vending", "Vend Guys Local", "PBS vending", 
@@ -761,6 +777,92 @@
                 this.checkSavedSession();
             },
             methods: {
+                // 智能解析函数
+                parseSmartInput() {
+                    if (!this.smartInputText.trim()) {
+                        alert("请粘贴包含相关信息的文本。");
+                        return;
+                    }
+
+                    const text = this.smartInputText;
+                    let foundAny = false;
+
+                    // 1. 匹配 Reseller 客户列表
+                    for (let r of this.resellersCatalog) {
+                        if (text.toLowerCase().includes(r.toLowerCase())) {
+                            this.form.resellerName = r;
+                            this.loadResellerMemory();
+                            foundAny = true;
+                            break;
+                        }
+                    }
+
+                    // 2. 匹配 Email
+                    const emailMatches = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g);
+                    if (emailMatches) {
+                        if (!this.form.resellerEmail) this.form.resellerEmail = emailMatches[0];
+                        this.form.shippingEmail = emailMatches[0];
+                        foundAny = true;
+                    }
+
+                    // 3. 匹配 Phone
+                    const phoneMatches = text.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g);
+                    if (phoneMatches) {
+                        if (!this.form.resellerPhone) this.form.resellerPhone = phoneMatches[0];
+                        this.form.shippingPhone = phoneMatches[0];
+                        foundAny = true;
+                    }
+
+                    // 4. 匹配产品型号及数量
+                    const extractedItems = [];
+                    const catalogKeys = Object.keys(this.productCatalog);
+
+                    catalogKeys.forEach(model => {
+                        const modelRegex = new RegExp(model.replace('-', '\\-'), 'i');
+                        if (modelRegex.test(text)) {
+                            let qty = 1;
+                            const qtyRegex = new RegExp(model.replace('-', '\\-') + `(?:[\\s\\S]{0,15}?)(?:x|qty:?|qty\\b|count:?|\\*)\\s*(\\d+)`, 'i');
+                            const matchQty = text.match(qtyRegex);
+
+                            if (matchQty && matchQty[1]) {
+                                qty = parseInt(matchQty[1]);
+                            }
+
+                            extractedItems.push({
+                                modelKey: model,
+                                price: this.productCatalog[model],
+                                qty: qty
+                            });
+                        }
+                    });
+
+                    if (extractedItems.length > 0) {
+                        this.form.items = extractedItems;
+                        foundAny = true;
+                    }
+
+                    // 5. 匹配地址
+                    const addrMatch = text.match(/(?:Address|Ship To|Destination|地址)[:：]\s*([^\n\r]+)/i);
+                    if (addrMatch && addrMatch[1]) {
+                        this.form.shippingAddress = addrMatch[1].trim();
+                        foundAny = true;
+                    }
+
+                    // 6. 匹配联系人姓名
+                    const contactMatch = text.match(/(?:Attn|Contact|Name|联系人)[:：]\s*([^\n\r,]+)/i);
+                    if (contactMatch && contactMatch[1]) {
+                        const name = contactMatch[1].trim();
+                        if (!this.form.resellerContactName) this.form.resellerContactName = name;
+                        this.form.shippingContactName = name;
+                        foundAny = true;
+                    }
+
+                    if (foundAny) {
+                        alert("已成功从文本中提取并自动填充匹配到的字段！");
+                    } else {
+                        alert("未能识别到已知字段，请手动录入。");
+                    }
+                },
                 generatePoTrackingID() {
                     const prefix = "PO-HAHAvending-";
                     const timestamp = Date.now().toString().slice(-6);
