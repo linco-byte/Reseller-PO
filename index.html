@@ -236,7 +236,6 @@
                                 </div>
                                 <div>
                                     <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Shipping Phone</label>
-                                    <!-- 【修正点 1】：改为绑定 form.shippingPhone -->
                                     <input type="tel" v-model="form.shippingPhone" @input="saveResellerMemory" placeholder="(555) 987-6543" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
                                 </div>
                             </div>
@@ -417,7 +416,6 @@
                                         <p class="font-bold text-slate-900 text-[11px] mb-0.5">Mode: <span class="text-blue-700 font-extrabold">{{ form.shippingMethod }}</span></p>
                                         <div v-if="form.shippingMethod === 'Logistics Shipping'">
                                             <p v-if="form.shippingContactName" class="text-slate-800 font-semibold">Attn: {{ form.shippingContactName }}</p>
-                                            <!-- 【修正点 2】：补充渲染 Shipping Email 和 Shipping Phone -->
                                             <p v-if="form.shippingEmail" class="text-slate-600 font-mono">{{ form.shippingEmail }}</p>
                                             <p v-if="form.shippingPhone" class="text-slate-600">{{ form.shippingPhone }}</p>
                                             <p v-if="form.shippingAddress" class="text-slate-700 font-medium leading-tight whitespace-pre-line mt-0.5 bg-white p-1 rounded border border-slate-200 text-[9px]">{{ form.shippingAddress }}</p>
@@ -777,7 +775,7 @@
                 this.checkSavedSession();
             },
             methods: {
-                // 智能解析函数
+                // 增强版智能解析函数
                 parseSmartInput() {
                     if (!this.smartInputText.trim()) {
                         alert("请粘贴包含相关信息的文本。");
@@ -785,47 +783,55 @@
                     }
 
                     const text = this.smartInputText;
-                    let foundAny = false;
+                    let foundCount = 0;
 
                     // 1. 匹配 Reseller 客户列表
                     for (let r of this.resellersCatalog) {
                         if (text.toLowerCase().includes(r.toLowerCase())) {
                             this.form.resellerName = r;
                             this.loadResellerMemory();
-                            foundAny = true;
+                            foundCount++;
                             break;
                         }
                     }
 
                     // 2. 匹配 Email
                     const emailMatches = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g);
-                    if (emailMatches) {
+                    if (emailMatches && emailMatches.length > 0) {
                         if (!this.form.resellerEmail) this.form.resellerEmail = emailMatches[0];
                         this.form.shippingEmail = emailMatches[0];
-                        foundAny = true;
+                        foundCount++;
                     }
 
                     // 3. 匹配 Phone
                     const phoneMatches = text.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g);
-                    if (phoneMatches) {
+                    if (phoneMatches && phoneMatches.length > 0) {
                         if (!this.form.resellerPhone) this.form.resellerPhone = phoneMatches[0];
                         this.form.shippingPhone = phoneMatches[0];
-                        foundAny = true;
+                        foundCount++;
                     }
 
-                    // 4. 匹配产品型号及数量
+                    // 4. 匹配产品型号及数量 (优化模糊正则)
                     const extractedItems = [];
                     const catalogKeys = Object.keys(this.productCatalog);
 
                     catalogKeys.forEach(model => {
-                        const modelRegex = new RegExp(model.replace('-', '\\-'), 'i');
+                        // 构建忽略空格与连字符的匹配正则
+                        const normalizedModelPattern = model.replace(/[-\s]/g, '[-\\s]?');
+                        const modelRegex = new RegExp(normalizedModelPattern, 'i');
+
                         if (modelRegex.test(text)) {
                             let qty = 1;
-                            const qtyRegex = new RegExp(model.replace('-', '\\-') + `(?:[\\s\\S]{0,15}?)(?:x|qty:?|qty\\b|count:?|\\*)\\s*(\\d+)`, 'i');
+
+                            // 捕获紧随型号后的数量 (如 x2, 2台, qty: 3, 2 units, 2个)
+                            const qtyRegex = new RegExp(normalizedModelPattern + `(?:[\\s\\S]{0,20}?)(?:x|qty:?|qty\\b|count:?|\\*|数量[:：]?)?\\s*(\\d+)(?:\\s*(?:台|个|units?|pcs?))?`, 'i');
                             const matchQty = text.match(qtyRegex);
 
                             if (matchQty && matchQty[1]) {
-                                qty = parseInt(matchQty[1]);
+                                const parsedQty = parseInt(matchQty[1]);
+                                if (parsedQty > 0 && parsedQty < 1000) {
+                                    qty = parsedQty;
+                                }
                             }
 
                             extractedItems.push({
@@ -838,29 +844,29 @@
 
                     if (extractedItems.length > 0) {
                         this.form.items = extractedItems;
-                        foundAny = true;
+                        foundCount++;
                     }
 
                     // 5. 匹配地址
-                    const addrMatch = text.match(/(?:Address|Ship To|Destination|地址)[:：]\s*([^\n\r]+)/i);
+                    const addrMatch = text.match(/(?:Address|Ship To|Destination|地址|送货地址)[:：]\s*([^\n\r]+)/i);
                     if (addrMatch && addrMatch[1]) {
                         this.form.shippingAddress = addrMatch[1].trim();
-                        foundAny = true;
+                        foundCount++;
                     }
 
                     // 6. 匹配联系人姓名
-                    const contactMatch = text.match(/(?:Attn|Contact|Name|联系人)[:：]\s*([^\n\r,]+)/i);
+                    const contactMatch = text.match(/(?:Attn|Contact|Name|联系人|收件人)[:：]\s*([^\n\r,]+)/i);
                     if (contactMatch && contactMatch[1]) {
                         const name = contactMatch[1].trim();
                         if (!this.form.resellerContactName) this.form.resellerContactName = name;
                         this.form.shippingContactName = name;
-                        foundAny = true;
+                        foundCount++;
                     }
 
-                    if (foundAny) {
-                        alert("已成功从文本中提取并自动填充匹配到的字段！");
+                    if (foundCount > 0) {
+                        alert(`识别成功！已自动填充 ${foundCount} 项匹配到的信息。`);
                     } else {
-                        alert("未能识别到已知字段，请手动录入。");
+                        alert("未能识别到已知字段。请检查文本中是否包含系统预设的客户名、设备机型（如 Pro 542、Mini 360）或联系信息。");
                     }
                 },
                 generatePoTrackingID() {
