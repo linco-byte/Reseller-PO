@@ -21,11 +21,10 @@
             }
             @page {
                 size: A4 portrait !important;
-                /* 通过 margin: 0 彻底去掉浏览器自动生成的 PDF 页眉页脚标题、日期和URL */
+                /* Remove browser header/footer titles, date, and URL via margin 0 */
                 margin: 0 !important;
             }
             body {
-                /* 适度 padding，确保 A4 边距合适 */
                 padding: 8mm !important;
             }
             .no-print, button, select, input, textarea, .admin-trigger, .modal-mask, svg {
@@ -34,12 +33,12 @@
             .main-workspace-grid {
                 display: block !important;
             }
-            /* 强制第 1 页打印完后分页 */
+            /* Force page break after page 1 */
             .print-page-1 {
                 page-break-after: always !important;
                 break-after: page !important;
             }
-            /* 强制第 2 页在新一页开始 */
+            /* Force page 2 onto new page */
             .print-page-2 {
                 page-break-before: always !important;
                 break-before: page !important;
@@ -83,42 +82,41 @@
                     <p class="text-xs text-slate-500 mt-1">Identify yourself to initialize the PO engine.</p>
                 </div>
                <form @submit.prevent="handleRegister" class="space-y-4 text-sm">
-    <!-- 名字输入框 -->
-    <div>
-        <label class="block text-xs font-semibold text-slate-600 mb-1">Sales Rep Full Name *</label>
-        <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-    </div>
-    
-    <!-- 电话输入框 -->
-    <div>
-        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
-        <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-    </div>
+                    <!-- 名字输入框 -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Sales Rep Full Name *</label>
+                        <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+                    </div>
+                    
+                    <!-- 电话输入框 -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
+                        <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+                    </div>
 
-    <!-- 邮箱输入框 -->
-    <div>
-        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Corporate Email *</label>
-        <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-    </div>
+                    <!-- 邮箱输入框 -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Corporate Email *</label>
+                        <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+                    </div>
 
-    <!-- 负责的客户多选（复选框样式优化） -->
-    <div>
-        <label class="block text-xs font-semibold text-slate-600 mb-1">Assigned Reseller Accounts (Select Multiple) *</label>
-        <div class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 max-h-[160px] overflow-y-auto space-y-2">
-            <div v-for="reseller in resellersCatalog" :key="reseller" class="flex items-center">
-                <input type="checkbox" :id="reseller" :value="reseller" v-model="authForm.assignedResellers" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                <label :for="reseller" class="ml-2 text-xs text-slate-700 select-none cursor-pointer">{{ reseller }}</label>
-            </div>
-        </div>
-        <!-- 必填提示：当没有勾选时显示 -->
-        <p v-if="authForm.assignedResellers.length === 0" class="text-[10px] text-red-500 mt-1">Please select at least one assigned account.</p>
-    </div>
+                    <!-- 负责的客户多选 -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Assigned Reseller Accounts (Select Multiple) *</label>
+                        <div class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 max-h-[160px] overflow-y-auto space-y-2">
+                            <div v-for="reseller in resellersCatalog" :key="reseller" class="flex items-center">
+                                <input type="checkbox" :id="reseller" :value="reseller" v-model="authForm.assignedResellers" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                <label :for="reseller" class="ml-2 text-xs text-slate-700 select-none cursor-pointer">{{ reseller }}</label>
+                            </div>
+                        </div>
+                        <p v-if="authForm.assignedResellers.length === 0" class="text-[10px] text-red-500 mt-1">Please select at least one assigned account.</p>
+                    </div>
 
-    <!-- 提交按钮 -->
-    <button type="submit" :disabled="authForm.assignedResellers.length === 0" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-        Initialize Workspace
-    </button>
-</form>
+                    <!-- 提交按钮 -->
+                    <button type="submit" :disabled="authForm.assignedResellers.length === 0" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                        Initialize Workspace
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -148,7 +146,7 @@
                 <!-- Left Side: Configurator Controls -->
                 <div class="lg:col-span-5 space-y-5 no-print text-sm">
 
-                    <!-- 新增：左侧配置面板最上方的文本框与解析按钮 -->
+                    <!-- 智能信息粘贴解析 -->
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-2">
                             <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
@@ -275,7 +273,6 @@
                             </div>
                         </div>
                         
-                        <!-- Down payment entry if installments > 1 -->
                         <div v-if="form.paymentTermsType > 1" class="p-3 bg-purple-50/50 rounded-lg border border-purple-100 transition-all">
                             <label class="block text-xs font-semibold text-purple-700 mb-1">1st Installment (Down Payment) ($) *</label>
                             <input type="number" v-model.number="form.downPayment" min="0" step="0.01" placeholder="Enter down payment amount" class="w-full bg-white border border-purple-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-purple-500 transition-all font-bold">
@@ -454,7 +451,7 @@
                                 </table>
                             </div>
 
-                            <!-- GRAND TOTAL 统计卡片 -->
+                            <!-- GRAND TOTAL 卡片 -->
                             <div class="my-1.5 bg-slate-900 text-white p-2 rounded-lg shadow-sm space-y-0.5 font-medium">
                                 <div class="flex justify-between text-[10px] text-slate-400">
                                     <span>Device Total:</span>
@@ -491,7 +488,6 @@
                                             <td class="py-0.5 text-center font-mono font-bold text-red-600">{{ phase.dueDate }}</td>
                                             <td class="py-0.5 text-right font-mono font-bold text-slate-900">${{ formatMoney(phase.amount) }}</td>
                                         </tr>
-                                        <!-- Total accumulation at table footer -->
                                         <tr class="border-t border-slate-300 font-bold bg-slate-100/50">
                                             <td class="py-0.5 text-slate-900">Total Scheduled Payment</td>
                                             <td class="py-0.5 text-center text-slate-400">--</td>
@@ -504,7 +500,6 @@
 
                         <!-- PAGE 1 BOTTOM SIGNATURE BLOCK & FISCAL CALCULATION -->
                         <div class="print-footer-anchor w-full mt-1 border-t border-slate-300 pt-1">
-                            
                             <!-- LEGAL AGREEMENT CLAUSE BOX -->
                             <div class="mb-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 text-[8.5px] text-slate-700 leading-normal space-y-1">
                                 <p><strong>1. Scope of Agreement.</strong> This attachment establishes the baseline legal definitions governing hardware procurement and warranty allocation under corporate tracking identity <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span>. The ordering reseller ({{ form.resellerName || '[Target Account]' }}) agrees to enforce standard retail activation matrices upon deployment of hardware units.</p>
@@ -527,7 +522,6 @@
                                 </div>
                             </div>
 
-                            <!-- 第一页末尾：提示查看第二页的卡片 -->
                             <div class="flex justify-between items-end text-[10px]">
                                 <div class="w-full space-y-1">
                                     <div class="p-1 bg-blue-50/60 rounded border border-blue-100 text-[8px] text-slate-700 leading-normal">
@@ -608,7 +602,7 @@
                         </div>
 
                         <div>
-                            <!-- MANDATORY OPERATIONAL COMPLIANCE NOTICE AT THE VERY BOTTOM OF PAGE 2 -->
+                            <!-- MANDATORY OPERATIONAL COMPLIANCE NOTICE -->
                             <div class="pt-4 border-t border-slate-200 text-[9px] text-slate-500 leading-relaxed text-center">
                                 <p class="mb-1">Thank you for your understanding and we appreciate your continued business!</p>
                                 <p><strong>Mandatory Operational Compliance Notice:</strong> Payments made by physical check are subject to an automatic hold of 5–7 banking business days for document verification and final confirmation of funds before warehouse release procedures begin. For expedited or priority dispatch, please use an electronic wire transfer.</p>
@@ -627,8 +621,7 @@
         createApp({
             data() {
                 return {
-                    smartInputText: '', // 智能解析绑定的文本
-                    // 全量绑定的客户清单列表，用于注册时勾选
+                    smartInputText: '',
                     resellersCatalog: [
                         "Twelve 28 vending", "Vend Guys Local", "PBS vending", 
                         "Ai Vend Solution", "Genius Vend", "Mod Brands", 
@@ -775,7 +768,6 @@
                 this.checkSavedSession();
             },
             methods: {
-                // 增强版智能解析函数
                 parseSmartInput() {
                     if (!this.smartInputText.trim()) {
                         alert("请粘贴包含相关信息的文本。");
@@ -785,7 +777,6 @@
                     const text = this.smartInputText;
                     let foundCount = 0;
 
-                    // 1. 匹配 Reseller 客户列表
                     for (let r of this.resellersCatalog) {
                         if (text.toLowerCase().includes(r.toLowerCase())) {
                             this.form.resellerName = r;
@@ -795,7 +786,6 @@
                         }
                     }
 
-                    // 2. 匹配 Email
                     const emailMatches = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g);
                     if (emailMatches && emailMatches.length > 0) {
                         if (!this.form.resellerEmail) this.form.resellerEmail = emailMatches[0];
@@ -803,7 +793,6 @@
                         foundCount++;
                     }
 
-                    // 3. 匹配 Phone
                     const phoneMatches = text.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g);
                     if (phoneMatches && phoneMatches.length > 0) {
                         if (!this.form.resellerPhone) this.form.resellerPhone = phoneMatches[0];
@@ -811,19 +800,15 @@
                         foundCount++;
                     }
 
-                    // 4. 匹配产品型号及数量 (优化模糊正则)
                     const extractedItems = [];
                     const catalogKeys = Object.keys(this.productCatalog);
 
                     catalogKeys.forEach(model => {
-                        // 构建忽略空格与连字符的匹配正则
                         const normalizedModelPattern = model.replace(/[-\s]/g, '[-\\s]?');
                         const modelRegex = new RegExp(normalizedModelPattern, 'i');
 
                         if (modelRegex.test(text)) {
                             let qty = 1;
-
-                            // 捕获紧随型号后的数量 (如 x2, 2台, qty: 3, 2 units, 2个)
                             const qtyRegex = new RegExp(normalizedModelPattern + `(?:[\\s\\S]{0,20}?)(?:x|qty:?|qty\\b|count:?|\\*|数量[:：]?)?\\s*(\\d+)(?:\\s*(?:台|个|units?|pcs?))?`, 'i');
                             const matchQty = text.match(qtyRegex);
 
@@ -847,14 +832,12 @@
                         foundCount++;
                     }
 
-                    // 5. 匹配地址
                     const addrMatch = text.match(/(?:Address|Ship To|Destination|地址|送货地址)[:：]\s*([^\n\r]+)/i);
                     if (addrMatch && addrMatch[1]) {
                         this.form.shippingAddress = addrMatch[1].trim();
                         foundCount++;
                     }
 
-                    // 6. 匹配联系人姓名
                     const contactMatch = text.match(/(?:Attn|Contact|Name|联系人|收件人)[:：]\s*([^\n\r,]+)/i);
                     if (contactMatch && contactMatch[1]) {
                         const name = contactMatch[1].trim();
@@ -974,12 +957,9 @@
                     const reseller = this.form.resellerName ? this.form.resellerName.trim() : 'Purchase Order';
                     const poNum = this.form.poNumber ? this.form.poNumber.trim() : '';
                     
-                    // 动态修改页面标题，浏览器另存为 PDF 时会自动将该标题作为默认文件名
                     document.title = `${reseller} - ${poNum}`;
-                    
                     window.print();
                     
-                    // 打印窗口关闭后恢复原页面标题
                     setTimeout(() => {
                         document.title = originalTitle;
                     }, 1000);
