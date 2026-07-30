@@ -82,25 +82,25 @@
                     <p class="text-xs text-slate-500 mt-1">Identify yourself to initialize the PO engine.</p>
                 </div>
                <form @submit.prevent="handleRegister" class="space-y-4 text-sm">
-                    <!-- 名字输入框 -->
+                    <!-- Sales Rep Name -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Sales Rep Full Name *</label>
                         <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                     </div>
                     
-                    <!-- 电话输入框 -->
+                    <!-- Direct Phone -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
                         <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                     </div>
 
-                    <!-- 邮箱输入框 -->
+                    <!-- Corporate Email -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Your Corporate Email *</label>
                         <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
                     </div>
 
-                    <!-- 负责的客户多选 -->
+                    <!-- Assigned Resellers Selection -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Assigned Reseller Accounts (Select Multiple) *</label>
                         <div class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 max-h-[160px] overflow-y-auto space-y-2">
@@ -112,7 +112,7 @@
                         <p v-if="authForm.assignedResellers.length === 0" class="text-[10px] text-red-500 mt-1">Please select at least one assigned account.</p>
                     </div>
 
-                    <!-- 提交按钮 -->
+                    <!-- Submit Button -->
                     <button type="submit" :disabled="authForm.assignedResellers.length === 0" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                         Initialize Workspace
                     </button>
@@ -146,17 +146,17 @@
                 <!-- Left Side: Configurator Controls -->
                 <div class="lg:col-span-5 space-y-5 no-print text-sm">
 
-                    <!-- 智能信息粘贴解析 -->
+                    <!-- Smart Info Input Parser -->
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-2">
                             <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
-                                ✨ 智能信息粘贴解析
+                                ✨ Smart Text Parser
                             </h3>
-                            <button @click="smartInputText = ''" class="text-[11px] text-slate-400 hover:text-slate-600">清空</button>
+                            <button @click="smartInputText = ''" class="text-[11px] text-slate-400 hover:text-slate-600">Clear</button>
                         </div>
-                        <textarea v-model="smartInputText" rows="3" placeholder="粘贴含客户名称、联系人、电话、邮箱、设备机型、数量及地址的任意文本..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"></textarea>
+                        <textarea v-model="smartInputText" rows="3" placeholder="Paste any text containing reseller name, contact, phone, email, models, quantity, and address..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"></textarea>
                         <button @click="parseSmartInput" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm cursor-pointer">
-                            🚀 自动识别并填充
+                            🚀 Auto Parse & Fill
                         </button>
                     </div>
 
@@ -451,7 +451,7 @@
                                 </table>
                             </div>
 
-                            <!-- GRAND TOTAL 卡片 -->
+                            <!-- GRAND TOTAL CARD -->
                             <div class="my-1.5 bg-slate-900 text-white p-2 rounded-lg shadow-sm space-y-0.5 font-medium">
                                 <div class="flex justify-between text-[10px] text-slate-400">
                                     <span>Device Total:</span>
@@ -628,7 +628,7 @@
                         "NC vending LLC", "vendx", "The vending center", 
                         "Vital Vending Sales LLC", "The Venders", "VP-Modern-Amenities LLC", 
                         "Vend Guys Internet", "Nayax", "Century vending", 
-                        "Aloha Smart Vending", "Culinary Ventures Vending"
+                        "Aloha Smart Vending", "Culinary Ventures Vending", "VE solution"
                     ],
                     productCatalog: {
                         "Mini 360": 2400.00,
@@ -770,7 +770,7 @@
             methods: {
                 parseSmartInput() {
                     if (!this.smartInputText.trim()) {
-                        alert("请粘贴包含相关信息的文本。");
+                        alert("Please paste text containing relevant order details.");
                         return;
                     }
 
@@ -847,9 +847,9 @@
                     }
 
                     if (foundCount > 0) {
-                        alert(`识别成功！已自动填充 ${foundCount} 项匹配到的信息。`);
+                        alert(`Parsed successfully! Auto-filled ${foundCount} matching field(s).`);
                     } else {
-                        alert("未能识别到已知字段。请检查文本中是否包含系统预设的客户名、设备机型（如 Pro 542、Mini 360）或联系信息。");
+                        alert("No known fields detected. Please check if the text includes valid reseller names, product models, or contact details.");
                     }
                 },
                 generatePoTrackingID() {
