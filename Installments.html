@@ -664,17 +664,20 @@
                 return val;
             });
 
-            // 税费计算逻辑：仅以单价折后总额（grossSubTotal）为基数，运费不参与计税
+            // 1. 税费计算：按要求只基于单价（折后）计算：税费 = 单价 * tax rate
             const computedTax = computed(() => {
                 const rate = (Number(form.value.taxRate) || 0) / 100;
                 return grossSubTotal.value * rate;
             });
 
+            // 2. 总价/小计：单价 + 运费 + 税费 + 手续费(若有)
             const totalContractValue = computed(() => {
                 return grossSubTotal.value + computedFreight.value + computedTax.value + (Number(form.value.financingSetupFee) || 0);
             });
 
-            // 首付计算逻辑修正：按设定比例计算商品额度及对应的百分比税额，运费/手续费作为固定项全额计入首付
+            // 3. 首付计算：
+            // - 50%首付：单价 * 50% + 税费 + 运费 + 手续费
+            // - 其他模式按对应逻辑依次补全
             const totalDownpaymentDue = computed(() => {
                 const opt = form.value.downpaymentOption;
                 const freight = computedFreight.value;
@@ -683,18 +686,18 @@
 
                 let val = 0;
                 if (opt === '50%') {
-                    val = (grossSubTotal.value * 0.50) + (tax * 0.50) + freight + setupFee;
+                    val = (grossSubTotal.value * 0.50) + tax + freight + setupFee;
                 } else if (opt === '30%') {
-                    val = (grossSubTotal.value * 0.30) + (tax * 0.30) + freight + setupFee;
+                    val = (grossSubTotal.value * 0.30) + tax + freight + setupFee;
                 } else if (opt === '1500_unit') {
-                    const productRatio = totalContractValue.value > 0 ? (1500 * totalHardwareQty.value) / grossSubTotal.value : 0;
-                    val = (1500 * totalHardwareQty.value) + (tax * Math.min(productRatio, 1)) + freight + setupFee;
+                    val = (1500 * totalHardwareQty.value) + tax + freight + setupFee;
                 } else if (opt === '0%') {
                     val = 0;
                 }
                 return val > totalContractValue.value ? totalContractValue.value : val;
             });
 
+            // 4. 分期金额：剩余的单价额度（即 总价 - 首付）
             const totalFinancedBalance = computed(() => {
                 const bal = totalContractValue.value - totalDownpaymentDue.value;
                 return bal < 0 ? 0 : bal;
