@@ -30,7 +30,7 @@
             .main-workspace-grid {
                 display: block !important;
             }
-            .print-page-1 {
+            .print-page-break {
                 page-break-after: always !important;
                 break-after: page !important;
             }
@@ -60,34 +60,34 @@
         }
     </style>
 </head>
-<body class="bg-purple-50/30 min-h-screen text-slate-800 antialiased">
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased">
 <div id="app">
     <!-- SYSTEM GATEKEEPER: SALES REP REGISTRATION -->
-    <div v-if="!isLoggedIn" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 no-print">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 border border-slate-200">
+    <div v-if="!isLoggedIn" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 no-print">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-8 border border-slate-200">
             <div class="text-center mb-6">
-                <div class="h-12 w-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3 border border-purple-100 shadow-sm">
+                <div class="h-12 w-12 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center mx-auto mb-3 border border-slate-200 shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-bold text-slate-900 tracking-tight">Financing PO Engine Registry</h2>
+                <h2 class="text-xl font-bold text-slate-900 tracking-tight">Financing PO Workspace</h2>
                 <p class="text-xs text-slate-500 mt-1">Authorized Sales Profile Setup</p>
             </div>
             <form @submit.prevent="handleRegister" class="space-y-4 text-sm">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Sales Rep Full Name *</label>
-                    <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
+                    <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition-all">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Your Corporate Email *</label>
-                    <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
+                    <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition-all">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
-                    <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
+                    <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition-all">
                 </div>
-                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer">
+                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer">
                     Open Financing Workspace
                 </button>
             </form>
@@ -100,20 +100,17 @@
         <header class="mb-6 no-print flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
             <div class="flex items-center gap-4">
                 <div>
-                    <h1 class="text-md font-bold tracking-tight text-slate-900">PO Engine <span class="text-xs font-normal text-slate-300 mx-1.5">|</span> <span class="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded border border-purple-100">Structured Financing Mode</span></h1>
+                    <h1 class="text-md font-bold tracking-tight text-slate-900">PO Engine <span class="text-xs font-normal text-slate-300 mx-1.5">|</span> <span class="text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">Structured Financing Mode</span></h1>
                     <p class="text-xs text-slate-500 mt-0.5">Active Rep: <span class="text-slate-800 font-bold">{{ currentUser.name }}</span></p>
                 </div>
-                <a href="index.html" class="text-xs text-blue-600 hover:text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg transition-colors font-medium shadow-sm flex items-center gap-1">
-                    🔄 Switch to Standard PO Mode
-                </a>
             </div>
             <div class="flex items-center gap-3">
                 <button @click="handleLogout" class="text-slate-500 hover:text-red-500 text-xs transition-colors cursor-pointer font-medium">Switch Profile</button>
-                <button @click="window.print()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5 cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/xl" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button @click="window.print()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
-                    Print / Download Financing PO (2-Pages)
+                    Print / Download PO (3-Pages)
                 </button>
             </div>
         </header>
@@ -123,14 +120,7 @@
             <div class="lg:col-span-5 space-y-5 no-print text-sm">
                 <!-- 1. Metadata Block -->
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-purple-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">📦 1. Logistics & Account Alignment</h3>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Target Reseller Account *</label>
-                        <select v-model="form.resellerName" @change="loadResellerMemory" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-bold focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
-                            <option value="">-- Choose Account for This PO --</option>
-                            <option v-for="reseller in resellers" :key="reseller" :value="reseller">{{ reseller }}</option>
-                        </select>
-                    </div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">📦 1. Order & Customer Info</h3>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 mb-1">PO Tracking ID (Auto)</label>
@@ -138,59 +128,62 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Client Ref PO # (Manual)</label>
-                            <input type="text" v-model="form.clientPoNumber" placeholder="e.g. PO-2026-FIN" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 font-mono text-xs focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
+                            <input type="text" v-model="form.clientPoNumber" placeholder="e.g. PO-2026-FIN" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 font-mono text-xs focus:outline-none focus:border-slate-500 focus:bg-white transition-all">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Estimated Downpayment Date</label>
-                            <input type="date" v-model="form.date" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
+                            <input type="date" v-model="form.date" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition-all">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Fulfillment Mode</label>
-                            <select v-model="form.shippingMethod" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-purple-500 focus:bg-white transition-all">
+                            <select v-model="form.shippingMethod" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition-all">
                                 <option value="Logistics Shipping">Logistics Shipping</option>
                                 <option value="Self-pickup">Self-pickup</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- BILLING MATRIX -->
-                    <div class="space-y-2.5 p-3.5 bg-slate-50/60 rounded-xl border border-slate-200">
-                        <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Billing Information (Reseller / Buyer):</span>
+                    <!-- CUSTOMER BILLING MATRIX -->
+                    <div class="space-y-2.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-[11px] font-bold text-slate-600 block uppercase tracking-wide">Customer Info (Buyer):</span>
                         <div>
-                            <input type="text" v-model="form.resellerContactName" @input="saveResellerMemory" placeholder="Billing Contact Name" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800">
+                            <input type="text" v-model="form.customerCompany" placeholder="Company / Individual Name *" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 font-medium">
+                        </div>
+                        <div>
+                            <input type="text" v-model="form.customerContactName" placeholder="Contact Person" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800">
                         </div>
                         <div class="grid grid-cols-2 gap-2">
-                            <input type="email" v-model="form.resellerEmail" @input="saveResellerMemory" placeholder="Billing Email" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
-                            <input type="tel" v-model="form.resellerPhone" @input="saveResellerMemory" placeholder="Billing Phone" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
+                            <input type="email" v-model="form.customerEmail" placeholder="Billing Email" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
+                            <input type="tel" v-model="form.customerPhone" placeholder="Billing Phone" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
                         </div>
                     </div>
 
                     <!-- SHIPPING DETAILS FIELD BLOCK -->
-                    <div class="space-y-2.5 p-3.5 bg-slate-50/60 rounded-xl border border-slate-200">
-                        <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Delivery & Shipping Address:</span>
+                    <div class="space-y-2.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-[11px] font-bold text-slate-600 block uppercase tracking-wide">Delivery & Shipping Address:</span>
                         <div v-if="form.shippingMethod === 'Self-pickup'">
                             <label class="block text-xs text-slate-500 mb-1">Pickup Warehouse Address</label>
                             <textarea v-model="form.pickupWarehouseText" rows="2" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs"></textarea>
                         </div>
                         <div v-else class="space-y-2">
                             <div class="grid grid-cols-2 gap-2">
-                                <input type="text" v-model="form.shippingContactName" @input="saveResellerMemory" placeholder="Recipient Name" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
-                                <input type="tel" v-model="form.shippingPhone" @input="saveResellerMemory" placeholder="Recipient Phone" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
+                                <input type="text" v-model="form.shippingContactName" placeholder="Recipient Name" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
+                                <input type="tel" v-model="form.shippingPhone" placeholder="Recipient Phone" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
                             </div>
-                            <textarea v-model="form.shippingAddress" rows="2" @input="saveResellerMemory" placeholder="Full Logistics Shipping Address..." class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs"></textarea>
+                            <textarea v-model="form.shippingAddress" rows="2" placeholder="Full Logistics Shipping Address..." class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs"></textarea>
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. Products Selection -->
+                <!-- 2. Product List Selection -->
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-purple-600 flex items-center gap-1.5">🛒 2. Hardware Allocation</h3>
-                        <button @click="addItem" class="text-[11px] bg-purple-50 border border-purple-200 text-purple-600 font-bold px-2.5 py-1 rounded-md hover:bg-purple-100 transition-all">+ Add SKU Line</button>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">🛒 2. Product List</h3>
+                        <button @click="addItem" class="text-[11px] bg-slate-100 border border-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-md hover:bg-slate-200 transition-all">+ Add Product</button>
                     </div>
-                    <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-slate-50/80 border border-slate-200 rounded-xl space-y-3 relative">
+                    <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 relative">
                         <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-3 text-red-500 text-xs font-medium">Remove</button>
                         <div>
                             <select v-model="item.modelKey" @change="onModelChange(index)" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 font-medium">
@@ -198,36 +191,59 @@
                                 <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }} (${{ price }})</option>
                             </select>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="flex items-center gap-2">
+                        <div class="grid grid-cols-3 gap-2 items-center">
+                            <div class="flex items-center gap-1.5">
                                 <span class="text-[11px] font-semibold text-slate-500">Qty:</span>
                                 <input type="number" v-model.number="item.qty" min="1" @input="syncFinancingTiers" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
                             </div>
-                            <div class="text-right text-xs text-slate-500 pt-1 font-mono">
-                                Base Price: <strong>${{ formatMoney(item.price) }}</strong>
+                            <div>
+                                <label class="block text-[10px] text-slate-500">Unit Disc ($)</label>
+                                <input type="number" v-model.number="item.unitDiscount" min="0" step="0.01" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-semibold">
+                            </div>
+                            <div class="text-right text-xs text-slate-500 pt-3 font-mono">
+                                Base: <strong>${{ formatMoney(item.price) }}</strong>
                             </div>
                         </div>
                     </div>
-                    <div class="p-2.5 bg-purple-50 text-purple-900 rounded-lg text-xs font-bold flex justify-between items-center">
-                        <span>Total Hardware Fleet:</span>
+                    
+                    <!-- ORDER-LEVEL DISCOUNT BLOCK -->
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                        <span class="text-[11px] font-bold text-slate-600 block uppercase tracking-wide">Order-Level Discount:</span>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-slate-500 mb-0.5">Discount Type</label>
+                                <select v-model="form.orderDiscountType" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
+                                    <option value="flat">Flat Amount ($)</option>
+                                    <option value="percent">Percentage (%)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-500 mb-0.5">Discount Value</label>
+                                <input type="number" v-model.number="form.orderDiscountValue" min="0" step="0.01" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-2.5 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold flex justify-between items-center border border-slate-200">
+                        <span>Total Product Fleet:</span>
                         <span class="text-sm font-black">{{ totalHardwareQty }} Units</span>
                     </div>
                 </div>
 
                 <!-- 3. Financing Policy Matrix -->
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-purple-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">⚖️ 3. Financing Parameter Engine</h3>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">⚖️ 3. Financing Parameter Engine</h3>
                     <div class="grid grid-cols-2 gap-2 text-[10px] bg-slate-50 p-3 rounded-lg border border-slate-200 font-medium">
-                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 1, 'text-slate-400': currentTierIndex !== 1}">🎁 Tier 1 (1 Unit): 50% Down | 3 Mos | $50 Fee</div>
-                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 2, 'text-slate-400': currentTierIndex !== 2}">📈 Tier 2 (2-4 Units): 30% Down | 6 Mos | $100 Fee</div>
-                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 3, 'text-slate-400': currentTierIndex !== 3}">🚀 Tier 3 (5-9 Units): Fixed Down | 12 Mos | $200 Fee</div>
-                        <div :class="{'text-purple-700 font-extrabold bg-white p-1.5 rounded shadow-sm border border-purple-200': currentTierIndex === 4, 'text-slate-400': currentTierIndex !== 4}">👑 Tier 4 (10+ Units): Promo Down | 18-24 Mos | $0 Fee</div>
+                        <div :class="{'text-slate-900 font-extrabold bg-white p-1.5 rounded shadow-sm border border-slate-300': currentTierIndex === 1, 'text-slate-400': currentTierIndex !== 1}">Tier 1 (1 Unit): 50% Down | 3 Mos | $50 Fee</div>
+                        <div :class="{'text-slate-900 font-extrabold bg-white p-1.5 rounded shadow-sm border border-slate-300': currentTierIndex === 2, 'text-slate-400': currentTierIndex !== 2}">Tier 2 (2-4 Units): 30% Down | 6 Mos | $100 Fee</div>
+                        <div :class="{'text-slate-900 font-extrabold bg-white p-1.5 rounded shadow-sm border border-slate-300': currentTierIndex === 3, 'text-slate-400': currentTierIndex !== 3}">Tier 3 (5-9 Units): Fixed Down | 12 Mos | $200 Fee</div>
+                        <div :class="{'text-slate-900 font-extrabold bg-white p-1.5 rounded shadow-sm border border-slate-300': currentTierIndex === 4, 'text-slate-400': currentTierIndex !== 4}">Tier 4 (10+ Units): Promo Down | 18-24 Mos | $0 Fee</div>
                     </div>
-                    <div class="space-y-3 bg-purple-50/20 p-4 rounded-xl border border-purple-100 text-xs">
+                    <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-slate-700 font-semibold mb-1">Installment Schedule Term</label>
-                                <select v-model.number="form.financingMonths" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-bold text-purple-700">
+                                <select v-model.number="form.financingMonths" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-bold text-slate-800">
                                     <option v-for="m in validMonthsOptions" :key="m" :value="m">{{ m }} Months</option>
                                 </select>
                             </div>
@@ -236,7 +252,7 @@
                                 <input type="number" v-model.number="form.financingSetupFee" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-mono font-bold">
                             </div>
                         </div>
-                        <div class="pt-1 border-t border-purple-100 mt-2">
+                        <div class="pt-1 border-t border-slate-200 mt-2">
                             <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Downpayment Metric Adjustments:</span>
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
@@ -273,57 +289,57 @@
             <!-- Right Side: Printable Document Sheets Container -->
             <div class="lg:col-span-7 space-y-8">
                 <!-- ==================== PAGE 1: PURCHASE ORDER SHEET ==================== -->
-                <div class="bg-white shadow-xl text-slate-900 border border-gray-200 a4-print-sheet print-page-1 mx-auto">
+                <div class="bg-white shadow-lg text-slate-900 border border-slate-200 a4-print-sheet print-page-break mx-auto">
                     <div class="w-full flex-none">
                         <div class="flex justify-between items-start border-b-2 border-slate-900 pb-1">
                             <div>
                                 <h2 class="text-base font-black tracking-tight text-slate-900">STRUCTURED FINANCING PURCHASE ORDER</h2>
-                                <p class="text-[11px] font-extrabold text-purple-950 mt-0.5">Haha Vending Corporate Holding</p>
+                                <p class="text-[11px] font-extrabold text-slate-900 mt-0.5">Haha Vending Corporate Holding</p>
                                 <p class="text-[8.5px] text-gray-500 tracking-wide font-medium">1754 North Brown Rd suite 200, Lawrenceville, GA 30043</p>
                             </div>
                             <div class="text-right text-[9.5px] space-y-0.5 text-gray-600 pt-1">
                                 <p><strong class="text-slate-900 uppercase font-bold text-[8px] tracking-wider block">Financing PO ID:</strong> <span class="font-mono text-[11px] font-bold text-slate-900">{{ form.poNumber }}</span></p>
-                                <p v-if="form.clientPoNumber"><strong class="text-purple-900 uppercase font-bold text-[8px] tracking-wider block mt-0.5">Client Ref PO #:</strong> <span class="font-mono text-[11px] font-bold text-purple-900">{{ form.clientPoNumber }}</span></p>
+                                <p v-if="form.clientPoNumber"><strong class="text-slate-900 uppercase font-bold text-[8px] tracking-wider block mt-0.5">Client Ref PO #:</strong> <span class="font-mono text-[11px] font-bold text-slate-900">{{ form.clientPoNumber }}</span></p>
                                 <p class="pt-0.5"><strong class="text-slate-900 font-semibold">Contract Date:</strong> {{ form.date || '------' }}</p>
                             </div>
                         </div>
 
                         <!-- CREDITOR & DEBTOR MATRIX -->
                         <div class="grid grid-cols-2 gap-4 my-1.5 text-[9.5px]">
-                            <div class="bg-slate-50 p-2 rounded border border-slate-150 flex flex-col justify-between">
+                            <div class="bg-slate-50 p-2 rounded border border-slate-200 flex flex-col justify-between">
                                 <div>
-                                    <h4 class="font-bold text-purple-950 uppercase tracking-wider text-[8px] mb-0.5">Seller / Issuing Creditor Framework:</h4>
+                                    <h4 class="font-bold text-slate-900 uppercase tracking-wider text-[8px] mb-0.5">Seller / Issuing Creditor Framework:</h4>
                                     <p class="font-black text-slate-900 mb-0.5">Haha Vending Corporate Holding</p>
                                     <p class="text-gray-500 text-[8.5px]">Account Executive: {{ currentUser.name }}</p>
                                     <p class="text-gray-500 text-[8.5px]">Email: {{ currentUser.email }}</p>
                                 </div>
                             </div>
-                            <div class="bg-slate-50 p-2 rounded border border-slate-150 flex flex-col justify-between">
+                            <div class="bg-slate-50 p-2 rounded border border-slate-200 flex flex-col justify-between">
                                 <div>
-                                    <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[8px] mb-0.5">Buyer / Account Obligor Profile:</h4>
-                                    <p class="font-bold text-slate-900 mb-0.5">{{ form.resellerName || '[No Buyer Selected]' }}</p>
-                                    <p v-if="form.resellerContactName" class="text-slate-800 font-medium">Attn: {{ form.resellerContactName }}</p>
-                                    <p class="text-gray-500 text-[8.5px] font-mono">Mail: {{ form.resellerEmail || '--' }} | Tel: {{ form.resellerPhone || '--' }}</p>
+                                    <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[8px] mb-0.5">Buyer / Customer Profile:</h4>
+                                    <p class="font-bold text-slate-900 mb-0.5">{{ form.customerCompany || '[No Customer Selected]' }}</p>
+                                    <p v-if="form.customerContactName" class="text-slate-800 font-medium">Attn: {{ form.customerContactName }}</p>
+                                    <p class="text-gray-500 text-[8.5px] font-mono">Mail: {{ form.customerEmail || '--' }} | Tel: {{ form.customerPhone || '--' }}</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- DELIVERY MATRIX ENDPOINT -->
-                        <div class="bg-slate-50 p-2 rounded border border-slate-150 text-[9.5px] mb-2">
+                        <div class="bg-slate-50 p-2 rounded border border-slate-200 text-[9.5px] mb-2">
                             <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[8px] mb-0.5">Fulfillment Strategies & Endpoint Location:</h4>
                             <div v-if="form.shippingMethod === 'Self-pickup'">
-                                <p class="text-[8.5px] text-purple-900 font-bold uppercase">[Self-Pickup Center Depot Facility]</p>
+                                <p class="text-[8.5px] text-slate-900 font-bold uppercase">[Self-Pickup Center Depot Facility]</p>
                                 <p class="text-gray-700 font-medium">{{ form.pickupWarehouseText }}</p>
                             </div>
                             <div v-else>
-                                <p class="text-[8.5px] text-blue-900 font-bold uppercase">[Direct Logistics Fleet Dispatch Address]</p>
+                                <p class="text-[8.5px] text-slate-900 font-bold uppercase">[Direct Logistics Fleet Dispatch Address]</p>
                                 <p v-if="form.shippingContactName" class="font-bold text-slate-900">Contact: {{ form.shippingContactName }} <span class="font-normal font-mono" v-if="form.shippingPhone">(Tel: {{ form.shippingPhone }})</span></p>
                                 <p class="text-gray-700 text-[8.5px] whitespace-pre-line leading-tight">{{ form.shippingAddress || 'No shipping location entered.' }}</p>
                             </div>
                         </div>
 
                         <!-- Strategy Banner -->
-                        <div class="text-[9px] bg-purple-50 text-purple-950 px-2 py-1 rounded flex justify-between font-bold border border-purple-100 mb-2">
+                        <div class="text-[9px] bg-slate-100 text-slate-900 px-2 py-1 rounded flex justify-between font-bold border border-slate-200 mb-2">
                             <span>Fulfillment Routine: {{ form.shippingMethod }}</span>
                             <span>Financing Terms: {{ form.financingMonths }} Months Deferred Structure (0% Interest)</span>
                         </div>
@@ -331,19 +347,21 @@
                         <!-- Products Breakdown Table -->
                         <table class="w-full text-left border-collapse my-1 text-[9.5px]">
                             <thead>
-                            <tr class="border-b border-slate-900 text-gray-400 font-bold uppercase tracking-wider text-[8px]">
-                                <th class="py-0.5">Structured Hardware Allocation Item SKU</th>
-                                <th class="py-0.5 text-center w-14">Qty</th>
-                                <th class="py-0.5 text-right w-24">Wholesale Price</th>
-                                <th class="py-0.5 text-right w-24">Extended Base Cost</th>
+                            <tr class="border-b border-slate-900 text-slate-500 font-bold uppercase tracking-wider text-[8px]">
+                                <th class="py-0.5">Structured Product Item SKU</th>
+                                <th class="py-0.5 text-center w-12">Qty</th>
+                                <th class="py-0.5 text-right w-20">Unit Price</th>
+                                <th class="py-0.5 text-right w-20">Unit Disc</th>
+                                <th class="py-0.5 text-right w-24">Extended Cost</th>
                             </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
                             <tr v-for="(item, index) in form.items" :key="index" class="text-gray-700">
-                                <td class="py-1 font-semibold text-slate-900">{{ item.modelKey || 'Awaiting Hardware Allocation Line...' }}</td>
+                                <td class="py-1 font-semibold text-slate-900">{{ item.modelKey || 'Awaiting Product Line...' }}</td>
                                 <td class="py-1 text-center font-bold text-slate-900">{{ item.qty }}</td>
                                 <td class="py-1 text-right text-gray-600">${{ formatMoney(item.price) }}</td>
-                                <td class="py-1 text-right font-bold text-slate-900">${{ formatMoney(item.qty * item.price) }}</td>
+                                <td class="py-1 text-right text-gray-500">-${{ formatMoney(item.unitDiscount || 0) }}</td>
+                                <td class="py-1 text-right font-bold text-slate-900">${{ formatMoney(item.qty * (item.price - (item.unitDiscount || 0))) }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -354,8 +372,20 @@
                         <div class="flex justify-end text-[9.5px] pt-1">
                             <div class="w-72 space-y-0.5 border-t-2 border-slate-900 pt-1">
                                 <div class="flex justify-between text-gray-500 font-medium">
-                                    <span>Hardware Fleet Base Valuation:</span>
-                                    <span class="font-semibold text-slate-900">${{ formatMoney(grossSubTotal) }}</span>
+                                    <span>Product Fleet Base Valuation:</span>
+                                    <span class="font-semibold text-slate-900">${{ formatMoney(rawSubTotal) }}</span>
+                                </div>
+                                <div v-if="totalItemDiscounts > 0" class="flex justify-between text-slate-600 font-medium">
+                                    <span>Item-Level Discounts:</span>
+                                    <span>-${{ formatMoney(totalItemDiscounts) }}</span>
+                                </div>
+                                <div v-if="computedOrderDiscount > 0" class="flex justify-between text-slate-600 font-medium">
+                                    <span>Order-Level Discount:</span>
+                                    <span>-${{ formatMoney(computedOrderDiscount) }}</span>
+                                </div>
+                                <div class="flex justify-between text-slate-700 font-bold border-t border-slate-200 pt-0.5">
+                                    <span>Net Product Valuation:</span>
+                                    <span>${{ formatMoney(grossSubTotal) }}</span>
                                 </div>
                                 <div class="flex justify-between text-gray-500 font-medium">
                                     <span>Logistics & Freight Packing Base:</span>
@@ -365,7 +395,7 @@
                                     <span>Consolidated Sales Tax ({{ form.taxRate }}%):</span>
                                     <span>+${{ formatMoney(computedTax) }}</span>
                                 </div>
-                                <div class="flex justify-between text-purple-700 font-bold bg-purple-50/50 px-1 py-0.5 rounded text-[9px]">
+                                <div class="flex justify-between text-slate-800 font-bold bg-slate-100 px-1 py-0.5 rounded text-[9px]">
                                     <span>Administrative / Financing Setup Fee:</span>
                                     <span>+${{ formatMoney(form.financingSetupFee) }}</span>
                                 </div>
@@ -373,11 +403,11 @@
                                     <span>Gross Structural Contract Valuation (GCV):</span>
                                     <span>${{ formatMoney(totalContractValue) }}</span>
                                 </div>
-                                <div class="flex justify-between text-blue-800 bg-blue-50 font-bold px-1 py-1 rounded text-[10px] border border-blue-100">
+                                <div class="flex justify-between text-slate-900 bg-slate-100 font-bold px-1 py-1 rounded text-[10px] border border-slate-200">
                                     <span>Initial Downpayment Due Immediately:</span>
                                     <span>${{ formatMoney(totalDownpaymentDue) }}</span>
                                 </div>
-                                <div class="flex justify-between text-red-600 font-black border-b border-gray-200 pb-0.5 text-[10px]">
+                                <div class="flex justify-between text-slate-800 font-black border-b border-gray-200 pb-0.5 text-[10px]">
                                     <span>Total Financed Deferred Portfolio Balance:</span>
                                     <span>${{ formatMoney(totalFinancedBalance) }}</span>
                                 </div>
@@ -403,13 +433,13 @@
                 </div>
 
                 <!-- ==================== PAGE 2: DETAILED FINANCING MATRIX AGENDA ==================== -->
-                <div class="bg-white shadow-xl text-slate-900 border border-gray-200 a4-print-sheet mx-auto">
+                <div class="bg-white shadow-lg text-slate-900 border border-slate-200 a4-print-sheet print-page-break mx-auto">
                     <div class="w-full flex-none border-b-2 border-slate-900 pb-1">
                         <h3 class="text-sm font-black tracking-tight text-slate-900">ANNEX B: ITEMIZED REPAYMENT RUN MATRIX</h3>
                         <p class="text-[9px] text-gray-500">Core Financial Rider Reference tied to Financing PO ID: <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span></p>
                     </div>
                     <div class="mt-3 text-[9.5px] text-gray-700 flex-grow space-y-4">
-                        <p class="leading-relaxed font-medium">Upon verified processing of the Initial Downpayment Invoice (<span class="font-bold text-blue-700">${{ formatMoney(totalDownpaymentDue) }}</span>), the outstanding Financed Balance (<span class="font-bold text-red-600">${{ formatMoney(totalFinancedBalance) }}</span>) is structured into <span class="font-bold text-purple-700">{{ form.financingMonths }}</span> periodic billing cycles:</p>
+                        <p class="leading-relaxed font-medium">Upon verified processing of the Initial Downpayment Invoice (<span class="font-bold text-slate-900">${{ formatMoney(totalDownpaymentDue) }}</span>), the outstanding Financed Balance (<span class="font-bold text-slate-900">${{ formatMoney(totalFinancedBalance) }}</span>) is structured into <span class="font-bold text-slate-900">{{ form.financingMonths }}</span> periodic billing cycles:</p>
 
                         <table class="w-full text-left border-collapse text-[9.5px]">
                             <thead>
@@ -421,7 +451,7 @@
                             </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 font-medium">
-                            <tr class="bg-blue-50/40 text-blue-900">
+                            <tr class="bg-slate-100 text-slate-900">
                                 <td class="py-1.5 px-1 font-bold">Downpayment</td>
                                 <td class="py-1.5 px-1 font-mono font-bold">{{ form.date || 'TBD (Contract Execution Date)' }}</td>
                                 <td class="py-1.5 px-1 italic">Immediate clearance mandatory (Includes Tax, Logistics Freight & Administrative Setup Fees)</td>
@@ -430,11 +460,52 @@
                             <tr v-for="schedule in computedSchedules" :key="schedule.term" class="text-slate-700 hover:bg-slate-50">
                                 <td class="py-1.5 px-1 font-semibold text-slate-900">Installment {{ schedule.term }}</td>
                                 <td class="py-1.5 px-1 font-mono text-gray-600">{{ schedule.dueDate }}</td>
-                                <td class="py-1.5 px-1 text-gray-500">Hardware base capital distribution payment module cycle. (0% Interest Rate)</td>
+                                <td class="py-1.5 px-1 text-gray-500">Product base capital distribution payment module cycle. (0% Interest Rate)</td>
                                 <td class="py-1.5 px-1 text-right font-mono font-bold text-slate-900">${{ formatMoney(schedule.amount) }}</td>
                             </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- ==================== PAGE 3: BANK INFORMATION ==================== -->
+                <div class="bg-white shadow-lg text-slate-900 border border-slate-200 a4-print-sheet mx-auto">
+                    <div class="w-full flex-none border-b-2 border-slate-900 pb-1">
+                        <h3 class="text-sm font-black tracking-tight text-slate-900">ANNEX C: COMPANY'S BANK INFORMATION</h3>
+                        <p class="text-[9px] text-gray-500">Official Payment Instructions tied to Financing PO ID: <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span></p>
+                    </div>
+
+                    <div class="mt-6 text-[10px] space-y-6 flex-grow">
+                        <!-- ZELLE PAYMENT METHOD -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-2 mb-3">1. Zelle Transfer Details</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <span class="text-slate-500 block text-[9px] uppercase font-semibold">Beneficiary Name</span>
+                                    <span class="font-extrabold text-slate-900 text-[11px]">HAHASMART INNOVATION INC</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500 block text-[9px] uppercase font-semibold">Registered Phone</span>
+                                    <span class="font-mono font-bold text-slate-900 text-[11px]">213-781-4659</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ACH / WIRE PAYMENT METHOD -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-2 mb-3">2. Direct Remittance / Email Inquiry</h4>
+                            <div class="space-y-2">
+                                <div>
+                                    <span class="text-slate-500 block text-[9px] uppercase font-semibold">Billing Contact Email</span>
+                                    <span class="font-mono font-bold text-slate-900 text-[11px]">faray@hahabianli.com</span>
+                                </div>
+                                <p class="text-gray-500 text-[8.5px] pt-2">Please issue payment confirmation / remittance advice receipts to the billing email above with reference to PO ID: <strong>{{ form.poNumber }}</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="print-footer-anchor w-full border-t border-slate-200 pt-3 text-[8px] text-gray-400 text-center">
+                        Haha Vending Corporate Holding • 1754 North Brown Rd suite 200, Lawrenceville, GA 30043
                     </div>
                 </div>
             </div>
@@ -449,7 +520,6 @@
         setup() {
             // AUTH PROFILE SETUP
             const isLoggedIn = ref(false);
-            const resellers = ["Vending Edge LLC", "Apex Distributing Group", "Nova Automation Inc", "Titan Retail Solutions"];
             
             const authForm = ref({
                 name: '',
@@ -463,7 +533,7 @@
                 phone: ''
             });
 
-            // UPDATED OFFICAL PRODUCT LIST & MATRIX PRICES
+            // PRODUCT LIST CATALOG & MATRIX PRICES
             const productCatalog = {
                 "Mini 360": 2899,
                 "Plus 440": 3399,
@@ -497,24 +567,26 @@
             const form = ref({
                 poNumber: generateTrackingID(),
                 clientPoNumber: '',
-                resellerName: '',
+                customerCompany: '',
+                customerContactName: '',
+                customerEmail: '',
+                customerPhone: '',
                 date: new Date().toISOString().split('T')[0],
                 shippingMethod: 'Logistics Shipping',
                 pickupWarehouseText: 'Haha Logistics Depot Core Hub - 1754 North Brown Rd, Lawrenceville, GA 30043',
-                resellerContactName: '',
-                resellerEmail: '',
-                resellerPhone: '',
                 shippingContactName: '',
                 shippingPhone: '',
                 shippingAddress: '',
                 items: [
-                    { modelKey: '', qty: 1, price: 0 }
+                    { modelKey: '', qty: 1, price: 0, unitDiscount: 0 }
                 ],
+                orderDiscountType: 'flat', // 'flat' or 'percent'
+                orderDiscountValue: 0,
                 financingMonths: 3,
                 financingSetupFee: 50,
                 downpaymentMode: 'percentage',
                 downpaymentPercent: 50,
-                downpaymentFixedPerUnit: 1200, // Tier 3 mid point default ($1000 - $1500)
+                downpaymentFixedPerUnit: 1200,
                 freightInput: 350,
                 taxRate: 7.00
             });
@@ -526,7 +598,7 @@
                     phone: authForm.value.phone
                 };
                 localStorage.setItem('financing_user_profile', JSON.stringify(currentUser.value));
-                isLoggedIn.value = true; // Fixed target workspace redirection logic
+                isLoggedIn.value = true;
             };
 
             const handleLogout = () => {
@@ -535,48 +607,9 @@
                 authForm.value = { name: '', email: '', phone: '' };
             };
 
-            // PERSISTENT ACCOUNT MATRIX MEMORY
-            const loadResellerMemory = () => {
-                if(!form.value.resellerName) return;
-                const memoryKey = `reseller_mem_${form.value.resellerName.replace(/\s+/g, '_')}`;
-                const saved = localStorage.getItem(memoryKey);
-                if (saved) {
-                    try {
-                        const parsed = JSON.parse(saved);
-                        form.value.resellerContactName = parsed.resellerContactName || '';
-                        form.value.resellerEmail = parsed.resellerEmail || '';
-                        form.value.resellerPhone = parsed.resellerPhone || '';
-                        form.value.shippingContactName = parsed.shippingContactName || '';
-                        form.value.shippingPhone = parsed.shippingPhone || '';
-                        form.value.shippingAddress = parsed.shippingAddress || '';
-                    } catch(e) {}
-                } else {
-                    form.value.resellerContactName = '';
-                    form.value.resellerEmail = '';
-                    form.value.resellerPhone = '';
-                    form.value.shippingContactName = '';
-                    form.value.shippingPhone = '';
-                    form.value.shippingAddress = '';
-                }
-            };
-
-            const saveResellerMemory = () => {
-                if(!form.value.resellerName) return;
-                const memoryKey = `reseller_mem_${form.value.resellerName.replace(/\s+/g, '_')}`;
-                const payload = {
-                    resellerContactName: form.value.resellerContactName,
-                    resellerEmail: form.value.resellerEmail,
-                    resellerPhone: form.value.resellerPhone,
-                    shippingContactName: form.value.shippingContactName,
-                    shippingPhone: form.value.shippingPhone,
-                    shippingAddress: form.value.shippingAddress
-                };
-                localStorage.setItem(memoryKey, JSON.stringify(payload));
-            };
-
             // GRID LINE MANAGEMENT
             const addItem = () => {
-                form.value.items.push({ modelKey: '', qty: 1, price: 0 });
+                form.value.items.push({ modelKey: '', qty: 1, price: 0, unitDiscount: 0 });
             };
 
             const removeItem = (idx) => {
@@ -590,7 +623,7 @@
                 syncFinancingTiers();
             };
 
-            // HARDWARE TOTAL QUANTITY
+            // TOTAL PRODUCT QUANTITY
             const totalHardwareQty = computed(() => {
                 return form.value.items.reduce((acc, curr) => acc + (Number(curr.qty) || 0), 0);
             });
@@ -606,7 +639,7 @@
 
             const validMonthsOptions = computed(() => {
                 const tier = currentTierIndex.value;
-                if (tier === 4) return [18, 24]; // 18 - 24 months optional range
+                if (tier === 4) return [18, 24];
                 if (tier === 3) return [12];
                 if (tier === 2) return [6];
                 return [3];
@@ -627,19 +660,41 @@
                 } else if (tier === 3) {
                     form.value.financingMonths = 12;
                     form.value.downpaymentMode = 'fixed_per_unit';
-                    form.value.downpaymentFixedPerUnit = 1200; // Customizable ($1000 - $1500)
+                    form.value.downpaymentFixedPerUnit = 1200;
                     form.value.financingSetupFee = 200;
                 } else if (tier === 4) {
-                    form.value.financingMonths = 18; // Default lowest bound of tier 4 range
+                    form.value.financingMonths = 18;
                     form.value.downpaymentMode = 'fixed_per_unit';
-                    form.value.downpaymentFixedPerUnit = 800; // Customizable ($500 - $1000)
-                    form.value.financingSetupFee = 0; // $0 Promo Fee
+                    form.value.downpaymentFixedPerUnit = 800;
+                    form.value.financingSetupFee = 0;
                 }
             };
 
-            // COMPUTED ACCOUNTING COMPUTATIONS
-            const grossSubTotal = computed(() => {
+            // COMPUTED DISCOUNT & ACCOUNTING COMPUTATIONS
+            const rawSubTotal = computed(() => {
                 return form.value.items.reduce((acc, curr) => acc + ((Number(curr.qty) || 0) * (Number(curr.price) || 0)), 0);
+            });
+
+            const totalItemDiscounts = computed(() => {
+                return form.value.items.reduce((acc, curr) => acc + ((Number(curr.qty) || 0) * (Number(curr.unitDiscount) || 0)), 0);
+            });
+
+            const subTotalAfterItemDiscounts = computed(() => {
+                const net = rawSubTotal.value - totalItemDiscounts.value;
+                return net < 0 ? 0 : net;
+            });
+
+            const computedOrderDiscount = computed(() => {
+                const val = Number(form.value.orderDiscountValue) || 0;
+                if (form.value.orderDiscountType === 'percent') {
+                    return subTotalAfterItemDiscounts.value * (val / 100);
+                }
+                return val > subTotalAfterItemDiscounts.value ? subTotalAfterItemDiscounts.value : val;
+            });
+
+            const grossSubTotal = computed(() => {
+                const val = subTotalAfterItemDiscounts.value - computedOrderDiscount.value;
+                return val < 0 ? 0 : val;
             });
 
             const computedFreight = computed(() => {
@@ -698,12 +753,11 @@
             };
 
             return {
-                isLoggedIn, resellers, authForm, currentUser, handleRegister, handleLogout,
-                productCatalog, form, loadResellerMemory, saveResellerMemory,
-                addItem, removeItem, onModelChange, totalHardwareQty, currentTierIndex,
-                validMonthsOptions, syncFinancingTiers, grossSubTotal, computedFreight,
-                computedTax, totalContractValue, totalDownpaymentDue, totalFinancedBalance,
-                computedSchedules, formatMoney
+                isLoggedIn, authForm, currentUser, handleRegister, handleLogout,
+                productCatalog, form, addItem, removeItem, onModelChange, totalHardwareQty, currentTierIndex,
+                validMonthsOptions, syncFinancingTiers, rawSubTotal, totalItemDiscounts, computedOrderDiscount,
+                grossSubTotal, computedFreight, computedTax, totalContractValue, totalDownpaymentDue, 
+                totalFinancedBalance, computedSchedules, formatMoney
             };
         }
     }).mount('#app');
