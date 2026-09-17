@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purchase Order Workspace</title>
+    <title>Financing Purchase Order Workspace</title>
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Vue 3 Framework -->
@@ -12,1025 +12,753 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        /* STRICT PRINT CONSTRAINTS: FIXED LATERAL BREAK PROTECTION */
         @media print {
             html, body {
                 margin: 0 !important;
                 padding: 0 !important;
                 background: #ffffff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             @page {
                 size: A4 portrait !important;
-                /* Remove browser header/footer titles, date, and URL via margin 0 */
                 margin: 0 !important;
             }
-            body {
-                padding: 8mm !important;
-            }
-            .no-print, button, select, input, textarea, .admin-trigger, .modal-mask, svg {
+            .no-print, button, select, input, textarea {
                 display: none !important;
-            }
-            .print-input {
-                border: none !important;
-                background: transparent !important;
-                padding: 0 !important;
-                outline: none !important;
-                box-shadow: none !important;
             }
             .main-workspace-grid {
                 display: block !important;
             }
-            /* Force page break after page 1 */
-            .print-page-1 {
+            .print-page-break {
                 page-break-after: always !important;
                 break-after: page !important;
             }
-            /* Force page 2 onto new page */
-            .print-page-2 {
-                page-break-before: always !important;
-                break-before: page !important;
-            }
             .a4-print-sheet {
-                width: 100% !important;
-                min-height: auto !important;
-                max-height: none !important;
+                width: 210mm !important;
+                min-height: 294mm !important;
+                padding: 10mm 15mm !important;
+                margin: 0 auto !important;
                 box-shadow: none !important;
+                border: none !important;
+                background: #ffffff !important;
+                color: #0f172a !important;
+                display: flex !important;
+                flex-direction: column !important;
+                box-sizing: border-box !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }
             .print-footer-anchor {
-                margin-top: 6px !important;
+                margin-top: auto !important;
                 page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }
             table {
-                font-size: 9px !important;
+                font-size: 9.5px !important;
             }
         }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 antialiased">
-
-    <!-- ================= TOP NAVIGATION BAR ================= -->
-    <div class="no-print bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center shadow-sm">
-        <div class="flex items-center space-x-2">
-            <img src="logo.png" alt="Logo" class="h-6 w-auto object-contain">
-            <span class="text-lg font-bold text-slate-700">Purchase Order System</span>
-            <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-mono">v1.3</span>
+<div id="app">
+    <!-- SYSTEM GATEKEEPER: SALES REP REGISTRATION -->
+    <div v-if="!isLoggedIn" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 no-print">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-8 border border-slate-200">
+            <div class="text-center mb-6">
+                <div class="h-12 w-12 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center mx-auto mb-3 border border-slate-200 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl font-bold text-slate-900 tracking-tight">Financing PO Workspace</h2>
+                <p class="text-xs text-slate-500 mt-1">Authorized Sales Profile Setup</p>
+            </div>
+            <form @submit.prevent="handleRegister" class="space-y-4 text-sm">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Sales Rep Full Name *</label>
+                    <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Your Corporate Email *</label>
+                    <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
+                    <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition-all">
+                </div>
+                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer">
+                    Open Financing Workspace
+                </button>
+            </form>
         </div>
     </div>
 
-    <div id="app">
-        <!-- SYSTEM GATEKEEPER: SALES REP REGISTRATION -->
-        <div v-if="!isLoggedIn" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 no-print">
-            <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 border border-slate-200">
-                <div class="text-center mb-6">
-                    <div class="h-12 w-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3 border border-blue-100 shadow-sm no-print">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M19.242 18.274A13.916 13.916 0 0021 11V7a4 4 0 00-8 0v4c0 2.476.657 4.793 1.808 6.792M12 11a13.942 13.942 0 00-2.316-5.074" /></svg>
-                    </div>
-                    <h2 class="text-xl font-bold text-slate-900 tracking-tight">Sales Representative Registry</h2>
-                    <p class="text-xs text-slate-500 mt-1">Identify yourself to initialize the PO engine.</p>
+    <!-- MAIN PO WORKSPACE -->
+    <div v-if="isLoggedIn" class="container mx-auto px-4 py-6 max-w-7xl">
+        <!-- Control Navbar -->
+        <header class="mb-6 no-print flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex items-center gap-4">
+                <div>
+                    <h1 class="text-md font-bold tracking-tight text-slate-900">PO Engine <span class="text-xs font-normal text-slate-300 mx-1.5">|</span> <span class="text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">Structured Financing Mode</span></h1>
+                    <p class="text-xs text-slate-500 mt-0.5">Active Rep: <span class="text-slate-800 font-bold">{{ currentUser.name }}</span></p>
                 </div>
-               <form @submit.prevent="handleRegister" class="space-y-4 text-sm">
-                    <!-- Sales Rep Name -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Sales Rep Full Name *</label>
-                        <input type="text" v-model="authForm.name" required placeholder="e.g. Alexander Wright" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                    </div>
-                    
-                    <!-- Direct Phone -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Direct Mobile Phone *</label>
-                        <input type="tel" v-model="authForm.phone" required placeholder="+1 (555) 019-2834" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                    </div>
-
-                    <!-- Corporate Email -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Your Corporate Email *</label>
-                        <input type="email" v-model="authForm.email" required placeholder="alex@hahavending.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                    </div>
-
-                    <!-- Assigned Resellers Selection -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Assigned Reseller Accounts (Select Multiple) *</label>
-                        <div class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 max-h-[160px] overflow-y-auto space-y-2">
-                            <div v-for="reseller in resellersCatalog" :key="reseller" class="flex items-center">
-                                <input type="checkbox" :id="reseller" :value="reseller" v-model="authForm.assignedResellers" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                                <label :for="reseller" class="ml-2 text-xs text-slate-700 select-none cursor-pointer">{{ reseller }}</label>
-                            </div>
-                        </div>
-                        <p v-if="authForm.assignedResellers.length === 0" class="text-[10px] text-red-500 mt-1">Please select at least one assigned account.</p>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <button type="submit" :disabled="authForm.assignedResellers.length === 0" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-md mt-2 tracking-wide cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                        Initialize Workspace
-                    </button>
-                </form>
             </div>
-        </div>
+            <div class="flex items-center gap-3">
+                <button @click="handleLogout" class="text-slate-500 hover:text-red-500 text-xs transition-colors cursor-pointer font-medium">Switch Profile</button>
+                <button @click="window.print()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print / Download PO (3-Pages)
+                </button>
+            </div>
+        </header>
 
-        <!-- MAIN PO WORKSPACE -->
-        <div v-if="isLoggedIn" class="container mx-auto px-4 py-6 max-w-7xl">
-            <!-- Control Navbar -->
-            <header class="mb-6 no-print flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                <div class="flex items-center gap-4">
-                    <div>
-                        <h1 class="text-md font-bold tracking-tight text-slate-900">PO Engine <span class="text-xs font-normal text-slate-300 mx-1.5">|</span> <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Sales Mode</span></h1>
-                        <p class="text-xs text-slate-500 mt-0.5">Active Rep: <span class="text-slate-800 font-bold">{{ currentUser.name }}</span></p>
-                    </div>
-                    <button @click="promptAdminAccess" class="admin-trigger text-xs text-slate-600 hover:text-blue-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer font-medium shadow-sm">
-                        🔒 Admin Portal (Global Logs)
-                    </button>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button @click="handleLogout" class="text-slate-500 hover:text-red-500 text-xs transition-colors cursor-pointer font-medium">Switch Profile</button>
-                    <button @click="downloadPDF" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5 cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                        Download PO (2-Pages A4)
-                    </button>
-                </div>
-            </header>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start main-workspace-grid">
-                <!-- Left Side: Configurator Controls -->
-                <div class="lg:col-span-5 space-y-5 no-print text-sm">
-
-                    <!-- Smart Info Input Parser -->
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
-                                ✨ Smart Text Parser
-                            </h3>
-                            <button @click="smartInputText = ''" class="text-[11px] text-slate-400 hover:text-slate-600">Clear</button>
-                        </div>
-                        <textarea v-model="smartInputText" rows="3" placeholder="Paste any text containing reseller name, contact, phone, email, models, quantity, and address..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"></textarea>
-                        <button @click="parseSmartInput" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-sm cursor-pointer">
-                            🚀 Auto Parse & Fill
-                        </button>
-                    </div>
-
-                    <!-- 1. Metadata Block -->
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">📦 1. Logistics & Account Alignment</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start main-workspace-grid">
+            <!-- Left Side: Configurator Controls -->
+            <div class="lg:col-span-5 space-y-5 no-print text-sm">
+                <!-- 1. Metadata Block -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">📦 1. Order & Customer Info</h3>
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Target Reseller Account * (Restricted to Assigned)</label>
-                            <select v-model="form.resellerName" @change="loadResellerMemory" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                                <option value="">-- Choose Account from Your Assigned Clients --</option>
-                                <option v-for="reseller in currentUser.assignedResellers" :key="reseller" :value="reseller">{{ reseller }}</option>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">PO Tracking ID (Auto)</label>
+                            <input type="text" v-model="form.poNumber" readonly class="w-full bg-slate-100 text-slate-400 border border-slate-200 rounded-lg px-2.5 py-2 cursor-not-allowed font-mono text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Client Ref PO # (Manual)</label>
+                            <input type="text" v-model="form.clientPoNumber" placeholder="e.g. PO-2026-FIN" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 font-mono text-xs focus:outline-none focus:border-slate-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Estimated Downpayment Date</label>
+                            <input type="date" v-model="form.date" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Fulfillment Mode</label>
+                            <select v-model="form.shippingMethod" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-slate-500 focus:bg-white transition-all">
+                                <option value="Logistics Shipping">Logistics Shipping</option>
+                                <option value="Self-pickup">Self-pickup</option>
                             </select>
                         </div>
-                        
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">PO Tracking ID (Auto)</label>
-                                <input type="text" v-model="form.poNumber" readonly class="w-full bg-slate-100 text-slate-400 border border-slate-200 rounded-lg px-2.5 py-2 cursor-not-allowed font-mono text-xs">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Client Ref PO # (Manual)</label>
-                                <input type="text" v-model="form.clientPoNumber" placeholder="e.g. PO-2026-889" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 font-mono text-xs focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Order Date</label>
-                                <input type="date" v-model="form.date" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Fulfillment Mode</label>
-                                <select v-model="form.shippingMethod" @change="handleShippingMethodChange" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                                    <option value="Logistics Shipping">Logistics Shipping</option>
-                                    <option value="Self-pickup">Self-pickup</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div v-if="form.shippingMethod === 'Self-pickup'">
-                            <label class="block text-xs font-semibold text-blue-600 mb-1">Pickup Warehouse Location Box *</label>
-                            <textarea v-model="form.pickupWarehouseText" rows="2" placeholder="Type specific corporate warehouse address here..." class="w-full bg-slate-50 border border-blue-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white text-xs"></textarea>
-                        </div>
-
-                        <!-- BILLING TO DETAILED MATRIX -->
-                        <div class="space-y-2.5 p-3.5 bg-slate-50/60 rounded-xl border border-slate-200">
-                            <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Billing To Information:</span>
-                            <div>
-                                <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Billing Contact Name</label>
-                                <input type="text" v-model="form.resellerContactName" @input="saveResellerMemory" placeholder="e.g. John Doe" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Billing Email</label>
-                                    <input type="email" v-model="form.resellerEmail" @input="saveResellerMemory" placeholder="billing@reseller.com" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Billing Phone</label>
-                                    <input type="tel" v-model="form.resellerPhone" @input="saveResellerMemory" placeholder="(555) 123-4567" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- SHIPPING TO COMPREHENSIVE INPUT MATRIX -->
-                        <div v-if="form.shippingMethod === 'Logistics Shipping'" class="space-y-2.5 p-3.5 bg-slate-50/60 rounded-xl border border-slate-200">
-                            <span class="text-[11px] font-bold text-slate-500 block uppercase tracking-wide">Shipping To / Delivery Details:</span>
-                            <div>
-                                <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Shipping Contact Name</label>
-                                <input type="text" v-model="form.shippingContactName" @input="saveResellerMemory" placeholder="e.g. Sarah Smith" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Shipping Email</label>
-                                    <input type="email" v-model="form.shippingEmail" @input="saveResellerMemory" placeholder="shipping@client.com" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Shipping Phone</label>
-                                    <input type="tel" v-model="form.shippingPhone" @input="saveResellerMemory" placeholder="(555) 987-6543" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Delivery Destination Address</label>
-                                <textarea v-model="form.shippingAddress" rows="2" @input="saveResellerMemory" placeholder="Full street address, suite, city, state, zip..." class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 text-xs"></textarea>
-                            </div>
-                        </div>
-
-                        <!-- INTERACTIVE SIGNATURE INPUT IN CONFIGURATOR -->
-                        <div class="space-y-2.5 p-3.5 bg-blue-50/40 rounded-xl border border-blue-100">
-                            <span class="text-[11px] font-bold text-blue-900 block uppercase tracking-wide">PO Validation & Signature:</span>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Authorized Signature *</label>
-                                    <input type="text" v-model="form.signature" placeholder="Type name to sign" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 italic font-serif focus:outline-none focus:border-blue-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Date Signed *</label>
-                                    <input type="date" v-model="form.dateSigned" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
-                    <!-- 2. Payment Terms Block -->
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">💰 2. Payment Terms Configuration</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Total Installments</label>
-                                <input type="number" v-model.number="form.paymentTermsType" min="1" max="12" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Net Term Interval (Days)</label>
-                                <input type="number" v-model.number="form.netDays" min="0" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
-                            </div>
-                        </div>
-                        
-                        <div v-if="form.paymentTermsType > 1" class="p-3 bg-purple-50/50 rounded-lg border border-purple-100 transition-all space-y-3">
-                            <div>
-                                <label class="block text-xs font-semibold text-purple-700 mb-1">1st Installment (Down Payment) ($) *</label>
-                                <input type="number" v-model.number="form.downPayment" min="0" step="0.01" placeholder="Enter down payment amount" class="w-full bg-white border border-purple-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-purple-500 transition-all font-bold">
-                            </div>
-                            <!-- Custom Installments Amount Inputs -->
-                            <div class="space-y-2 border-t border-purple-200/60 pt-2">
-                                <label class="block text-xs font-semibold text-purple-800">Manual Amount Per Phase (Optional Override)</label>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div v-for="i in (form.paymentTermsType - 1)" :key="i">
-                                        <label class="block text-[10px] text-purple-700 font-medium">Phase {{ i + 1 }} ($):</label>
-                                        <input type="number" v-model.number="form.manualInstallments[i - 1]" step="0.01" placeholder="Auto split" class="w-full bg-white border border-purple-200 rounded px-2 py-1 text-xs text-slate-800 focus:outline-none focus:border-purple-500">
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="text-[10px] text-purple-600">Note: Leave blank for automatic average distribution of remaining balance.</p>
-                        </div>
-                    </div>
-
-                    <!-- 3. Products Selection -->
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">🛒 3. Products Selection</h3>
-                            <button @click="addItem" class="text-[11px] bg-blue-50 border border-blue-200 text-blue-600 font-bold px-2.5 py-1 rounded-md hover:bg-blue-100 transition-all cursor-pointer shadow-sm">+ Append SKU</button>
-                        </div>
-                        <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-slate-50/80 border border-slate-200 rounded-xl space-y-3 relative">
-                            <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-3 text-red-500 hover:text-red-700 text-xs font-medium cursor-pointer">Remove</button>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Hardware Model</label>
-                                <select v-model="item.modelKey" @change="onModelChange(index)" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 font-medium focus:outline-none focus:border-blue-500">
-                                    <option value="">-- Choose Hardware SKU --</option>
-                                    <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }} (${{ price }})</option>
-                                </select>
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[11px] font-semibold text-slate-500">Qty:</span>
-                                    <input type="number" v-model.number="item.qty" min="1" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-bold focus:outline-none focus:border-blue-500">
-                                </div>
-                                <div class="text-right text-xs text-slate-500 pt-1">
-                                    Price: <span class="font-mono font-bold text-slate-700">${{ formatMoney(item.price) }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 4. FREIGHT & TAX CONFIGURATOR -->
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-blue-600 border-b border-slate-100 pb-2 flex items-center gap-1.5">🚚 4. Freight & Tax Matrix</h3>
-                        <div class="grid grid-cols-2 gap-3 text-sm">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Freight Calculation Mode</label>
-                                <select v-model="form.freightType" :disabled="form.shippingMethod === 'Self-pickup'" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <option value="total">By Total Freight</option>
-                                    <option value="per_unit">Per Unit Freight</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">{{ form.freightType === 'per_unit' ? 'Per Unit Freight ($)' : 'Total Freight Amount ($)' }}</label>
-                                <input type="number" v-model.number="form.freightInput" :disabled="form.shippingMethod === 'Self-pickup'" min="0" step="0.01" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                            </div>
+                    <!-- BILLING TO MATRIX -->
+                    <div class="space-y-2.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-[11px] font-bold text-slate-600 block uppercase tracking-wide">Billing To:</span>
+                        <div>
+                            <input type="text" v-model="form.customerCompany" placeholder="Company / Individual Name *" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 font-medium">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tax Rate (%)</label>
-                            <input type="number" v-model.number="form.taxRate" min="0" step="0.01" placeholder="e.g. 8.25" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-all">
+                            <input type="text" v-model="form.customerContactName" placeholder="Contact Person" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="email" v-model="form.customerEmail" placeholder="Billing Email" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
+                            <input type="tel" v-model="form.customerPhone" placeholder="Billing Phone" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
                         </div>
                     </div>
 
-                    <!-- 5. DISCOUNT CONFIGURATOR MATRIX -->
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-600 flex items-center gap-1.5">🏷️ 5. Discount Matrix</h3>
-                            <button @click="addDiscount" class="text-[11px] bg-purple-50 border border-purple-200 text-purple-600 font-bold px-2.5 py-1 rounded-md hover:bg-purple-100 transition-all cursor-pointer shadow-sm">+ Add New Discount</button>
+                    <!-- SHIPPING TO DETAILS BLOCK -->
+                    <div class="space-y-2.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-[11px] font-bold text-slate-600 block uppercase tracking-wide">Shipping To:</span>
+                        <div v-if="form.shippingMethod === 'Self-pickup'">
+                            <label class="block text-xs text-slate-500 mb-1">Pickup Warehouse Address</label>
+                            <textarea v-model="form.pickupWarehouseText" rows="2" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs"></textarea>
                         </div>
-                        <div v-for="(discount, dIdx) in form.discounts" :key="dIdx" class="p-4 bg-purple-50/30 border border-purple-100 rounded-xl space-y-3 relative text-xs">
-                            <button @click="removeDiscount(dIdx)" class="absolute top-2 right-3 text-red-500 hover:text-red-700 font-medium cursor-pointer">Remove</button>
+                        <div v-else class="space-y-2">
                             <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Target Scope</label>
-                                    <select v-model="discount.scope" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
-                                        <option value="unit">Per Item Discount</option>
-                                        <option value="total">Total Order Discount</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Calculation Method</label>
-                                    <select v-model="discount.type" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
-                                        <option value="amount">Fixed Amount ($)</option>
-                                        <option value="percent">Percentage (%)</option>
-                                    </select>
-                                </div>
+                                <input type="text" v-model="form.shippingContactName" placeholder="Recipient Name" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
+                                <input type="tel" v-model="form.shippingPhone" placeholder="Recipient Phone" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
                             </div>
-                            <div v-if="discount.scope === 'unit'">
-                                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Apply To Hardware Model *</label>
-                                <select v-model="discount.targetModel" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-medium">
-                                    <option value="">-- Choose target product model --</option>
-                                    <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }}</option>
+                            <textarea v-model="form.shippingAddress" rows="2" placeholder="Full Logistics Shipping Address..." class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Product List Selection -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">🛒 2. Product List</h3>
+                        <button @click="addItem" class="text-[11px] bg-slate-100 border border-slate-300 text-slate-700 font-bold px-2.5 py-1 rounded-md hover:bg-slate-200 transition-all">+ Add Product</button>
+                    </div>
+                    <div v-for="(item, index) in form.items" :key="index" class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 relative">
+                        <button @click="removeItem(index)" v-if="form.items.length > 1" class="absolute top-2 right-3 text-red-500 text-xs font-medium">Remove</button>
+                        <div>
+                            <select v-model="item.modelKey" @change="onModelChange(index)" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 font-medium">
+                                <option value="">-- Select Product SKU --</option>
+                                <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }} (${{ price }})</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 items-center">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[11px] font-semibold text-slate-500">Qty:</span>
+                                <input type="number" v-model.number="item.qty" min="1" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
+                            </div>
+                            <div class="text-right text-xs text-slate-500 font-mono">
+                                Base: <strong>${{ formatMoney(item.price) }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-2.5 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold flex justify-between items-center border border-slate-200">
+                        <span>Total Product Fleet:</span>
+                        <span class="text-sm font-black">{{ totalHardwareQty }} Units</span>
+                    </div>
+                </div>
+
+                <!-- 3. Discounts Block -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">🏷️ 3. Discounts</h3>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-slate-500 mb-0.5">Discount Type</label>
+                                <select v-model="form.orderDiscountType" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
+                                    <option value="flat">Flat Amount ($)</option>
+                                    <option value="percent">Percentage (%)</option>
                                 </select>
                             </div>
-                            <div class="grid grid-cols-3 gap-2 items-end">
-                                <div>
-                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Value <span>({{ discount.type === 'amount' ? '$' : '%' }})</span></label>
-                                    <input type="number" v-model.number="discount.value" min="0" step="0.01" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold text-slate-800">
-                                </div>
-                                <div class="col-span-2">
-                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Reason / Motivation *</label>
-                                    <input type="text" v-model="discount.reason" placeholder="e.g. Bulk promotion discount" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
-                                </div>
+                            <div>
+                                <label class="block text-xs text-slate-500 mb-0.5">Discount Value</label>
+                                <input type="number" v-model.number="form.orderDiscountValue" min="0" step="0.01" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Side: Printable Documents Frame -->
-                <div class="lg:col-span-7 space-y-8">
-                    <!-- ==================== PAGE 1: PURCHASE ORDER SHEET ==================== -->
-                    <div class="bg-white shadow-xl text-slate-900 border border-gray-200 a4-print-sheet print-page-1 mx-auto p-4 flex flex-col justify-between">
-                        <div class="w-full flex-none">
-                            <!-- Top Corporate Head -->
-                            <div class="flex justify-between items-start border-b-2 border-slate-900 pb-1">
-                                <div class="flex items-center gap-3">
-                                    <img src="logo.png" alt="Company Logo" class="h-10 w-auto object-contain">
-                                    <div>
-                                        <h2 class="text-base font-black tracking-tight text-slate-900">PURCHASE ORDER</h2>
-                                        <p class="text-[11px] font-extrabold text-blue-950 mt-0.5">Haha Vending</p>
-                                        <p class="text-[9px] text-gray-500 tracking-wide font-medium">16192 Coastal Highway, Lewes, Delaware 19958</p>
-                                    </div>
-                                </div>
-                                <div class="text-right text-[10px] space-y-0.5 text-gray-600 pt-1">
-                                    <p><strong class="text-slate-900 uppercase font-bold text-[8px] tracking-wider block">PO Tracking ID:</strong> <span class="font-mono text-[11px] font-bold text-slate-900">{{ form.poNumber }}</span></p>
-                                    <p v-if="form.clientPoNumber"><strong class="text-blue-900 uppercase font-bold text-[8px] tracking-wider block mt-0.5">Client Ref PO #:</strong> <span class="font-mono text-[11px] font-bold text-blue-900">{{ form.clientPoNumber }}</span></p>
-                                    <p class="pt-0.5"><strong class="text-slate-900 font-semibold">Order Date:</strong> {{ form.date || '------' }}</p>
-                                </div>
+                <!-- 4. Freight & Tax -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">🚚 4. Freight & Tax</h3>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Freight Calculation Mode</label>
+                                <select v-model="form.freightMode" :disabled="form.shippingMethod === 'Self-pickup'" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs">
+                                    <option value="per_unit">Per Unit Rate ($/Unit)</option>
+                                    <option value="total">Entire Order Total ($)</option>
+                                </select>
                             </div>
-
-                            <!-- BILLING TO & SHIPPING TO MATRIX -->
-                            <div class="grid grid-cols-2 gap-3 my-1 text-[10px]">
-                                <div class="bg-slate-50 p-1.5 rounded border border-slate-150 flex flex-col justify-between">
-                                    <div>
-                                        <h4 class="font-bold text-blue-950 uppercase tracking-wider text-[8px] mb-0.5">Billing To:</h4>
-                                        <p class="font-bold text-xs text-slate-900 mb-0.5">{{ form.resellerName || '[No Account Chosen]' }}</p>
-                                        <p v-if="form.resellerContactName" class="text-slate-800 font-semibold text-[10px]">Attn: {{ form.resellerContactName }}</p>
-                                        <p v-if="form.resellerEmail" class="text-slate-600 font-mono">{{ form.resellerEmail }}</p>
-                                        <p v-if="form.resellerPhone" class="text-slate-600">{{ form.resellerPhone }}</p>
-                                    </div>
-                                </div>
-                                <div class="bg-slate-50 p-1.5 rounded border border-slate-150 flex flex-col justify-between">
-                                    <div>
-                                        <h4 class="font-bold text-blue-950 uppercase tracking-wider text-[8px] mb-0.5">Shipping to:</h4>
-                                        <p class="font-bold text-slate-900 text-[11px] mb-0.5">Mode: <span class="text-blue-700 font-extrabold">{{ form.shippingMethod }}</span></p>
-                                        <div v-if="form.shippingMethod === 'Logistics Shipping'">
-                                            <p v-if="form.shippingContactName" class="text-slate-800 font-semibold">Attn: {{ form.shippingContactName }}</p>
-                                            <p v-if="form.shippingEmail" class="text-slate-600 font-mono">{{ form.shippingEmail }}</p>
-                                            <p v-if="form.shippingPhone" class="text-slate-600">{{ form.shippingPhone }}</p>
-                                            <p v-if="form.shippingAddress" class="text-slate-700 font-medium leading-tight whitespace-pre-line mt-0.5 bg-white p-1 rounded border border-slate-200 text-[9px]">{{ form.shippingAddress }}</p>
-                                        </div>
-                                        <div v-else>
-                                            <p class="text-slate-500 font-semibold text-[9px]">Pickup Location Target:</p>
-                                            <p class="text-blue-900 font-bold bg-blue-50/50 p-1 rounded border border-blue-100 whitespace-pre-line leading-tight text-[9px] mt-0.5">{{ form.pickupWarehouseText || '[No Pickup Address Specified]' }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- PRODUCTS SKU TABLE MATRIX -->
-                            <div class="my-1 text-[10px]">
-                                <table class="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr class="bg-slate-900 text-white uppercase text-[8px] tracking-wider font-bold">
-                                            <th class="p-1 rounded-l text-center w-8">#</th>
-                                            <th class="p-1">Hardware SKU Model</th>
-                                            <th class="p-1 text-center w-16">Unit Price</th>
-                                            <th class="p-1 text-center w-12">Qty</th>
-                                            <th class="p-1 text-right rounded-r w-20">Ext Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(item, idx) in form.items" :key="idx" class="border-b border-slate-200 text-[10px] hover:bg-slate-50/50">
-                                            <td class="p-1 text-center font-mono text-slate-400">{{ idx + 1 }}</td>
-                                            <td class="p-1 font-bold text-slate-900">
-                                                {{ item.modelKey || '[No SKU Selected]' }}
-                                            </td>
-                                            <td class="p-1 text-center font-mono">${{ formatMoney(item.price) }}</td>
-                                            <td class="p-1 text-center font-bold text-slate-800">{{ item.qty || 0 }}</td>
-                                            <td class="p-1 text-right font-mono font-bold text-slate-900">${{ formatMoney(item.price * (item.qty || 0)) }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!-- GRAND TOTAL CARD -->
-                            <div class="my-1.5 bg-slate-900 text-white p-2 rounded-lg shadow-sm space-y-0.5 font-medium">
-                                <div class="flex justify-between text-[10px] text-slate-400">
-                                    <span>Device Total:</span>
-                                    <span class="font-mono">${{ formatMoney(computedSubtotal) }}</span>
-                                </div>
-                                <div v-if="computedTotalDiscount > 0" class="flex justify-between text-[10px] text-purple-400 font-bold">
-                                    <span>Total Applied Discounts:</span>
-                                    <span class="font-mono">-${{ formatMoney(computedTotalDiscount) }}</span>
-                                </div>
-                                <div class="flex justify-between text-[10px] text-slate-400 border-b border-slate-700 pb-1">
-                                    <span>Freight Charge:</span>
-                                    <span class="font-mono">${{ formatMoney(computedFreight) }}</span>
-                                </div>
-                                <div class="flex justify-between items-center text-xs font-black pt-1 text-yellow-400">
-                                    <span>GRAND TOTAL (USD):</span>
-                                    <span class="font-mono text-sm">${{ formatMoney(computedTotalAmount) }}</span>
-                                </div>
-                            </div>
-
-                            <!-- DYNAMIC CUSTOM PAYMENT TERMS & SCHEDULE BLOCK -->
-                            <div class="my-1.5 border border-slate-200 rounded p-1.5 bg-slate-50/50">
-                                <h4 class="text-[9px] font-bold text-slate-900 uppercase tracking-wider mb-0.5">📋 Payment Terms & Schedule</h4>
-                                <table class="w-full text-left text-[9px] border-collapse">
-                                    <thead>
-                                        <tr class="border-b border-slate-300 text-slate-500 font-semibold">
-                                            <th class="py-0.5">Payment Phase</th>
-                                            <th class="py-0.5 text-center">Payment Due Date</th>
-                                            <th class="py-0.5 text-right">Payment Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(phase, index) in computedPaymentSchedule" :key="index" class="border-b border-slate-100 last:border-none">
-                                            <td class="py-0.5 font-medium text-slate-800">{{ phase.term }}</td>
-                                            <td class="py-0.5 text-center font-mono font-bold text-red-600">{{ phase.dueDate }}</td>
-                                            <td class="py-0.5 text-right font-mono font-bold text-slate-900">
-                                                <span v-if="index === 0 || computedPaymentSchedule.length === 1">${{ formatMoney(phase.amount) }}</span>
-                                                <div v-else class="flex items-center justify-end">
-                                                    <span>$</span>
-                                                    <input type="number" step="0.01" v-model.number="form.manualInstallments[index - 1]" :placeholder="formatMoney(phase.amount)" class="print-input w-16 text-right font-mono font-bold text-slate-900 bg-white border border-slate-300 rounded px-1 py-0.5 focus:outline-none focus:border-blue-500 text-[9px]">
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr class="border-t border-slate-300 font-bold bg-slate-100/50">
-                                            <td class="py-0.5 text-slate-900">Total Scheduled Payment</td>
-                                            <td class="py-0.5 text-center text-slate-400">--</td>
-                                            <td class="py-0.5 text-right font-mono text-blue-900">${{ formatMoney(computedTotalAmount) }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Freight Value ($)</label>
+                                <input type="number" v-model.number="form.freightInput" :disabled="form.shippingMethod === 'Self-pickup'" min="0" step="0.01" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-bold">
                             </div>
                         </div>
-
-                        <!-- PAGE 1 BOTTOM SIGNATURE BLOCK & FISCAL CALCULATION -->
-                        <div class="print-footer-anchor w-full mt-1 border-t border-slate-300 pt-1">
-                            <!-- LEGAL AGREEMENT CLAUSE BOX -->
-                            <div class="mb-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 text-[8.5px] text-slate-700 leading-normal space-y-1">
-                                <p><strong>1. Scope of Agreement.</strong> This attachment establishes the baseline legal definitions governing hardware procurement and warranty allocation under corporate tracking identity <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span>. The ordering reseller ({{ form.resellerName || '[Target Account]' }}) agrees to enforce standard retail activation matrices upon deployment of hardware units.</p>
-                                <p><strong>2. Payment Enforcement.</strong> Complete fulfillment remains tethered directly to the custom scheduled installments. Late payments trigger immediate suspension of cloud backend APIs on hardware nodes until settlement profiles return to active parameters.</p>
-                            </div>
-
-                            <!-- Page 1 Signatures & Date -->
-                            <div class="grid grid-cols-2 gap-3 text-[9px] mb-1.5 bg-slate-50 p-1.5 rounded border border-slate-200">
-                                <div>
-                                    <p class="text-slate-500 font-semibold">Authorized Signature:</p>
-                                    <div class="h-5 border-b border-slate-300 flex items-end font-serif italic text-slate-900 text-xs pl-1">
-                                        {{ form.signature || '_______________________' }}
-                                    </div>
-                                </div>
-                                <div>
-                                    <p class="text-slate-500 font-semibold">Date Signed:</p>
-                                    <div class="h-5 border-b border-slate-300 flex items-end font-mono text-slate-900 pl-1">
-                                        {{ form.dateSigned || '_______________________' }}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex justify-between items-end text-[10px]">
-                                <div class="w-full space-y-1">
-                                    <div class="p-1 bg-blue-50/60 rounded border border-blue-100 text-[8px] text-slate-700 leading-normal">
-                                        <strong class="text-blue-900 uppercase font-bold text-[8px] block tracking-wide mb-0.5">Quick Reference Remittance:</strong>
-                                        Please consult Page 2 for verified structural bank routing records (JPMorgan Chase / Bank of America / Zelle network pathways).
-                                    </div>
-                                </div>
-                            </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Sales Tax Rate (%)</label>
+                            <input type="number" v-model.number="form.taxRate" min="0" step="0.01" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-bold">
                         </div>
                     </div>
+                </div>
 
-                    <!-- ==================== PAGE 2: OFFICIAL REMITTANCE CHANNELS ==================== -->
-                    <div class="bg-white shadow-xl text-slate-900 border border-gray-200 a4-print-sheet print-page-2 mx-auto p-6 flex flex-col justify-between">
-                        <div class="w-full flex-none space-y-4 text-[10px]">
-                            <div class="border-b border-slate-300 pb-2 flex justify-between items-end">
-                                <div>
-                                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">OFFICIAL REVENUE REMITTANCE CHANNELS</h3>
-                                    <p class="text-[8px] text-slate-400 mt-0.5">Attachment Reference: PO #{{ form.poNumber }}</p>
-                                </div>
-                                <div class="text-right text-[8px] text-slate-500 font-mono">
-                                    Phone: +1 323-847-6151<br>www.hahavending.com
-                                </div>
-                            </div>
-
-                            <!-- OFFICIAL CORPORATE REMITTANCE CHANNELS -->
-                            <div class="mt-2 border border-slate-200 rounded-lg p-3 bg-slate-50/80">
-                                <h4 class="text-[10px] font-black text-blue-950 uppercase tracking-wider border-b border-slate-200 pb-1.5 mb-2 flex items-center gap-1">
-                                    🏛️ COMPANY'S VERIFIED BANKING INFORMATION
-                                </h4>
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[9.5px]">
-                                    <!-- Channel 1: Zelle Instant Payments -->
-                                    <div class="bg-white p-2.5 rounded border border-slate-200 shadow-sm space-y-1">
-                                        <span class="font-bold text-purple-700 block uppercase tracking-wider text-[8.5px]">Option 1: Zelle Network</span>
-                                        <div class="space-y-0.5 text-slate-700">
-                                            <p><span class="text-slate-400">Primary Phone Gateway:</span> <strong class="text-slate-900 font-mono">213-781-4659</strong></p>
-                                        </div>
-                                    </div>
-
-                                    <!-- Channel 2: Bank of America -->
-                                    <div class="bg-white p-2.5 rounded border border-slate-200 shadow-sm space-y-1">
-                                        <span class="font-bold text-blue-700 block uppercase tracking-wider text-[8.5px]">Option 2: Bank of America</span>
-                                        <div class="space-y-0.5 text-slate-700 font-sans">
-                                            <p><span class="text-slate-400">Beneficiary:</span> <span class="font-bold text-slate-800">HAHASMART INNOVATION INC</span></p>
-                                            <p><span class="text-slate-400">Account No. (Mandatory):</span> <strong class="text-slate-900 font-mono text-[10px]">325217415040</strong></p>
-                                            <p><span class="text-slate-400">Routing Number (Domestic):</span> <strong class="text-slate-900 font-mono">026009593</strong></p>
-                                            <p><span class="text-slate-400">Swift Code (International):</span> <strong class="text-slate-900 font-mono">BOFAUS3N</strong></p>
-                                            <p class="text-[8px] text-slate-500 leading-tight mt-1"><span class="text-slate-400">Bank Address:</span> Bank of America, NA, 222 Broadway, New York, NY 10038</p>
-                                        </div>
-                                    </div>
-
-                                    <!-- Channel 3: Chase Bank -->
-                                    <div class="bg-white p-2.5 rounded border border-slate-200 shadow-sm space-y-1 md:col-span-2">
-                                        <span class="font-bold text-cyan-700 block uppercase tracking-wider text-[8.5px]">Option 3: Chase Bank</span>
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700">
-                                            <div class="space-y-0.5">
-                                                <p><span class="text-slate-400">Beneficiary:</span> <span class="font-bold text-slate-800">HAHASMART INNOVATION INC</span></p>
-                                                <p><span class="text-slate-400">Account No. (Mandatory):</span> <strong class="text-slate-900 font-mono text-[10px]">2908910509</strong></p>
-                                            </div>
-                                            <div class="space-y-0.5">
-                                                <p><span class="text-slate-400">Routing Number (Domestic):</span> <strong class="text-slate-900 font-mono">061092387</strong></p>
-                                                <p><span class="text-slate-400">Swift Code (International):</span> <strong class="text-slate-900 font-mono">CHASUS33</strong></p>
-                                            </div>
-                                        </div>
-                                        <p class="text-[8px] text-slate-500 border-t border-slate-100 pt-1 mt-1"><span class="text-slate-400">Bank Address:</span> 270 Park Avenue, New York, NY 10017, USA</p>
-                                    </div>
-
-                                    <!-- Channel 4: East West Bank -->
-                                    <div class="bg-white p-2.5 rounded border border-slate-200 shadow-sm space-y-1 md:col-span-2">
-                                        <span class="font-bold text-emerald-700 block uppercase tracking-wider text-[8.5px]">Option 4: East West Bank</span>
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700">
-                                            <div class="space-y-0.5">
-                                                <p><span class="text-slate-400">Beneficiary Name (Required):</span> <span class="font-bold text-slate-800">HAHASMART INNOVATION INC</span></p>
-                                                <p><span class="text-slate-400">Beneficiary Account Number (Mandatory):</span> <strong class="text-slate-900 font-mono text-[10px]">8618037736</strong></p>
-                                                <p><span class="text-slate-400">Receiving Bank Name:</span> <strong class="text-slate-900">East West Bank</strong></p>
-                                            </div>
-                                            <div class="space-y-0.5">
-                                                <p><span class="text-slate-400">Bank Routing Number (Domestic Wires):</span> <strong class="text-slate-900 font-mono">322070381</strong></p>
-                                                <p><span class="text-slate-400">Swift Code (International Wires):</span> <strong class="text-slate-900 font-mono">EWBKUS66XXX</strong></p>
-                                            </div>
-                                        </div>
-                                        <p class="text-[8px] text-slate-500 border-t border-slate-100 pt-1 mt-1"><span class="text-slate-400">Receiving Bank Address:</span> 135 N. Los Robles Avenue Pasadena, CA 91101</p>
-                                    </div>
-                                </div>
-
-                                <!-- CREDIT CARD MERCHANT PROCESSOR CLAUSE -->
-                                <div class="mt-3 bg-yellow-50/70 border border-yellow-200/80 rounded p-2 text-[9px] text-slate-700 leading-normal">
-                                    <strong>Alternative Merchant Processing:</strong> If you prefer to settle metrics via credit card, please note that a <strong>2.5% processing fee</strong> will automatically apply. We accept secure digital corporate credit card payments powered via PayPal or Stripe networks.
-                                </div>
-                            </div>
-                        </div>
-
+                <!-- 5. Financing Parameters -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">⚖️ 5. Financing Parameters</h3>
+                    <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
                         <div>
-                            <!-- MANDATORY OPERATIONAL COMPLIANCE NOTICE -->
-                            <div class="pt-4 border-t border-slate-200 text-[9px] text-slate-500 leading-relaxed text-center">
-                                <p class="mb-1">Thank you for your understanding and we appreciate your continued business!</p>
-                                <p><strong>Mandatory Operational Compliance Notice:</strong> Payments made by physical check are subject to an automatic hold of 5–7 banking business days for document verification and final confirmation of funds before warehouse release procedures begin. For expedited or priority dispatch, please use an electronic wire transfer.</p>
-                                <p class="text-[8px] text-slate-400 mt-1">Corporate Registrant Address: 16192 Coastal Highway, Lewes, Delaware 19958</p>
+                            <label class="block text-slate-700 font-semibold mb-1">Downpayment Option Preset</label>
+                            <select v-model="form.downpaymentOption" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-bold text-slate-800">
+                                <option value="50%">50% Downpayment</option>
+                                <option value="30%">30% Downpayment</option>
+                                <option value="1500_unit">$1,500 / Unit</option>
+                                <option value="0%">0 Downpayment (100% Financed)</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Financing Months (Terms)</label>
+                                <input type="number" v-model.number="form.financingMonths" min="1" max="60" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-bold text-slate-800">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Setup Fee ($)</label>
+                                <input type="number" v-model.number="form.financingSetupFee" min="0" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-mono font-bold">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Right Side: Printable Document Sheets Container -->
+            <div class="lg:col-span-7 space-y-8">
+                <!-- ==================== PAGE 1: PURCHASE ORDER SHEET ==================== -->
+                <div class="bg-white shadow-lg text-slate-900 border border-slate-200 a4-print-sheet print-page-break mx-auto">
+                    <div class="w-full flex-none">
+                        <div class="flex justify-between items-start border-b-2 border-slate-900 pb-1">
+                            <div>
+                                <h2 class="text-base font-black tracking-tight text-slate-900">Installment Purchase Order</h2>
+                                <p class="text-[11px] font-extrabold text-slate-900 mt-0.5">HAHASMART Vending</p>
+                                <p class="text-[8.5px] text-gray-500 tracking-wide font-medium">1754 North Brown Rd suite 200, Lawrenceville, GA 30043</p>
+                            </div>
+                            <div class="text-right text-[9.5px] space-y-0.5 text-gray-600 pt-1">
+                                <p><strong class="text-slate-900 uppercase font-bold text-[8px] tracking-wider block">PO ID:</strong> <span class="font-mono text-[11px] font-bold text-slate-900">{{ form.poNumber }}</span></p>
+                                <p v-if="form.clientPoNumber"><strong class="text-slate-900 uppercase font-bold text-[8px] tracking-wider block mt-0.5">Client Ref PO #:</strong> <span class="font-mono text-[11px] font-bold text-slate-900">{{ form.clientPoNumber }}</span></p>
+                                <p class="pt-0.5"><strong class="text-slate-900 font-semibold">Date:</strong> {{ form.date || '------' }}</p>
+                            </div>
+                        </div>
+
+                        <!-- BILLING TO & SHIPPING TO MATRIX -->
+                        <div class="grid grid-cols-2 gap-4 my-2 text-[9.5px]">
+                            <div class="bg-slate-50 p-2 rounded border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="font-bold text-slate-900 uppercase tracking-wider text-[8px] mb-0.5">Billing To:</h4>
+                                    <p class="font-bold text-slate-900 mb-0.5">{{ form.customerCompany || '[No Billing Info]' }}</p>
+                                    <p v-if="form.customerContactName" class="text-slate-800 font-medium">Attn: {{ form.customerContactName }}</p>
+                                    <p class="text-gray-500 text-[8.5px] font-mono">Mail: {{ form.customerEmail || '--' }} | Tel: {{ form.customerPhone || '--' }}</p>
+                                </div>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[8px] mb-0.5">Shipping To:</h4>
+                                    <div v-if="form.shippingMethod === 'Self-pickup'">
+                                        <p class="text-[8.5px] text-slate-900 font-bold uppercase">[Self-Pickup]</p>
+                                        <p class="text-gray-700 font-medium">{{ form.pickupWarehouseText }}</p>
+                                    </div>
+                                    <div v-else>
+                                        <p v-if="form.shippingContactName" class="font-bold text-slate-900">Attn: {{ form.shippingContactName }} <span class="font-normal font-mono" v-if="form.shippingPhone">(Tel: {{ form.shippingPhone }})</span></p>
+                                        <p class="text-gray-700 text-[8.5px] whitespace-pre-line leading-tight">{{ form.shippingAddress || 'No shipping address provided.' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Strategy Banner -->
+                        <div class="text-[9px] bg-slate-100 text-slate-900 px-2 py-1 rounded flex justify-between font-bold border border-slate-200 mb-2">
+                            <span>Fulfillment Routine: {{ form.shippingMethod }}</span>
+                            <span>Financing Terms: {{ form.financingMonths }} Months Deferred Structure</span>
+                        </div>
+
+                        <!-- Products Breakdown Table -->
+                        <table class="w-full text-left border-collapse my-1 text-[9.5px]">
+                            <thead>
+                            <tr class="border-b border-slate-900 text-slate-500 font-bold uppercase tracking-wider text-[8px]">
+                                <th class="py-0.5">Product SKU</th>
+                                <th class="py-0.5 text-center w-16">Qty</th>
+                                <th class="py-0.5 text-right w-24">Unit Price</th>
+                                <th class="py-0.5 text-right w-28">Extended Price</th>
+                            </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                            <tr v-for="(item, index) in form.items" :key="index" class="text-gray-700">
+                                <td class="py-1 font-semibold text-slate-900">{{ item.modelKey || 'Awaiting Product Selection...' }}</td>
+                                <td class="py-1 text-center font-bold text-slate-900">{{ item.qty }}</td>
+                                <td class="py-1 text-right text-gray-600">${{ formatMoney(item.price) }}</td>
+                                <td class="py-1 text-right font-bold text-slate-900">${{ formatMoney(item.qty * item.price) }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Bottom Accounting Math Ledger -->
+                    <div class="print-footer-anchor w-full">
+                        <div class="flex justify-end text-[9.5px] pt-1">
+                            <div class="w-72 space-y-0.5 border-t-2 border-slate-900 pt-1">
+                                <div class="flex justify-between text-gray-500 font-medium">
+                                    <span>Product Subtotal:</span>
+                                    <span class="font-semibold text-slate-900">${{ formatMoney(rawSubTotal) }}</span>
+                                </div>
+                                <div v-if="computedOrderDiscount > 0" class="flex justify-between text-slate-600 font-medium">
+                                    <span>Order Discount:</span>
+                                    <span>-${{ formatMoney(computedOrderDiscount) }}</span>
+                                </div>
+                                <div class="flex justify-between text-slate-700 font-bold border-t border-slate-200 pt-0.5">
+                                    <span>Net Subtotal:</span>
+                                    <span>${{ formatMoney(grossSubTotal) }}</span>
+                                </div>
+                                <div class="flex justify-between text-gray-500 font-medium">
+                                    <span>Freight Shipping:</span>
+                                    <span>+${{ formatMoney(computedFreight) }}</span>
+                                </div>
+                                <div class="flex justify-between text-gray-500 font-medium">
+                                    <span>Sales Tax ({{ form.taxRate }}%):</span>
+                                    <span>+${{ formatMoney(computedTax) }}</span>
+                                </div>
+                                <div v-if="form.financingSetupFee > 0" class="flex justify-between text-slate-800 font-bold bg-slate-100 px-1 py-0.5 rounded text-[9px]">
+                                    <span>Financing Setup Fee:</span>
+                                    <span>+${{ formatMoney(form.financingSetupFee) }}</span>
+                                </div>
+                                <div class="flex justify-between text-slate-900 font-black border-t border-gray-200 pt-0.5 text-[10px]">
+                                    <span>Total Contract Value:</span>
+                                    <span>${{ formatMoney(totalContractValue) }}</span>
+                                </div>
+                                <div class="flex justify-between text-slate-900 bg-slate-100 font-bold px-1 py-1 rounded text-[10px] border border-slate-200">
+                                    <span>Downpayment Due:</span>
+                                    <span>${{ formatMoney(totalDownpaymentDue) }}</span>
+                                </div>
+                                <div class="flex justify-between text-slate-800 font-black border-b border-gray-200 pb-0.5 text-[10px]">
+                                    <span>Total Financed Balance:</span>
+                                    <span>${{ formatMoney(totalFinancedBalance) }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Policy Terms Clause -->
+                        <div class="mt-4 border-t border-slate-200 pt-1.5 text-[7px] text-slate-400 leading-normal">
+                            <p class="font-bold text-slate-500 uppercase tracking-wider mb-0.5">Terms & Conditions:</p>
+                            <p>This document constitutes a formal rider to the master business structure between the parties. The Financed Balance outlined here will be parsed into consecutive installment cycles detailed on Annex B (Page 2).</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-8 mt-6 text-[9px]">
+                            <div>
+                                <p class="font-bold text-slate-800">Authorized Signature:</p>
+                                <div class="border-b border-slate-400 mt-6 h-1 w-full"></div>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-800">Date signed:</p>
+                                <p class="text-[9px] font-mono text-slate-800 border-b border-slate-400 mt-2 pb-0.5">{{ usCentralDateSigned }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== PAGE 2: DETAILED FINANCING MATRIX AGENDA ==================== -->
+                <div class="bg-white shadow-lg text-slate-900 border border-slate-200 a4-print-sheet print-page-break mx-auto">
+                    <div class="w-full flex-none border-b-2 border-slate-900 pb-1">
+                        <h3 class="text-sm font-black tracking-tight text-slate-900">ANNEX B: ITEMIZED REPAYMENT SCHEDULE</h3>
+                        <p class="text-[9px] text-gray-500">Core Financial Rider Reference tied to PO ID: <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span></p>
+                    </div>
+                    <div class="mt-3 text-[9.5px] text-gray-700 flex-grow space-y-4">
+                        <p class="leading-relaxed font-medium">Upon verified processing of the Downpayment Invoice (<span class="font-bold text-slate-900">${{ formatMoney(totalDownpaymentDue) }}</span>), the outstanding Financed Balance (<span class="font-bold text-slate-900">${{ formatMoney(totalFinancedBalance) }}</span>) is structured into <span class="font-bold text-slate-900">{{ form.financingMonths }}</span> periodic billing cycles:</p>
+
+                        <table class="w-full text-left border-collapse text-[9.5px]">
+                            <thead>
+                            <tr class="border-b-2 border-slate-800 text-slate-500 font-bold uppercase tracking-wider text-[7.5px]">
+                                <th class="py-1 w-24">Cycle</th>
+                                <th class="py-1 w-36">Due Date</th>
+                                <th class="py-1">Description</th>
+                                <th class="py-1 text-right w-28">Amount Due</th>
+                            </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 font-medium">
+                            <tr class="bg-slate-100 text-slate-900">
+                                <td class="py-1.5 px-1 font-bold">Downpayment</td>
+                                <td class="py-1.5 px-1 font-mono font-bold">{{ form.date || 'TBD' }}</td>
+                                <td class="py-1.5 px-1 italic">Immediate clearance required</td>
+                                <td class="py-1.5 px-1 text-right font-mono font-bold">${{ formatMoney(totalDownpaymentDue) }}</td>
+                            </tr>
+                            <tr v-for="schedule in computedSchedules" :key="schedule.term" class="text-slate-700 hover:bg-slate-50">
+                                <td class="py-1.5 px-1 font-semibold text-slate-900">Installment {{ schedule.term }}</td>
+                                <td class="py-1.5 px-1 font-mono text-gray-600">{{ schedule.dueDate }}</td>
+                                <td class="py-1.5 px-1 text-gray-500">Scheduled Installment Payment</td>
+                                <td class="py-1.5 px-1 text-right font-mono font-bold text-slate-900">${{ formatMoney(schedule.amount) }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ==================== PAGE 3: BANK INFORMATION ==================== -->
+                <div class="bg-white shadow-lg text-slate-900 border border-slate-200 a4-print-sheet mx-auto">
+                    <div class="w-full flex-none border-b-2 border-slate-900 pb-1">
+                        <h3 class="text-sm font-black tracking-tight text-slate-900">ANNEX C: COMPANY'S BANK INFORMATION</h3>
+                        <p class="text-[9px] text-gray-500">Official Payment Instructions tied to PO ID: <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span></p>
+                    </div>
+
+                    <div class="mt-4 text-[9.5px] space-y-4 flex-grow">
+                        <!-- 1. ZELLE -->
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-1 mb-2">1. Zelle Transfer Details</h4>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <span class="text-slate-500 block text-[8.5px] uppercase font-semibold">Tel</span>
+                                    <span class="font-mono font-bold text-slate-900 text-[10px]">213-781-4659</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500 block text-[8.5px] uppercase font-semibold">Beneficiary Name</span>
+                                    <span class="font-extrabold text-slate-900 text-[10px]">HAHASMART INNOVATION INC</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500 block text-[8.5px] uppercase font-semibold">Email</span>
+                                    <span class="font-mono font-bold text-slate-900 text-[10px]">faray@hahabianli.com</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. BANK NAME HEADER -->
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-1 mb-1">2. Bank Wire / ACH Details</h4>
+
+                            <!-- (1) Bank of America -->
+                            <div class="border-b border-slate-200 pb-2">
+                                <h5 class="font-bold text-slate-900 text-[10px] mb-1">（1）Bank of America</h5>
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px]">
+                                    <div><span class="text-gray-500">Beneficiary Name:</span> <strong class="text-slate-900">HAHASMART INNOVATION INC</strong></div>
+                                    <div><span class="text-gray-500">Beneficiary Account Number:</span> <strong class="font-mono text-slate-900">325217415040</strong></div>
+                                    <div><span class="text-gray-500">Bank Routing Number (domestic wires):</span> <strong class="font-mono text-slate-900">026009593</strong></div>
+                                    <div><span class="text-gray-500">Swift Code (International Wire):</span> <strong class="font-mono text-slate-900">BOFAUS3N</strong></div>
+                                    <div class="col-span-2"><span class="text-gray-500">Bank Address:</span> <span class="text-slate-800">Bank of America, NA, 222 Broadway, New York, New York 10038</span></div>
+                                </div>
+                            </div>
+
+                            <!-- (2) Chase Bank -->
+                            <div class="border-b border-slate-200 pb-2">
+                                <h5 class="font-bold text-slate-900 text-[10px] mb-1">（2）Chase Bank</h5>
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px]">
+                                    <div><span class="text-gray-500">Beneficiary Name:</span> <strong class="text-slate-900">HAHASMART INNOVATION INC</strong></div>
+                                    <div><span class="text-gray-500">Beneficiary Account Number:</span> <strong class="font-mono text-slate-900">2908910509</strong></div>
+                                    <div><span class="text-gray-500">Bank Routing Number (domestic wires):</span> <strong class="font-mono text-slate-900">061092387</strong></div>
+                                    <div><span class="text-gray-500">Swift Code (International Wire):</span> <strong class="font-mono text-slate-900">CHASUS33</strong></div>
+                                    <div class="col-span-2"><span class="text-gray-500">Bank Address:</span> <span class="text-slate-800">270 Park Avenue, New York, NY 10017, USA</span></div>
+                                </div>
+                            </div>
+
+                            <!-- (3) East West Bank -->
+                            <div>
+                                <h5 class="font-bold text-slate-900 text-[10px] mb-1">（3）East West Bank</h5>
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px]">
+                                    <div><span class="text-gray-500">Beneficiary Name:</span> <strong class="text-slate-900">HAHASMART INNOVATION INC</strong></div>
+                                    <div><span class="text-gray-500">Beneficiary Account Number:</span> <strong class="font-mono text-slate-900">8618037736</strong></div>
+                                    <div><span class="text-gray-500">Bank Routing Number (domestic wires):</span> <strong class="font-mono text-slate-900">322070381</strong></div>
+                                    <div><span class="text-gray-500">Swift Code (international wires):</span> <strong class="font-mono text-slate-900">EWBKUS66XXX</strong></div>
+                                    <div><span class="text-gray-500">Receiving Bank Name:</span> <span class="text-slate-800">East West Bank</span></div>
+                                    <div><span class="text-gray-500">Receiving Bank Address:</span> <span class="text-slate-800">135 N. Los Robles Avenue Pasadena, CA 91101</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="print-footer-anchor w-full border-t border-slate-200 pt-3 text-[8px] text-gray-400 text-center">
+                        HAHASMART Vending • 1754 North Brown Rd suite 200, Lawrenceville, GA 30043
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <script>
-        const { createApp } = Vue;
+<script>
+    const { createApp, ref, computed } = Vue;
 
-        createApp({
-            data() {
-                return {
-                    smartInputText: '',
-                    resellersCatalog: [
-                        "Twelve 28 vending", "Vend Guys Local", "PBS vending", 
-                        "Ai Vend Solution", "Genius Vend", "Mod Brands", 
-                        "NC vending LLC", "vendx", "The vending center", 
-                        "Vital Vending Sales LLC", "The Venders", "VP-Modern-Amenities LLC", 
-                        "Vend Guys Internet", "Nayax", "Century vending", 
-                        "SPG Vending Solutions", "Culinary Ventures Vending", "VE solution", "Vending machine outlet"
-                    ],
-                    productCatalog: {
-                        "Mini 360": 2400.00,
-                        "Plus 440": 2600.00,
-                        "Pro 542": 3200.00,
-                        "Pro 542 - NAYAX": 3500.00,
-                        "US542S": 3700.00,
-                        "Ultra 1200": 5000.00,
-                        "Freezer 550": 3500.00,
-                        "Max 620s": 4000.00,
-                        "Max 660": 3600.00,
-                        "O-pro 500": 3500.00,
-                        "O-Max 700": 3900.00,
-                        "O-Max 700S": 4300.00,
-                        "O-Elite 900": 4200.00,
-                        "Ultra 1200 Dual Temp": 5200.00,
-                        "US Smart Kit - Basic": 1200.00,
-                        "US Smart Kit - POS": 1640.00
-                    },
-                    isLoggedIn: false,
-                    authForm: { name: '', email: '', phone: '', assignedResellers: [] },
-                    currentUser: { name: '', email: '', phone: '', assignedResellers: [] },
-                    form: {
-                        poNumber: '',
-                        clientPoNumber: '',
-                        resellerName: '',
-                        date: new Date().toISOString().split('T')[0],
-                        shippingMethod: 'Logistics Shipping',
-                        pickupWarehouseText: 'Haha Vending Corporate Registry Warehouse Depot,\n16192 Coastal Highway, Lewes, Delaware 19958',
-                        netDays: 30,
-                        downPayment: 0,
-                        paymentTermsType: 1,
-                        manualInstallments: [],
-                        freightType: 'total',
-                        freightInput: 0,
-                        taxRate: 0,
-                        resellerContactName: '',
-                        resellerEmail: '',
-                        resellerPhone: '',
-                        shippingContactName: '',
-                        shippingEmail: '',
-                        shippingPhone: '',
-                        shippingAddress: '',
-                        signature: '',
-                        dateSigned: new Date().toISOString().split('T')[0],
-                        items: [
-                            { modelKey: '', price: 0, qty: 1 }
-                        ],
-                        discounts: []
-                    }
-                }
-            },
-            computed: {
-                computedPaymentSchedule() {
-                    const schedule = [];
-                    const baseDate = this.form.date ? new Date(this.form.date) : new Date();
-                    const totalAmount = this.computedTotalAmount;
-                    const termsCount = Math.max(1, parseInt(this.form.paymentTermsType) || 1);
-                    const intervalDays = parseInt(this.form.netDays) || 0;
+    createApp({
+        setup() {
+            // AUTH PROFILE SETUP
+            const isLoggedIn = ref(false);
+            
+            const authForm = ref({
+                name: '',
+                email: '',
+                phone: ''
+            });
 
-                    const formatDate = (dateObj) => {
-                        return dateObj.toISOString().split('T')[0];
-                    };
+            const currentUser = ref({
+                name: '',
+                email: '',
+                phone: ''
+            });
 
-                    if (termsCount === 1) {
-                        const dueDate = new Date(baseDate);
-                        dueDate.setDate(dueDate.getDate() + intervalDays);
-                        schedule.push({
-                            term: "100% Net Payment",
-                            dueDate: formatDate(dueDate),
-                            amount: totalAmount
-                        });
-                    } else {
-                        let downPayment = parseFloat(this.form.downPayment) || 0;
-                        if (downPayment > totalAmount) downPayment = totalAmount;
+            // PRODUCT LIST CATALOG & MATRIX PRICES
+            const productCatalog = {
+                "Mini 360": 2899,
+                "Plus 440": 3399,
+                "pro 542": 4299,
+                "pro 542(nayax)": 4599,
+                "ultra 1200": 5000,
+                "freezer 550": 4699,
+                "Max 620": 4599,
+                "Max 620s": 5399,
+                "Max 66": 4999
+            };
 
-                        schedule.push({
-                            term: "Phase 1: Down Payment",
-                            dueDate: formatDate(new Date(baseDate)),
-                            amount: downPayment
-                        });
-
-                        const remainingAmount = totalAmount - downPayment;
-                        const remainingPhases = termsCount - 1;
-                        
-                        // Calculate specified amounts vs auto-split
-                        let specifiedSum = 0;
-                        let unspecifiedCount = 0;
-                        for (let i = 0; i < remainingPhases; i++) {
-                            const val = parseFloat(this.form.manualInstallments[i]);
-                            if (!isNaN(val) && val >= 0) {
-                                specifiedSum += val;
-                            } else {
-                                unspecifiedCount++;
-                            }
-                        }
-
-                        const autoSlice = unspecifiedCount > 0 ? Math.max(0, (remainingAmount - specifiedSum) / unspecifiedCount) : 0;
-
-                        for (let i = 1; i <= remainingPhases; i++) {
-                            const nextDate = new Date(baseDate);
-                            nextDate.setDate(nextDate.getDate() + (i * intervalDays));
-                            const manualVal = parseFloat(this.form.manualInstallments[i - 1]);
-                            const phaseAmount = (!isNaN(manualVal) && manualVal >= 0) ? manualVal : autoSlice;
-
-                            schedule.push({
-                                term: `Phase ${i + 1}: Term Split`,
-                                dueDate: formatDate(nextDate),
-                                amount: phaseAmount
-                            });
-                        }
-                    }
-                    return schedule;
-                },
-                computedSubtotal() {
-                    return this.form.items.reduce((acc, item) => {
-                        return acc + ((parseFloat(item.price) || 0) * (parseInt(item.qty) || 0));
-                    }, 0);
-                },
-                computedTotalDiscount() {
-                    let totalD = 0;
-                    this.form.discounts.forEach(d => {
-                        const val = parseFloat(d.value) || 0;
-                        if (d.scope === 'total') {
-                            if (d.type === 'percent') {
-                                totalD += this.computedSubtotal * (val / 100);
-                            } else {
-                                totalD += val;
-                            }
-                        } else if (d.scope === 'unit' && d.targetModel) {
-                            const matchedItems = this.form.items.filter(i => i.modelKey === d.targetModel);
-                            matchedItems.forEach(item => {
-                                const qty = parseInt(item.qty) || 0;
-                                if (d.type === 'percent') {
-                                    totalD += (parseFloat(item.price) || 0) * qty * (val / 100);
-                                } else {
-                                    totalD += val * qty;
-                                }
-                            });
-                        }
-                    });
-                    return Math.min(totalD, this.computedSubtotal);
-                },
-                computedFreight() {
-                    if (this.form.shippingMethod === 'Self-pickup') return 0;
-                    const val = parseFloat(this.form.freightInput) || 0;
-                    if (this.form.freightType === 'per_unit') {
-                        const totalQty = this.form.items.reduce((acc, item) => acc + (parseInt(item.qty) || 0), 0);
-                        return val * totalQty;
-                    }
-                    return val;
-                },
-                computedTotalAmount() {
-                    const balance = this.computedSubtotal - this.computedTotalDiscount + this.computedFreight;
-                    const tax = Math.max(0, balance) * ((parseFloat(this.form.taxRate) || 0) / 100);
-                    return Math.max(0, balance + tax);
-                }
-            },
-            created() {
-                this.generatePoTrackingID();
-                this.checkSavedSession();
-            },
-            methods: {
-                parseSmartInput() {
-                    if (!this.smartInputText.trim()) {
-                        alert("Please paste text containing relevant order details.");
-                        return;
-                    }
-
-                    const text = this.smartInputText;
-                    let foundCount = 0;
-
-                    for (let r of this.resellersCatalog) {
-                        if (text.toLowerCase().includes(r.toLowerCase())) {
-                            this.form.resellerName = r;
-                            this.loadResellerMemory();
-                            foundCount++;
-                            break;
-                        }
-                    }
-
-                    const emailMatches = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g);
-                    if (emailMatches && emailMatches.length > 0) {
-                        if (!this.form.resellerEmail) this.form.resellerEmail = emailMatches[0];
-                        this.form.shippingEmail = emailMatches[0];
-                        foundCount++;
-                    }
-
-                    const phoneMatches = text.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g);
-                    if (phoneMatches && phoneMatches.length > 0) {
-                        if (!this.form.resellerPhone) this.form.resellerPhone = phoneMatches[0];
-                        this.form.shippingPhone = phoneMatches[0];
-                        foundCount++;
-                    }
-
-                    const extractedItems = [];
-                    const catalogKeys = Object.keys(this.productCatalog);
-
-                    catalogKeys.forEach(model => {
-                        const normalizedModelPattern = model.replace(/[-\s]/g, '[-\\s]?');
-                        const modelRegex = new RegExp(normalizedModelPattern, 'i');
-
-                        if (modelRegex.test(text)) {
-                            let qty = 1;
-                            const qtyRegex = new RegExp(normalizedModelPattern + `(?:[\\s\\S]{0,20}?)(?:x|qty:?|qty\\b|count:?|\\*|数量[:：]?)?\\s*(\\d+)(?:\\s*(?:台|个|units?|pcs?))?`, 'i');
-                            const matchQty = text.match(qtyRegex);
-
-                            if (matchQty && matchQty[1]) {
-                                const parsedQty = parseInt(matchQty[1]);
-                                if (parsedQty > 0 && parsedQty < 1000) {
-                                    qty = parsedQty;
-                                }
-                            }
-
-                            extractedItems.push({
-                                modelKey: model,
-                                price: this.productCatalog[model],
-                                qty: qty
-                            });
-                        }
-                    });
-
-                    if (extractedItems.length > 0) {
-                        this.form.items = extractedItems;
-                        foundCount++;
-                    }
-
-                    const addrMatch = text.match(/(?:Address|Ship To|Destination|地址|送货地址)[:：]\s*([^\n\r]+)/i);
-                    if (addrMatch && addrMatch[1]) {
-                        this.form.shippingAddress = addrMatch[1].trim();
-                        foundCount++;
-                    }
-
-                    const contactMatch = text.match(/(?:Attn|Contact|Name|联系人|收件人)[:：]\s*([^\n\r,]+)/i);
-                    if (contactMatch && contactMatch[1]) {
-                        const name = contactMatch[1].trim();
-                        if (!this.form.resellerContactName) this.form.resellerContactName = name;
-                        this.form.shippingContactName = name;
-                        foundCount++;
-                    }
-
-                    if (foundCount > 0) {
-                        alert(`Parsed successfully! Auto-filled ${foundCount} matching field(s).`);
-                    } else {
-                        alert("No known fields detected. Please check if the text includes valid reseller names, product models, or contact details.");
-                    }
-                },
-                generatePoTrackingID() {
-                    const prefix = "PO-HAHAvending-";
-                    const timestamp = Date.now().toString().slice(-6);
-                    const random = Math.floor(1000 + Math.random() * 9000);
-                    this.form.poNumber = `${prefix}${timestamp}-${random}`;
-                },
-                checkSavedSession() {
-                    const cached = localStorage.getItem('po_rep_profile');
-                    if (cached) {
-                        try {
-                            const profile = JSON.parse(cached);
-                            if (profile && profile.name && profile.assignedResellers) {
-                                this.currentUser = profile;
-                                this.isLoggedIn = true;
-                            }
-                        } catch(e) {
-                            localStorage.removeItem('po_rep_profile');
-                        }
-                    }
-                },
-                handleRegister() {
-                    if (!this.authForm.name || !this.authForm.email || !this.authForm.phone || this.authForm.assignedResellers.length === 0) {
-                        alert("Please accurately fill out all registry matrices.");
-                        return;
-                    }
-                    this.currentUser = { ...this.authForm };
-                    localStorage.setItem('po_rep_profile', JSON.stringify(this.currentUser));
-                    this.isLoggedIn = true;
-                },
-                handleLogout() {
-                    if(confirm("Confirm logging out of this profile?")) {
-                        localStorage.removeItem('po_rep_profile');
-                        this.isLoggedIn = false;
-                        this.authForm = { name: '', email: '', phone: '', assignedResellers: [] };
-                        this.form.resellerName = '';
-                    }
-                },
-                addItem() {
-                    this.form.items.push({ modelKey: '', price: 0, qty: 1 });
-                },
-                removeItem(index) {
-                    this.form.items.splice(index, 1);
-                },
-                onModelChange(index) {
-                    const key = this.form.items[index].modelKey;
-                    this.form.items[index].price = this.productCatalog[key] || 0;
-                },
-                addDiscount() {
-                    this.form.discounts.push({ scope: 'total', type: 'amount', targetModel: '', value: 0, reason: '' });
-                },
-                removeDiscount(index) {
-                    this.form.discounts.splice(index, 1);
-                },
-                handleShippingMethodChange() {
-                    if (this.form.shippingMethod === 'Self-pickup') {
-                        this.form.freightInput = 0;
-                    }
-                },
-                loadResellerMemory() {
-                    if (!this.form.resellerName) return;
-                    const key = `reseller_mem_${this.form.resellerName.replace(/\s+/g, '_')}`;
-                    const mem = localStorage.getItem(key);
-                    if (mem) {
-                        try {
-                            const data = JSON.parse(mem);
-                            this.form.resellerContactName = data.resellerContactName || '';
-                            this.form.resellerEmail = data.resellerEmail || '';
-                            this.form.resellerPhone = data.resellerPhone || '';
-                            this.form.shippingContactName = data.shippingContactName || '';
-                            this.form.shippingEmail = data.shippingEmail || '';
-                            this.form.shippingPhone = data.shippingPhone || '';
-                            this.form.shippingAddress = data.shippingAddress || '';
-                        } catch (e) {}
-                    } else {
-                        this.form.resellerContactName = '';
-                        this.form.resellerEmail = '';
-                        this.form.resellerPhone = '';
-                        this.form.shippingContactName = '';
-                        this.form.shippingEmail = '';
-                        this.form.shippingPhone = '';
-                        this.form.shippingAddress = '';
-                    }
-                },
-                saveResellerMemory() {
-                    if (!this.form.resellerName) return;
-                    const key = `reseller_mem_${this.form.resellerName.replace(/\s+/g, '_')}`;
-                    const payload = {
-                        resellerContactName: this.form.resellerContactName,
-                        resellerEmail: this.form.resellerEmail,
-                        resellerPhone: this.form.resellerPhone,
-                        shippingContactName: this.form.shippingContactName,
-                        shippingEmail: this.form.shippingEmail,
-                        shippingPhone: this.form.shippingPhone,
-                        shippingAddress: this.form.shippingAddress
-                    };
-                    localStorage.setItem(key, JSON.stringify(payload));
-                },
-                promptAdminAccess() {
-                    alert("Verification Required: Active directory sync path is locked under external IAM authority control panels.");
-                },
-                downloadPDF() {
-                    const originalTitle = document.title;
-                    const reseller = this.form.resellerName ? this.form.resellerName.trim() : 'Purchase Order';
-                    const poNum = this.form.poNumber ? this.form.poNumber.trim() : '';
-                    
-                    document.title = `${reseller} - ${poNum}`;
-                    window.print();
-                    
-                    setTimeout(() => {
-                        document.title = originalTitle;
-                    }, 1000);
-                },
-                formatMoney(val) {
-                    return (parseFloat(val) || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            // SYNCED STORAGE SYSTEM MEMORY FOR PROFILE
+            const savedProfile = localStorage.getItem('financing_user_profile');
+            if (savedProfile) {
+                try {
+                    const parsed = JSON.parse(savedProfile);
+                    currentUser.value = parsed;
+                    isLoggedIn.value = true;
+                } catch(e) {
+                    localStorage.removeItem('financing_user_profile');
                 }
             }
-        }).mount('#app');
-    </script>
+
+            const generateTrackingID = () => {
+                const rng = Math.floor(100000 + Math.random() * 900000);
+                return `PO-FIN-${rng}`;
+            };
+
+            // PRIMARY FORM MATRIX STATE
+            const form = ref({
+                poNumber: generateTrackingID(),
+                clientPoNumber: '',
+                customerCompany: '',
+                customerContactName: '',
+                customerEmail: '',
+                customerPhone: '',
+                date: new Date().toISOString().split('T')[0],
+                shippingMethod: 'Logistics Shipping',
+                pickupWarehouseText: 'HAHASMART Depot Hub - 1754 North Brown Rd, Lawrenceville, GA 30043',
+                shippingContactName: '',
+                shippingPhone: '',
+                shippingAddress: '',
+                items: [
+                    { modelKey: '', qty: 1, price: 0 }
+                ],
+                orderDiscountType: 'flat', // 'flat' or 'percent'
+                orderDiscountValue: 0,
+                freightMode: 'total', // 'per_unit' or 'total'
+                freightInput: 350,
+                taxRate: 7.00,
+                downpaymentOption: '50%', // '50%', '30%', '1500_unit', '0%'
+                financingMonths: 3,
+                financingSetupFee: 0
+            });
+
+            const handleRegister = () => {
+                currentUser.value = {
+                    name: authForm.value.name,
+                    email: authForm.value.email,
+                    phone: authForm.value.phone
+                };
+                localStorage.setItem('financing_user_profile', JSON.stringify(currentUser.value));
+                isLoggedIn.value = true;
+            };
+
+            const handleLogout = () => {
+                localStorage.removeItem('financing_user_profile');
+                isLoggedIn.value = false;
+                authForm.value = { name: '', email: '', phone: '' };
+            };
+
+            // GRID LINE MANAGEMENT
+            const addItem = () => {
+                form.value.items.push({ modelKey: '', qty: 1, price: 0 });
+            };
+
+            const removeItem = (idx) => {
+                form.value.items.splice(idx, 1);
+            };
+
+            const onModelChange = (idx) => {
+                const key = form.value.items[idx].modelKey;
+                form.value.items[idx].price = productCatalog[key] || 0;
+            };
+
+            // TOTAL PRODUCT QUANTITY
+            const totalHardwareQty = computed(() => {
+                return form.value.items.reduce((acc, curr) => acc + (Number(curr.qty) || 0), 0);
+            });
+
+            // COMPUTED DISCOUNT & ACCOUNTING COMPUTATIONS
+            const rawSubTotal = computed(() => {
+                return form.value.items.reduce((acc, curr) => acc + ((Number(curr.qty) || 0) * (Number(curr.price) || 0)), 0);
+            });
+
+            const computedOrderDiscount = computed(() => {
+                const val = Number(form.value.orderDiscountValue) || 0;
+                if (form.value.orderDiscountType === 'percent') {
+                    return rawSubTotal.value * (val / 100);
+                }
+                return val > rawSubTotal.value ? rawSubTotal.value : val;
+            });
+
+            const grossSubTotal = computed(() => {
+                const val = rawSubTotal.value - computedOrderDiscount.value;
+                return val < 0 ? 0 : val;
+            });
+
+            const computedFreight = computed(() => {
+                if (form.value.shippingMethod === 'Self-pickup') return 0;
+                const val = Number(form.value.freightInput) || 0;
+                if (form.value.freightMode === 'per_unit') {
+                    return val * totalHardwareQty.value;
+                }
+                return val;
+            });
+
+            // 修正：税费只按商品折后价格（grossSubTotal）计算，不加上运费（computedFreight）
+            const computedTax = computed(() => {
+                const base = grossSubTotal.value;
+                return base * ((Number(form.value.taxRate) || 0) / 100);
+            });
+
+            const totalContractValue = computed(() => {
+                return grossSubTotal.value + computedFreight.value + computedTax.value + (Number(form.value.financingSetupFee) || 0);
+            });
+
+            const totalDownpaymentDue = computed(() => {
+                const opt = form.value.downpaymentOption;
+                const freight = computedFreight.value;
+                const tax = computedTax.value;
+                const setupFee = Number(form.value.financingSetupFee) || 0;
+
+                let val = 0;
+                if (opt === '50%') {
+                    val = (grossSubTotal.value * 0.50) + freight + tax + setupFee;
+                } else if (opt === '30%') {
+                    val = (grossSubTotal.value * 0.30) + freight + tax + setupFee;
+                } else if (opt === '1500_unit') {
+                    val = (1500 * totalHardwareQty.value) + freight + tax + setupFee;
+                } else if (opt === '0%') {
+                    val = 0;
+                }
+                return val > totalContractValue.value ? totalContractValue.value : val;
+            });
+
+            const totalFinancedBalance = computed(() => {
+                const bal = totalContractValue.value - totalDownpaymentDue.value;
+                return bal < 0 ? 0 : bal;
+            });
+
+            const computedSchedules = computed(() => {
+                const months = form.value.financingMonths || 1;
+                const bal = totalFinancedBalance.value;
+                
+                const baseInstallment = Math.floor((bal / months) * 100) / 100;
+                const totalBase = Math.round(baseInstallment * months * 100) / 100;
+                const remainder = Math.round((bal - totalBase) * 100) / 100;
+
+                const list = [];
+                const dateParts = form.value.date ? form.value.date.split('-') : [];
+                let currentDate;
+                if (dateParts.length === 3) {
+                    currentDate = new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2]));
+                } else {
+                    currentDate = new Date();
+                }
+
+                for (let i = 1; i <= months; i++) {
+                    const daysToAdd = (i === 1) ? 45 : 30;
+                    currentDate.setDate(currentDate.getDate() + daysToAdd);
+                    
+                    let currentAmount = baseInstallment;
+                    if (i === months) {
+                        currentAmount = Math.round((baseInstallment + remainder) * 100) / 100;
+                    }
+
+                    const year = currentDate.getFullYear();
+                    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(currentDate.getDate()).padStart(2, '0');
+
+                    list.push({
+                        term: i,
+                        dueDate: `${year}-${month}-${day}`,
+                        amount: currentAmount
+                    });
+                }
+                return list;
+            });
+
+            const usCentralDateSigned = computed(() => {
+                return new Intl.DateTimeFormat('en-US', {
+                    timeZone: 'America/Chicago',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                }).format(new Date());
+            });
+
+            const formatMoney = (val) => {
+                return (Number(val) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            };
+
+            return {
+                isLoggedIn, authForm, currentUser, handleRegister, handleLogout,
+                productCatalog, form, addItem, removeItem, onModelChange, totalHardwareQty,
+                rawSubTotal, computedOrderDiscount, grossSubTotal, computedFreight, computedTax, 
+                totalContractValue, totalDownpaymentDue, totalFinancedBalance, computedSchedules,
+                usCentralDateSigned, formatMoney
+            };
+        }
+    }).mount('#app');
+</script>
 </body>
 </html>
