@@ -397,14 +397,14 @@
                             <p class="font-bold text-slate-500 uppercase tracking-wider mb-0.5">Terms & Conditions:</p>
                             <p>This document constitutes a formal rider to the master business structure between the parties. The Financed Balance outlined here will be parsed into consecutive installment cycles detailed on Annex B (Page 2).</p>
                         </div>
-                        <div class="grid grid-cols-2 gap-8 mt-4 text-[9px]">
-                            <div class="border-t border-slate-400 pt-1">
-                                <p class="font-bold text-slate-800">HAHASMART Vending Authorization</p>
-                                <p class="text-[8px] font-medium text-slate-500 mt-2">Executive Agent: {{ currentUser.name }}</p>
+                        <div class="grid grid-cols-2 gap-8 mt-6 text-[9px]">
+                            <div>
+                                <p class="font-bold text-slate-800">Authorized Signature:</p>
+                                <div class="border-b border-slate-400 mt-6 h-1 w-full"></div>
                             </div>
-                            <div class="border-t border-slate-400 pt-1">
-                                <p class="font-bold text-slate-800">Customer Acceptance</p>
-                                <p class="text-[8px] text-slate-500 mt-2">Authorized Officer Signature Date: ____ / ____ / ________</p>
+                            <div>
+                                <p class="font-bold text-slate-800">Date signed:</p>
+                                <p class="text-[9px] font-mono text-slate-800 border-b border-slate-400 mt-2 pb-0.5">{{ usCentralDateSigned }}</p>
                             </div>
                         </div>
                     </div>
@@ -673,6 +673,7 @@
                 return grossSubTotal.value + computedFreight.value + computedTax.value + (Number(form.value.financingSetupFee) || 0);
             });
 
+            // 1. 修正首付计算逻辑
             const totalDownpaymentDue = computed(() => {
                 const opt = form.value.downpaymentOption;
                 const freight = computedFreight.value;
@@ -681,9 +682,9 @@
 
                 let val = 0;
                 if (opt === '50%') {
-                    val = grossSubTotal.value * 0.50 + freight + tax + setupFee;
+                    val = (grossSubTotal.value * 0.50) + freight + tax + setupFee;
                 } else if (opt === '30%') {
-                    val = grossSubTotal.value * 0.30 + freight + tax + setupFee;
+                    val = (grossSubTotal.value * 0.30) + freight + tax + setupFee;
                 } else if (opt === '1500_unit') {
                     val = (1500 * totalHardwareQty.value) + freight + tax + setupFee;
                 } else if (opt === '0%') {
@@ -697,34 +698,56 @@
                 return bal < 0 ? 0 : bal;
             });
 
+            // 2. 首付日期距离第1期45天，后续每期30天规则
             const computedSchedules = computed(() => {
                 const months = form.value.financingMonths || 1;
                 const bal = totalFinancedBalance.value;
                 
-                // 保留2位小数，计算基准单期金额与尾差补到最后一期
                 const baseInstallment = Math.floor((bal / months) * 100) / 100;
                 const totalBase = Math.round(baseInstallment * months * 100) / 100;
                 const remainder = Math.round((bal - totalBase) * 100) / 100;
 
                 const list = [];
-                const baseDate = form.value.date ? new Date(form.value.date) : new Date();
+                // 确保对日期解析不因时区产生偏差
+                const dateParts = form.value.date ? form.value.date.split('-') : [];
+                let currentDate;
+                if (dateParts.length === 3) {
+                    currentDate = new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2]));
+                } else {
+                    currentDate = new Date();
+                }
 
                 for (let i = 1; i <= months; i++) {
-                    const nextDate = new Date(baseDate);
-                    nextDate.setMonth(baseDate.getMonth() + i);
+                    // 第1期距离首付日期 45 天，后续每期增加 30 天
+                    const daysToAdd = (i === 1) ? 45 : 30;
+                    currentDate.setDate(currentDate.getDate() + daysToAdd);
                     
                     let currentAmount = baseInstallment;
                     if (i === months) {
                         currentAmount = Math.round((baseInstallment + remainder) * 100) / 100;
                     }
 
+                    const year = currentDate.getFullYear();
+                    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(currentDate.getDate()).padStart(2, '0');
+
                     list.push({
                         term: i,
-                        dueDate: nextDate.toISOString().split('T')[0],
+                        dueDate: `${year}-${month}-${day}`,
                         amount: currentAmount
                     });
                 }
                 return list;
+            });
+
+            // 3. 自动解析美国中部时区当前日期 (CT: America/Chicago)
+            const usCentralDateSigned = computed(() => {
+                return new Intl.DateTimeFormat('en-US', {
+                    timeZone: 'America/Chicago',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                }).format(new Date());
             });
 
             const formatMoney = (val) => {
@@ -735,7 +758,8 @@
                 isLoggedIn, authForm, currentUser, handleRegister, handleLogout,
                 productCatalog, form, addItem, removeItem, onModelChange, totalHardwareQty,
                 rawSubTotal, computedOrderDiscount, grossSubTotal, computedFreight, computedTax, 
-                totalContractValue, totalDownpaymentDue, totalFinancedBalance, computedSchedules, formatMoney
+                totalContractValue, totalDownpaymentDue, totalFinancedBalance, computedSchedules,
+                usCentralDateSigned, formatMoney
             };
         }
     }).mount('#app');
