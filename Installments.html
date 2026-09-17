@@ -664,16 +664,17 @@
                 return val;
             });
 
+            // 税费计算逻辑：仅以单价折后总额（grossSubTotal）为基数，运费不参与计税
             const computedTax = computed(() => {
-                const base = grossSubTotal.value + computedFreight.value;
-                return base * ((Number(form.value.taxRate) || 0) / 100);
+                const rate = (Number(form.value.taxRate) || 0) / 100;
+                return grossSubTotal.value * rate;
             });
 
             const totalContractValue = computed(() => {
                 return grossSubTotal.value + computedFreight.value + computedTax.value + (Number(form.value.financingSetupFee) || 0);
             });
 
-            // 1. 修正首付计算逻辑
+            // 首付计算逻辑修正：按设定比例计算商品额度及对应的百分比税额，运费/手续费作为固定项全额计入首付
             const totalDownpaymentDue = computed(() => {
                 const opt = form.value.downpaymentOption;
                 const freight = computedFreight.value;
@@ -682,11 +683,12 @@
 
                 let val = 0;
                 if (opt === '50%') {
-                    val = (grossSubTotal.value * 0.50) + freight + tax + setupFee;
+                    val = (grossSubTotal.value * 0.50) + (tax * 0.50) + freight + setupFee;
                 } else if (opt === '30%') {
-                    val = (grossSubTotal.value * 0.30) + freight + tax + setupFee;
+                    val = (grossSubTotal.value * 0.30) + (tax * 0.30) + freight + setupFee;
                 } else if (opt === '1500_unit') {
-                    val = (1500 * totalHardwareQty.value) + freight + tax + setupFee;
+                    const productRatio = totalContractValue.value > 0 ? (1500 * totalHardwareQty.value) / grossSubTotal.value : 0;
+                    val = (1500 * totalHardwareQty.value) + (tax * Math.min(productRatio, 1)) + freight + setupFee;
                 } else if (opt === '0%') {
                     val = 0;
                 }
@@ -698,7 +700,6 @@
                 return bal < 0 ? 0 : bal;
             });
 
-            // 2. 首付日期距离第1期45天，后续每期30天规则
             const computedSchedules = computed(() => {
                 const months = form.value.financingMonths || 1;
                 const bal = totalFinancedBalance.value;
@@ -708,7 +709,6 @@
                 const remainder = Math.round((bal - totalBase) * 100) / 100;
 
                 const list = [];
-                // 确保对日期解析不因时区产生偏差
                 const dateParts = form.value.date ? form.value.date.split('-') : [];
                 let currentDate;
                 if (dateParts.length === 3) {
@@ -718,7 +718,6 @@
                 }
 
                 for (let i = 1; i <= months; i++) {
-                    // 第1期距离首付日期 45 天，后续每期增加 30 天
                     const daysToAdd = (i === 1) ? 45 : 30;
                     currentDate.setDate(currentDate.getDate() + daysToAdd);
                     
@@ -740,7 +739,6 @@
                 return list;
             });
 
-            // 3. 自动解析美国中部时区当前日期 (CT: America/Chicago)
             const usCentralDateSigned = computed(() => {
                 return new Intl.DateTimeFormat('en-US', {
                     timeZone: 'America/Chicago',
