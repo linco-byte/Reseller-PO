@@ -145,9 +145,9 @@
                         </div>
                     </div>
 
-                    <!-- CUSTOMER BILLING MATRIX -->
+                    <!-- BILLING TO MATRIX -->
                     <div class="space-y-2.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                        <span class="text-[11px] font-bold text-slate-600 block uppercase tracking-wide">Customer Info (Buyer):</span>
+                        <span class="text-[11px] font-bold text-slate-600 block uppercase tracking-wide">Billing To:</span>
                         <div>
                             <input type="text" v-model="form.customerCompany" placeholder="Company / Individual Name *" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 font-medium">
                         </div>
@@ -160,9 +160,9 @@
                         </div>
                     </div>
 
-                    <!-- SHIPPING DETAILS FIELD BLOCK -->
+                    <!-- SHIPPING TO DETAILS BLOCK -->
                     <div class="space-y-2.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                        <span class="text-[11px] font-bold text-slate-600 block uppercase tracking-wide">Delivery & Shipping Address:</span>
+                        <span class="text-[11px] font-bold text-slate-600 block uppercase tracking-wide">Shipping To:</span>
                         <div v-if="form.shippingMethod === 'Self-pickup'">
                             <label class="block text-xs text-slate-500 mb-1">Pickup Warehouse Address</label>
                             <textarea v-model="form.pickupWarehouseText" rows="2" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs"></textarea>
@@ -191,24 +191,27 @@
                                 <option v-for="(price, model) in productCatalog" :key="model" :value="model">{{ model }} (${{ price }})</option>
                             </select>
                         </div>
-                        <div class="grid grid-cols-3 gap-2 items-center">
+                        <div class="grid grid-cols-2 gap-2 items-center">
                             <div class="flex items-center gap-1.5">
                                 <span class="text-[11px] font-semibold text-slate-500">Qty:</span>
-                                <input type="number" v-model.number="item.qty" min="1" @input="syncFinancingTiers" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
+                                <input type="number" v-model.number="item.qty" min="1" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
                             </div>
-                            <div>
-                                <label class="block text-[10px] text-slate-500">Unit Disc ($)</label>
-                                <input type="number" v-model.number="item.unitDiscount" min="0" step="0.01" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-semibold">
-                            </div>
-                            <div class="text-right text-xs text-slate-500 pt-3 font-mono">
+                            <div class="text-right text-xs text-slate-500 font-mono">
                                 Base: <strong>${{ formatMoney(item.price) }}</strong>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- ORDER-LEVEL DISCOUNT BLOCK -->
+
+                    <div class="p-2.5 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold flex justify-between items-center border border-slate-200">
+                        <span>Total Product Fleet:</span>
+                        <span class="text-sm font-black">{{ totalHardwareQty }} Units</span>
+                    </div>
+                </div>
+
+                <!-- 3. Discounts Block -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">🏷️ 3. Discounts</h3>
                     <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                        <span class="text-[11px] font-bold text-slate-600 block uppercase tracking-wide">Order-Level Discount:</span>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs text-slate-500 mb-0.5">Discount Type</label>
@@ -223,64 +226,54 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="p-2.5 bg-slate-100 text-slate-800 rounded-lg text-xs font-bold flex justify-between items-center border border-slate-200">
-                        <span>Total Product Fleet:</span>
-                        <span class="text-sm font-black">{{ totalHardwareQty }} Units</span>
-                    </div>
                 </div>
 
-                <!-- 3. Financing Policy Matrix -->
+                <!-- 4. Freight & Tax -->
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">⚖️ 3. Financing Parameter Engine</h3>
-                    <div class="grid grid-cols-2 gap-2 text-[10px] bg-slate-50 p-3 rounded-lg border border-slate-200 font-medium">
-                        <div :class="{'text-slate-900 font-extrabold bg-white p-1.5 rounded shadow-sm border border-slate-300': currentTierIndex === 1, 'text-slate-400': currentTierIndex !== 1}">Tier 1 (1 Unit): 50% Down | 3 Mos | $50 Fee</div>
-                        <div :class="{'text-slate-900 font-extrabold bg-white p-1.5 rounded shadow-sm border border-slate-300': currentTierIndex === 2, 'text-slate-400': currentTierIndex !== 2}">Tier 2 (2-4 Units): 30% Down | 6 Mos | $100 Fee</div>
-                        <div :class="{'text-slate-900 font-extrabold bg-white p-1.5 rounded shadow-sm border border-slate-300': currentTierIndex === 3, 'text-slate-400': currentTierIndex !== 3}">Tier 3 (5-9 Units): Fixed Down | 12 Mos | $200 Fee</div>
-                        <div :class="{'text-slate-900 font-extrabold bg-white p-1.5 rounded shadow-sm border border-slate-300': currentTierIndex === 4, 'text-slate-400': currentTierIndex !== 4}">Tier 4 (10+ Units): Promo Down | 18-24 Mos | $0 Fee</div>
-                    </div>
-                    <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">🚚 4. Freight & Tax</h3>
+                    <div class="space-y-3">
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Installment Schedule Term</label>
-                                <select v-model.number="form.financingMonths" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-bold text-slate-800">
-                                    <option v-for="m in validMonthsOptions" :key="m" :value="m">{{ m }} Months</option>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Freight Calculation Mode</label>
+                                <select v-model="form.freightMode" :disabled="form.shippingMethod === 'Self-pickup'" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs">
+                                    <option value="per_unit">Per Unit Rate ($/Unit)</option>
+                                    <option value="total">Entire Order Total ($)</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Setup / Administrative Fee ($)</label>
-                                <input type="number" v-model.number="form.financingSetupFee" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-mono font-bold">
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Freight Value ($)</label>
+                                <input type="number" v-model.number="form.freightInput" :disabled="form.shippingMethod === 'Self-pickup'" min="0" step="0.01" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-bold">
                             </div>
-                        </div>
-                        <div class="pt-1 border-t border-slate-200 mt-2">
-                            <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Downpayment Metric Adjustments:</span>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-slate-600 mb-0.5">Calculation Model</label>
-                                    <select v-model="form.downpaymentMode" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
-                                        <option value="percentage">Percentage Allocation (%)</option>
-                                        <option value="fixed_per_unit">Fixed Rate per Node ($/Unit)</option>
-                                    </select>
-                                </div>
-                                <div v-if="form.downpaymentMode === 'percentage'">
-                                    <label class="block text-slate-600 mb-0.5">Downpayment Matrix (%)</label>
-                                    <input type="number" v-model.number="form.downpaymentPercent" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
-                                </div>
-                                <div v-if="form.downpaymentMode === 'fixed_per_unit'">
-                                    <label class="block text-slate-600 mb-0.5">Fixed Rate ($/Unit)</label>
-                                    <input type="number" v-model.number="form.downpaymentFixedPerUnit" min="500" max="1500" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Freight Packaging Surcharge ($)</label>
-                            <input type="number" v-model.number="form.freightInput" :disabled="form.shippingMethod === 'Self-pickup'" min="0" step="0.01" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Sales Tax Rate (%)</label>
-                            <input type="number" v-model.number="form.taxRate" min="0" step="0.01" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5">
+                            <input type="number" v-model.number="form.taxRate" min="0" step="0.01" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-bold">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Financing Parameters -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">⚖️ 5. Financing Parameters</h3>
+                    <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+                        <div>
+                            <label class="block text-slate-700 font-semibold mb-1">Downpayment Option Preset</label>
+                            <select v-model="form.downpaymentOption" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-bold text-slate-800">
+                                <option value="50%">50% Downpayment</option>
+                                <option value="30%">30% Downpayment</option>
+                                <option value="1500_unit">$1,500 / Unit</option>
+                                <option value="0%">0 Downpayment (100% Financed)</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Financing Months (Terms)</label>
+                                <input type="number" v-model.number="form.financingMonths" min="1" max="60" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-bold text-slate-800">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Setup Fee ($)</label>
+                                <input type="number" v-model.number="form.financingSetupFee" min="0" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 font-mono font-bold">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -293,75 +286,64 @@
                     <div class="w-full flex-none">
                         <div class="flex justify-between items-start border-b-2 border-slate-900 pb-1">
                             <div>
-                                <h2 class="text-base font-black tracking-tight text-slate-900">STRUCTURED FINANCING PURCHASE ORDER</h2>
-                                <p class="text-[11px] font-extrabold text-slate-900 mt-0.5">Haha Vending Corporate Holding</p>
+                                <h2 class="text-base font-black tracking-tight text-slate-900">Installment Purchase Order</h2>
+                                <p class="text-[11px] font-extrabold text-slate-900 mt-0.5">HAHASMART Vending</p>
                                 <p class="text-[8.5px] text-gray-500 tracking-wide font-medium">1754 North Brown Rd suite 200, Lawrenceville, GA 30043</p>
                             </div>
                             <div class="text-right text-[9.5px] space-y-0.5 text-gray-600 pt-1">
-                                <p><strong class="text-slate-900 uppercase font-bold text-[8px] tracking-wider block">Financing PO ID:</strong> <span class="font-mono text-[11px] font-bold text-slate-900">{{ form.poNumber }}</span></p>
+                                <p><strong class="text-slate-900 uppercase font-bold text-[8px] tracking-wider block">PO ID:</strong> <span class="font-mono text-[11px] font-bold text-slate-900">{{ form.poNumber }}</span></p>
                                 <p v-if="form.clientPoNumber"><strong class="text-slate-900 uppercase font-bold text-[8px] tracking-wider block mt-0.5">Client Ref PO #:</strong> <span class="font-mono text-[11px] font-bold text-slate-900">{{ form.clientPoNumber }}</span></p>
-                                <p class="pt-0.5"><strong class="text-slate-900 font-semibold">Contract Date:</strong> {{ form.date || '------' }}</p>
+                                <p class="pt-0.5"><strong class="text-slate-900 font-semibold">Date:</strong> {{ form.date || '------' }}</p>
                             </div>
                         </div>
 
-                        <!-- CREDITOR & DEBTOR MATRIX -->
-                        <div class="grid grid-cols-2 gap-4 my-1.5 text-[9.5px]">
+                        <!-- BILLING TO & SHIPPING TO MATRIX -->
+                        <div class="grid grid-cols-2 gap-4 my-2 text-[9.5px]">
                             <div class="bg-slate-50 p-2 rounded border border-slate-200 flex flex-col justify-between">
                                 <div>
-                                    <h4 class="font-bold text-slate-900 uppercase tracking-wider text-[8px] mb-0.5">Seller / Issuing Creditor Framework:</h4>
-                                    <p class="font-black text-slate-900 mb-0.5">Haha Vending Corporate Holding</p>
-                                    <p class="text-gray-500 text-[8.5px]">Account Executive: {{ currentUser.name }}</p>
-                                    <p class="text-gray-500 text-[8.5px]">Email: {{ currentUser.email }}</p>
-                                </div>
-                            </div>
-                            <div class="bg-slate-50 p-2 rounded border border-slate-200 flex flex-col justify-between">
-                                <div>
-                                    <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[8px] mb-0.5">Buyer / Customer Profile:</h4>
-                                    <p class="font-bold text-slate-900 mb-0.5">{{ form.customerCompany || '[No Customer Selected]' }}</p>
+                                    <h4 class="font-bold text-slate-900 uppercase tracking-wider text-[8px] mb-0.5">Billing To:</h4>
+                                    <p class="font-bold text-slate-900 mb-0.5">{{ form.customerCompany || '[No Billing Info]' }}</p>
                                     <p v-if="form.customerContactName" class="text-slate-800 font-medium">Attn: {{ form.customerContactName }}</p>
                                     <p class="text-gray-500 text-[8.5px] font-mono">Mail: {{ form.customerEmail || '--' }} | Tel: {{ form.customerPhone || '--' }}</p>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- DELIVERY MATRIX ENDPOINT -->
-                        <div class="bg-slate-50 p-2 rounded border border-slate-200 text-[9.5px] mb-2">
-                            <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[8px] mb-0.5">Fulfillment Strategies & Endpoint Location:</h4>
-                            <div v-if="form.shippingMethod === 'Self-pickup'">
-                                <p class="text-[8.5px] text-slate-900 font-bold uppercase">[Self-Pickup Center Depot Facility]</p>
-                                <p class="text-gray-700 font-medium">{{ form.pickupWarehouseText }}</p>
-                            </div>
-                            <div v-else>
-                                <p class="text-[8.5px] text-slate-900 font-bold uppercase">[Direct Logistics Fleet Dispatch Address]</p>
-                                <p v-if="form.shippingContactName" class="font-bold text-slate-900">Contact: {{ form.shippingContactName }} <span class="font-normal font-mono" v-if="form.shippingPhone">(Tel: {{ form.shippingPhone }})</span></p>
-                                <p class="text-gray-700 text-[8.5px] whitespace-pre-line leading-tight">{{ form.shippingAddress || 'No shipping location entered.' }}</p>
+                            <div class="bg-slate-50 p-2 rounded border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[8px] mb-0.5">Shipping To:</h4>
+                                    <div v-if="form.shippingMethod === 'Self-pickup'">
+                                        <p class="text-[8.5px] text-slate-900 font-bold uppercase">[Self-Pickup]</p>
+                                        <p class="text-gray-700 font-medium">{{ form.pickupWarehouseText }}</p>
+                                    </div>
+                                    <div v-else>
+                                        <p v-if="form.shippingContactName" class="font-bold text-slate-900">Attn: {{ form.shippingContactName }} <span class="font-normal font-mono" v-if="form.shippingPhone">(Tel: {{ form.shippingPhone }})</span></p>
+                                        <p class="text-gray-700 text-[8.5px] whitespace-pre-line leading-tight">{{ form.shippingAddress || 'No shipping address provided.' }}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Strategy Banner -->
                         <div class="text-[9px] bg-slate-100 text-slate-900 px-2 py-1 rounded flex justify-between font-bold border border-slate-200 mb-2">
                             <span>Fulfillment Routine: {{ form.shippingMethod }}</span>
-                            <span>Financing Terms: {{ form.financingMonths }} Months Deferred Structure (0% Interest)</span>
+                            <span>Financing Terms: {{ form.financingMonths }} Months Deferred Structure</span>
                         </div>
 
                         <!-- Products Breakdown Table -->
                         <table class="w-full text-left border-collapse my-1 text-[9.5px]">
                             <thead>
                             <tr class="border-b border-slate-900 text-slate-500 font-bold uppercase tracking-wider text-[8px]">
-                                <th class="py-0.5">Structured Product Item SKU</th>
-                                <th class="py-0.5 text-center w-12">Qty</th>
-                                <th class="py-0.5 text-right w-20">Unit Price</th>
-                                <th class="py-0.5 text-right w-20">Unit Disc</th>
-                                <th class="py-0.5 text-right w-24">Extended Cost</th>
+                                <th class="py-0.5">Product SKU</th>
+                                <th class="py-0.5 text-center w-16">Qty</th>
+                                <th class="py-0.5 text-right w-24">Unit Price</th>
+                                <th class="py-0.5 text-right w-28">Extended Price</th>
                             </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
                             <tr v-for="(item, index) in form.items" :key="index" class="text-gray-700">
-                                <td class="py-1 font-semibold text-slate-900">{{ item.modelKey || 'Awaiting Product Line...' }}</td>
+                                <td class="py-1 font-semibold text-slate-900">{{ item.modelKey || 'Awaiting Product Selection...' }}</td>
                                 <td class="py-1 text-center font-bold text-slate-900">{{ item.qty }}</td>
                                 <td class="py-1 text-right text-gray-600">${{ formatMoney(item.price) }}</td>
-                                <td class="py-1 text-right text-gray-500">-${{ formatMoney(item.unitDiscount || 0) }}</td>
-                                <td class="py-1 text-right font-bold text-slate-900">${{ formatMoney(item.qty * (item.price - (item.unitDiscount || 0))) }}</td>
+                                <td class="py-1 text-right font-bold text-slate-900">${{ formatMoney(item.qty * item.price) }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -372,60 +354,56 @@
                         <div class="flex justify-end text-[9.5px] pt-1">
                             <div class="w-72 space-y-0.5 border-t-2 border-slate-900 pt-1">
                                 <div class="flex justify-between text-gray-500 font-medium">
-                                    <span>Product Fleet Base Valuation:</span>
+                                    <span>Product Subtotal:</span>
                                     <span class="font-semibold text-slate-900">${{ formatMoney(rawSubTotal) }}</span>
                                 </div>
-                                <div v-if="totalItemDiscounts > 0" class="flex justify-between text-slate-600 font-medium">
-                                    <span>Item-Level Discounts:</span>
-                                    <span>-${{ formatMoney(totalItemDiscounts) }}</span>
-                                </div>
                                 <div v-if="computedOrderDiscount > 0" class="flex justify-between text-slate-600 font-medium">
-                                    <span>Order-Level Discount:</span>
+                                    <span>Order Discount:</span>
                                     <span>-${{ formatMoney(computedOrderDiscount) }}</span>
                                 </div>
                                 <div class="flex justify-between text-slate-700 font-bold border-t border-slate-200 pt-0.5">
-                                    <span>Net Product Valuation:</span>
+                                    <span>Net Subtotal:</span>
                                     <span>${{ formatMoney(grossSubTotal) }}</span>
                                 </div>
                                 <div class="flex justify-between text-gray-500 font-medium">
-                                    <span>Logistics & Freight Packing Base:</span>
+                                    <span>Freight Shipping:</span>
                                     <span>+${{ formatMoney(computedFreight) }}</span>
                                 </div>
                                 <div class="flex justify-between text-gray-500 font-medium">
-                                    <span>Consolidated Sales Tax ({{ form.taxRate }}%):</span>
+                                    <span>Sales Tax ({{ form.taxRate }}%):</span>
                                     <span>+${{ formatMoney(computedTax) }}</span>
                                 </div>
-                                <div class="flex justify-between text-slate-800 font-bold bg-slate-100 px-1 py-0.5 rounded text-[9px]">
-                                    <span>Administrative / Financing Setup Fee:</span>
+                                <div v-if="form.financingSetupFee > 0" class="flex justify-between text-slate-800 font-bold bg-slate-100 px-1 py-0.5 rounded text-[9px]">
+                                    <span>Financing Setup Fee:</span>
                                     <span>+${{ formatMoney(form.financingSetupFee) }}</span>
                                 </div>
                                 <div class="flex justify-between text-slate-900 font-black border-t border-gray-200 pt-0.5 text-[10px]">
-                                    <span>Gross Structural Contract Valuation (GCV):</span>
+                                    <span>Total Contract Value:</span>
                                     <span>${{ formatMoney(totalContractValue) }}</span>
                                 </div>
                                 <div class="flex justify-between text-slate-900 bg-slate-100 font-bold px-1 py-1 rounded text-[10px] border border-slate-200">
-                                    <span>Initial Downpayment Due Immediately:</span>
+                                    <span>Downpayment Due:</span>
                                     <span>${{ formatMoney(totalDownpaymentDue) }}</span>
                                 </div>
                                 <div class="flex justify-between text-slate-800 font-black border-b border-gray-200 pb-0.5 text-[10px]">
-                                    <span>Total Financed Deferred Portfolio Balance:</span>
+                                    <span>Total Financed Balance:</span>
                                     <span>${{ formatMoney(totalFinancedBalance) }}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Policy Lockout Terms Clause -->
+                        <!-- Policy Terms Clause -->
                         <div class="mt-4 border-t border-slate-200 pt-1.5 text-[7px] text-slate-400 leading-normal">
-                            <p class="font-bold text-slate-500 uppercase tracking-wider mb-0.5">Structured Portfolio Financing Terms & Warranties:</p>
-                            <p>This document constitutes a formal rider to the master business structure between the parties. The Financed Balance outlined here will be parsed into consecutive installment cycles detailed on Annex B (Page 2). Failure to settle obligations within established windows triggers automated cellular lockout mechanisms on all distributed node systems.</p>
+                            <p class="font-bold text-slate-500 uppercase tracking-wider mb-0.5">Terms & Conditions:</p>
+                            <p>This document constitutes a formal rider to the master business structure between the parties. The Financed Balance outlined here will be parsed into consecutive installment cycles detailed on Annex B (Page 2).</p>
                         </div>
                         <div class="grid grid-cols-2 gap-8 mt-4 text-[9px]">
                             <div class="border-t border-slate-400 pt-1">
-                                <p class="font-bold text-slate-800">Haha Vending Corporate Authorization</p>
+                                <p class="font-bold text-slate-800">HAHASMART Vending Authorization</p>
                                 <p class="text-[8px] font-medium text-slate-500 mt-2">Executive Agent: {{ currentUser.name }}</p>
                             </div>
                             <div class="border-t border-slate-400 pt-1">
-                                <p class="font-bold text-slate-800">Buyer Account Bound Obligor Acceptance</p>
+                                <p class="font-bold text-slate-800">Customer Acceptance</p>
                                 <p class="text-[8px] text-slate-500 mt-2">Authorized Officer Signature Date: ____ / ____ / ________</p>
                             </div>
                         </div>
@@ -435,32 +413,32 @@
                 <!-- ==================== PAGE 2: DETAILED FINANCING MATRIX AGENDA ==================== -->
                 <div class="bg-white shadow-lg text-slate-900 border border-slate-200 a4-print-sheet print-page-break mx-auto">
                     <div class="w-full flex-none border-b-2 border-slate-900 pb-1">
-                        <h3 class="text-sm font-black tracking-tight text-slate-900">ANNEX B: ITEMIZED REPAYMENT RUN MATRIX</h3>
-                        <p class="text-[9px] text-gray-500">Core Financial Rider Reference tied to Financing PO ID: <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span></p>
+                        <h3 class="text-sm font-black tracking-tight text-slate-900">ANNEX B: ITEMIZED REPAYMENT SCHEDULE</h3>
+                        <p class="text-[9px] text-gray-500">Core Financial Rider Reference tied to PO ID: <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span></p>
                     </div>
                     <div class="mt-3 text-[9.5px] text-gray-700 flex-grow space-y-4">
-                        <p class="leading-relaxed font-medium">Upon verified processing of the Initial Downpayment Invoice (<span class="font-bold text-slate-900">${{ formatMoney(totalDownpaymentDue) }}</span>), the outstanding Financed Balance (<span class="font-bold text-slate-900">${{ formatMoney(totalFinancedBalance) }}</span>) is structured into <span class="font-bold text-slate-900">{{ form.financingMonths }}</span> periodic billing cycles:</p>
+                        <p class="leading-relaxed font-medium">Upon verified processing of the Downpayment Invoice (<span class="font-bold text-slate-900">${{ formatMoney(totalDownpaymentDue) }}</span>), the outstanding Financed Balance (<span class="font-bold text-slate-900">${{ formatMoney(totalFinancedBalance) }}</span>) is structured into <span class="font-bold text-slate-900">{{ form.financingMonths }}</span> periodic billing cycles:</p>
 
                         <table class="w-full text-left border-collapse text-[9.5px]">
                             <thead>
                             <tr class="border-b-2 border-slate-800 text-slate-500 font-bold uppercase tracking-wider text-[7.5px]">
-                                <th class="py-1 w-24">Cycle Interval</th>
-                                <th class="py-1 w-36">Target Maturity Date</th>
-                                <th class="py-1">Operational Portfolio Standing Guidance</th>
-                                <th class="py-1 text-right w-28">Installment Due</th>
+                                <th class="py-1 w-24">Cycle</th>
+                                <th class="py-1 w-36">Due Date</th>
+                                <th class="py-1">Description</th>
+                                <th class="py-1 text-right w-28">Amount Due</th>
                             </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 font-medium">
                             <tr class="bg-slate-100 text-slate-900">
                                 <td class="py-1.5 px-1 font-bold">Downpayment</td>
-                                <td class="py-1.5 px-1 font-mono font-bold">{{ form.date || 'TBD (Contract Execution Date)' }}</td>
-                                <td class="py-1.5 px-1 italic">Immediate clearance mandatory (Includes Tax, Logistics Freight & Administrative Setup Fees)</td>
+                                <td class="py-1.5 px-1 font-mono font-bold">{{ form.date || 'TBD' }}</td>
+                                <td class="py-1.5 px-1 italic">Immediate clearance required</td>
                                 <td class="py-1.5 px-1 text-right font-mono font-bold">${{ formatMoney(totalDownpaymentDue) }}</td>
                             </tr>
                             <tr v-for="schedule in computedSchedules" :key="schedule.term" class="text-slate-700 hover:bg-slate-50">
                                 <td class="py-1.5 px-1 font-semibold text-slate-900">Installment {{ schedule.term }}</td>
                                 <td class="py-1.5 px-1 font-mono text-gray-600">{{ schedule.dueDate }}</td>
-                                <td class="py-1.5 px-1 text-gray-500">Product base capital distribution payment module cycle. (0% Interest Rate)</td>
+                                <td class="py-1.5 px-1 text-gray-500">Scheduled Installment Payment</td>
                                 <td class="py-1.5 px-1 text-right font-mono font-bold text-slate-900">${{ formatMoney(schedule.amount) }}</td>
                             </tr>
                             </tbody>
@@ -472,40 +450,74 @@
                 <div class="bg-white shadow-lg text-slate-900 border border-slate-200 a4-print-sheet mx-auto">
                     <div class="w-full flex-none border-b-2 border-slate-900 pb-1">
                         <h3 class="text-sm font-black tracking-tight text-slate-900">ANNEX C: COMPANY'S BANK INFORMATION</h3>
-                        <p class="text-[9px] text-gray-500">Official Payment Instructions tied to Financing PO ID: <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span></p>
+                        <p class="text-[9px] text-gray-500">Official Payment Instructions tied to PO ID: <span class="font-mono font-bold text-slate-900">{{ form.poNumber }}</span></p>
                     </div>
 
-                    <div class="mt-6 text-[10px] space-y-6 flex-grow">
-                        <!-- ZELLE PAYMENT METHOD -->
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-2 mb-3">1. Zelle Transfer Details</h4>
-                            <div class="grid grid-cols-2 gap-4">
+                    <div class="mt-4 text-[9.5px] space-y-4 flex-grow">
+                        <!-- 1. ZELLE -->
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-1 mb-2">1. Zelle Transfer Details</h4>
+                            <div class="grid grid-cols-3 gap-2">
                                 <div>
-                                    <span class="text-slate-500 block text-[9px] uppercase font-semibold">Beneficiary Name</span>
-                                    <span class="font-extrabold text-slate-900 text-[11px]">HAHASMART INNOVATION INC</span>
+                                    <span class="text-slate-500 block text-[8.5px] uppercase font-semibold">Tel</span>
+                                    <span class="font-mono font-bold text-slate-900 text-[10px]">213-781-4659</span>
                                 </div>
                                 <div>
-                                    <span class="text-slate-500 block text-[9px] uppercase font-semibold">Registered Phone</span>
-                                    <span class="font-mono font-bold text-slate-900 text-[11px]">213-781-4659</span>
+                                    <span class="text-slate-500 block text-[8.5px] uppercase font-semibold">Beneficiary Name</span>
+                                    <span class="font-extrabold text-slate-900 text-[10px]">HAHASMART INNOVATION INC</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500 block text-[8.5px] uppercase font-semibold">Email</span>
+                                    <span class="font-mono font-bold text-slate-900 text-[10px]">faray@hahabianli.com</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- ACH / WIRE PAYMENT METHOD -->
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-2 mb-3">2. Direct Remittance / Email Inquiry</h4>
-                            <div class="space-y-2">
-                                <div>
-                                    <span class="text-slate-500 block text-[9px] uppercase font-semibold">Billing Contact Email</span>
-                                    <span class="font-mono font-bold text-slate-900 text-[11px]">faray@hahabianli.com</span>
+                        <!-- 2. BANK NAME HEADER -->
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-1 mb-1">2. Bank Wire / ACH Details</h4>
+
+                            <!-- (1) Bank of America -->
+                            <div class="border-b border-slate-200 pb-2">
+                                <h5 class="font-bold text-slate-900 text-[10px] mb-1">（1）Bank of America</h5>
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px]">
+                                    <div><span class="text-gray-500">Beneficiary Name:</span> <strong class="text-slate-900">HAHASMART INNOVATION INC</strong></div>
+                                    <div><span class="text-gray-500">Beneficiary Account Number:</span> <strong class="font-mono text-slate-900">325217415040</strong></div>
+                                    <div><span class="text-gray-500">Bank Routing Number (domestic wires):</span> <strong class="font-mono text-slate-900">026009593</strong></div>
+                                    <div><span class="text-gray-500">Swift Code (International Wire):</span> <strong class="font-mono text-slate-900">BOFAUS3N</strong></div>
+                                    <div class="col-span-2"><span class="text-gray-500">Bank Address:</span> <span class="text-slate-800">Bank of America, NA, 222 Broadway, New York, New York 10038</span></div>
                                 </div>
-                                <p class="text-gray-500 text-[8.5px] pt-2">Please issue payment confirmation / remittance advice receipts to the billing email above with reference to PO ID: <strong>{{ form.poNumber }}</strong>.</p>
+                            </div>
+
+                            <!-- (2) Chase Bank -->
+                            <div class="border-b border-slate-200 pb-2">
+                                <h5 class="font-bold text-slate-900 text-[10px] mb-1">（2）Chase Bank</h5>
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px]">
+                                    <div><span class="text-gray-500">Beneficiary Name:</span> <strong class="text-slate-900">HAHASMART INNOVATION INC</strong></div>
+                                    <div><span class="text-gray-500">Beneficiary Account Number:</span> <strong class="font-mono text-slate-900">2908910509</strong></div>
+                                    <div><span class="text-gray-500">Bank Routing Number (domestic wires):</span> <strong class="font-mono text-slate-900">061092387</strong></div>
+                                    <div><span class="text-gray-500">Swift Code (International Wire):</span> <strong class="font-mono text-slate-900">CHASUS33</strong></div>
+                                    <div class="col-span-2"><span class="text-gray-500">Bank Address:</span> <span class="text-slate-800">270 Park Avenue, New York, NY 10017, USA</span></div>
+                                </div>
+                            </div>
+
+                            <!-- (3) East West Bank -->
+                            <div>
+                                <h5 class="font-bold text-slate-900 text-[10px] mb-1">（3）East West Bank</h5>
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px]">
+                                    <div><span class="text-gray-500">Beneficiary Name:</span> <strong class="text-slate-900">HAHASMART INNOVATION INC</strong></div>
+                                    <div><span class="text-gray-500">Beneficiary Account Number:</span> <strong class="font-mono text-slate-900">8618037736</strong></div>
+                                    <div><span class="text-gray-500">Bank Routing Number (domestic wires):</span> <strong class="font-mono text-slate-900">322070381</strong></div>
+                                    <div><span class="text-gray-500">Swift Code (international wires):</span> <strong class="font-mono text-slate-900">EWBKUS66XXX</strong></div>
+                                    <div><span class="text-gray-500">Receiving Bank Name:</span> <span class="text-slate-800">East West Bank</span></div>
+                                    <div><span class="text-gray-500">Receiving Bank Address:</span> <span class="text-slate-800">135 N. Los Robles Avenue Pasadena, CA 91101</span></div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="print-footer-anchor w-full border-t border-slate-200 pt-3 text-[8px] text-gray-400 text-center">
-                        Haha Vending Corporate Holding • 1754 North Brown Rd suite 200, Lawrenceville, GA 30043
+                        HAHASMART Vending • 1754 North Brown Rd suite 200, Lawrenceville, GA 30043
                     </div>
                 </div>
             </div>
@@ -573,22 +585,21 @@
                 customerPhone: '',
                 date: new Date().toISOString().split('T')[0],
                 shippingMethod: 'Logistics Shipping',
-                pickupWarehouseText: 'Haha Logistics Depot Core Hub - 1754 North Brown Rd, Lawrenceville, GA 30043',
+                pickupWarehouseText: 'HAHASMART Depot Hub - 1754 North Brown Rd, Lawrenceville, GA 30043',
                 shippingContactName: '',
                 shippingPhone: '',
                 shippingAddress: '',
                 items: [
-                    { modelKey: '', qty: 1, price: 0, unitDiscount: 0 }
+                    { modelKey: '', qty: 1, price: 0 }
                 ],
                 orderDiscountType: 'flat', // 'flat' or 'percent'
                 orderDiscountValue: 0,
-                financingMonths: 3,
-                financingSetupFee: 50,
-                downpaymentMode: 'percentage',
-                downpaymentPercent: 50,
-                downpaymentFixedPerUnit: 1200,
+                freightMode: 'total', // 'per_unit' or 'total'
                 freightInput: 350,
-                taxRate: 7.00
+                taxRate: 7.00,
+                downpaymentOption: '50%', // '50%', '30%', '1500_unit', '0%'
+                financingMonths: 3,
+                financingSetupFee: 0
             });
 
             const handleRegister = () => {
@@ -609,18 +620,16 @@
 
             // GRID LINE MANAGEMENT
             const addItem = () => {
-                form.value.items.push({ modelKey: '', qty: 1, price: 0, unitDiscount: 0 });
+                form.value.items.push({ modelKey: '', qty: 1, price: 0 });
             };
 
             const removeItem = (idx) => {
                 form.value.items.splice(idx, 1);
-                syncFinancingTiers();
             };
 
             const onModelChange = (idx) => {
                 const key = form.value.items[idx].modelKey;
                 form.value.items[idx].price = productCatalog[key] || 0;
-                syncFinancingTiers();
             };
 
             // TOTAL PRODUCT QUANTITY
@@ -628,78 +637,31 @@
                 return form.value.items.reduce((acc, curr) => acc + (Number(curr.qty) || 0), 0);
             });
 
-            // FINANCING POLICY ENGINE AUTOMATED ALIGNMENT
-            const currentTierIndex = computed(() => {
-                const qty = totalHardwareQty.value;
-                if (qty >= 10) return 4;
-                if (qty >= 5) return 3;
-                if (qty >= 2) return 2;
-                return 1;
-            });
-
-            const validMonthsOptions = computed(() => {
-                const tier = currentTierIndex.value;
-                if (tier === 4) return [18, 24];
-                if (tier === 3) return [12];
-                if (tier === 2) return [6];
-                return [3];
-            });
-
-            const syncFinancingTiers = () => {
-                const tier = currentTierIndex.value;
-                if (tier === 1) {
-                    form.value.financingMonths = 3;
-                    form.value.downpaymentMode = 'percentage';
-                    form.value.downpaymentPercent = 50;
-                    form.value.financingSetupFee = 50;
-                } else if (tier === 2) {
-                    form.value.financingMonths = 6;
-                    form.value.downpaymentMode = 'percentage';
-                    form.value.downpaymentPercent = 30;
-                    form.value.financingSetupFee = 100;
-                } else if (tier === 3) {
-                    form.value.financingMonths = 12;
-                    form.value.downpaymentMode = 'fixed_per_unit';
-                    form.value.downpaymentFixedPerUnit = 1200;
-                    form.value.financingSetupFee = 200;
-                } else if (tier === 4) {
-                    form.value.financingMonths = 18;
-                    form.value.downpaymentMode = 'fixed_per_unit';
-                    form.value.downpaymentFixedPerUnit = 800;
-                    form.value.financingSetupFee = 0;
-                }
-            };
-
             // COMPUTED DISCOUNT & ACCOUNTING COMPUTATIONS
             const rawSubTotal = computed(() => {
                 return form.value.items.reduce((acc, curr) => acc + ((Number(curr.qty) || 0) * (Number(curr.price) || 0)), 0);
             });
 
-            const totalItemDiscounts = computed(() => {
-                return form.value.items.reduce((acc, curr) => acc + ((Number(curr.qty) || 0) * (Number(curr.unitDiscount) || 0)), 0);
-            });
-
-            const subTotalAfterItemDiscounts = computed(() => {
-                const net = rawSubTotal.value - totalItemDiscounts.value;
-                return net < 0 ? 0 : net;
-            });
-
             const computedOrderDiscount = computed(() => {
                 const val = Number(form.value.orderDiscountValue) || 0;
                 if (form.value.orderDiscountType === 'percent') {
-                    return subTotalAfterItemDiscounts.value * (val / 100);
+                    return rawSubTotal.value * (val / 100);
                 }
-                return val > subTotalAfterItemDiscounts.value ? subTotalAfterItemDiscounts.value : val;
+                return val > rawSubTotal.value ? rawSubTotal.value : val;
             });
 
             const grossSubTotal = computed(() => {
-                const val = subTotalAfterItemDiscounts.value - computedOrderDiscount.value;
+                const val = rawSubTotal.value - computedOrderDiscount.value;
                 return val < 0 ? 0 : val;
             });
 
             const computedFreight = computed(() => {
                 if (form.value.shippingMethod === 'Self-pickup') return 0;
-                return Number(form.value.freightInput) || 0;
+                const val = Number(form.value.freightInput) || 0;
+                if (form.value.freightMode === 'per_unit') {
+                    return val * totalHardwareQty.value;
+                }
+                return val;
             });
 
             const computedTax = computed(() => {
@@ -712,14 +674,22 @@
             });
 
             const totalDownpaymentDue = computed(() => {
-                let downpaymentHardwareBase = 0;
-                if (form.value.downpaymentMode === 'percentage') {
-                    downpaymentHardwareBase = grossSubTotal.value * ((Number(form.value.downpaymentPercent) || 0) / 100);
-                } else {
-                    downpaymentHardwareBase = totalHardwareQty.value * (Number(form.value.downpaymentFixedPerUnit) || 0);
+                const opt = form.value.downpaymentOption;
+                const freight = computedFreight.value;
+                const tax = computedTax.value;
+                const setupFee = Number(form.value.financingSetupFee) || 0;
+
+                let val = 0;
+                if (opt === '50%') {
+                    val = grossSubTotal.value * 0.50 + freight + tax + setupFee;
+                } else if (opt === '30%') {
+                    val = grossSubTotal.value * 0.30 + freight + tax + setupFee;
+                } else if (opt === '1500_unit') {
+                    val = (1500 * totalHardwareQty.value) + freight + tax + setupFee;
+                } else if (opt === '0%') {
+                    val = 0;
                 }
-                const value = downpaymentHardwareBase + computedFreight.value + computedTax.value + (Number(form.value.financingSetupFee) || 0);
-                return value > totalContractValue.value ? totalContractValue.value : value;
+                return val > totalContractValue.value ? totalContractValue.value : val;
             });
 
             const totalFinancedBalance = computed(() => {
@@ -728,10 +698,14 @@
             });
 
             const computedSchedules = computed(() => {
-                const months = form.value.financingMonths || 3;
+                const months = form.value.financingMonths || 1;
                 const bal = totalFinancedBalance.value;
-                const installmentAmount = bal / months;
                 
+                // 保留2位小数，计算基准单期金额与尾差补到最后一期
+                const baseInstallment = Math.floor((bal / months) * 100) / 100;
+                const totalBase = Math.round(baseInstallment * months * 100) / 100;
+                const remainder = Math.round((bal - totalBase) * 100) / 100;
+
                 const list = [];
                 const baseDate = form.value.date ? new Date(form.value.date) : new Date();
 
@@ -739,10 +713,15 @@
                     const nextDate = new Date(baseDate);
                     nextDate.setMonth(baseDate.getMonth() + i);
                     
+                    let currentAmount = baseInstallment;
+                    if (i === months) {
+                        currentAmount = Math.round((baseInstallment + remainder) * 100) / 100;
+                    }
+
                     list.push({
                         term: i,
                         dueDate: nextDate.toISOString().split('T')[0],
-                        amount: installmentAmount
+                        amount: currentAmount
                     });
                 }
                 return list;
@@ -754,10 +733,9 @@
 
             return {
                 isLoggedIn, authForm, currentUser, handleRegister, handleLogout,
-                productCatalog, form, addItem, removeItem, onModelChange, totalHardwareQty, currentTierIndex,
-                validMonthsOptions, syncFinancingTiers, rawSubTotal, totalItemDiscounts, computedOrderDiscount,
-                grossSubTotal, computedFreight, computedTax, totalContractValue, totalDownpaymentDue, 
-                totalFinancedBalance, computedSchedules, formatMoney
+                productCatalog, form, addItem, removeItem, onModelChange, totalHardwareQty,
+                rawSubTotal, computedOrderDiscount, grossSubTotal, computedFreight, computedTax, 
+                totalContractValue, totalDownpaymentDue, totalFinancedBalance, computedSchedules, formatMoney
             };
         }
     }).mount('#app');
