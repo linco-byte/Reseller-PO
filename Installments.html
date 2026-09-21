@@ -527,7 +527,7 @@
 </div>
 
 <script>
-    const { createApp, ref, computed } = Vue;
+    const { createApp, ref, computed, watch } = Vue;
 
     createApp({
         setup() {
@@ -559,15 +559,15 @@
                 "Max 660": 4999
             };
 
-            // SYNCED STORAGE SYSTEM MEMORY FOR PROFILE
-            const savedProfile = localStorage.getItem('financing_user_profile');
+            // SYNCED STORAGE SYSTEM MEMORY FOR PROFILE (Key 改为 installments_user_profile)
+            const savedProfile = localStorage.getItem('installments_user_profile');
             if (savedProfile) {
                 try {
                     const parsed = JSON.parse(savedProfile);
                     currentUser.value = parsed;
                     isLoggedIn.value = true;
                 } catch(e) {
-                    localStorage.removeItem('financing_user_profile');
+                    localStorage.removeItem('installments_user_profile');
                 }
             }
 
@@ -603,18 +603,33 @@
                 financingSetupFee: 0
             });
 
+            // 读取已保存的表单数据（如果有）
+            const savedForm = localStorage.getItem('installments_form_data');
+            if (savedForm) {
+                try {
+                    form.value = { ...form.value, ...JSON.parse(savedForm) };
+                } catch(e) {
+                    localStorage.removeItem('installments_form_data');
+                }
+            }
+
+            // 自动深度监听表单变动并持久化写入 LocalStorage
+            watch(form, (newVal) => {
+                localStorage.setItem('installments_form_data', JSON.stringify(newVal));
+            }, { deep: true });
+
             const handleRegister = () => {
                 currentUser.value = {
                     name: authForm.value.name,
                     email: authForm.value.email,
                     phone: authForm.value.phone
                 };
-                localStorage.setItem('financing_user_profile', JSON.stringify(currentUser.value));
+                localStorage.setItem('installments_user_profile', JSON.stringify(currentUser.value));
                 isLoggedIn.value = true;
             };
 
             const handleLogout = () => {
-                localStorage.removeItem('financing_user_profile');
+                localStorage.removeItem('installments_user_profile');
                 isLoggedIn.value = false;
                 authForm.value = { name: '', email: '', phone: '' };
             };
