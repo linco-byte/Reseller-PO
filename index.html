@@ -520,7 +520,7 @@
                                         <tr class="border-t border-slate-300 font-bold bg-slate-100/50">
                                             <td class="py-0.5 text-slate-900">Total Scheduled Payment</td>
                                             <td class="py-0.5 text-center text-slate-400">--</td>
-                                            <td class="py-0.5 text-right font-mono text-blue-900">${{ formatMoney(computedTotalAmount) }}</td>
+                                            <td class="py-0.5 text-right font-mono text-blue-900">${{ formatMoney(computedTotalScheduledPayment) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -782,6 +782,7 @@
                             amount: actualDownPayment
                         });
 
+                        // 剩余分期计算逻辑：剩余分期金额 = 应付总额(Grand Total) - 实际首付金额
                         const remainingAmount = totalAmount - actualDownPayment;
                         const remainingPhases = termsCount - 1;
                         
@@ -828,13 +829,6 @@
                             } else {
                                 totalD += val;
                             }
-                        } else if (d.scope === 'down_payment') {
-                            const baseDownPayment = parseFloat(this.form.downPayment) || 0;
-                            if (d.type === 'percent') {
-                                totalD += baseDownPayment * (val / 100);
-                            } else {
-                                totalD += val;
-                            }
                         } else if (d.scope === 'unit' && d.targetModel) {
                             const matchedItems = this.form.items.filter(i => i.modelKey === d.targetModel);
                             matchedItems.forEach(item => {
@@ -859,9 +853,13 @@
                     return val;
                 },
                 computedTotalAmount() {
+                    // Grand Total: 仅按整单折扣与单品折扣扣减设备总价，加上运费与税费
                     const balance = this.computedSubtotal - this.computedTotalDiscount + this.computedFreight;
                     const tax = Math.max(0, balance) * ((parseFloat(this.form.taxRate) || 0) / 100);
                     return Math.max(0, balance + tax);
+                },
+                computedTotalScheduledPayment() {
+                    return this.computedPaymentSchedule.reduce((acc, phase) => acc + (parseFloat(phase.amount) || 0), 0);
                 }
             },
             created() {
