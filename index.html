@@ -656,19 +656,21 @@
     <script>
         const { createApp } = Vue;
 
-        createApp({
-            data() {
-                return {
-                    smartInputText: '',
-                    resellersCatalog: [
-                        "Twelve 28 vending", "Vend Guys Local", "PBS vending", 
-                        "Ai Vend Solution", "Genius Vend", "Mod Brands", 
-                        "NC vending LLC", "vendx", "The vending center", 
-                        "Vital Vending Sales LLC", "The Venders", "VP-Modern-Amenities LLC", 
-                        "Vend Guys Internet", "Nayax", "Century vending",  "Pay Grab And Go. LLC",
-                        "SPG Vending Solutions", "Culinary Ventures Vending", "VE solution", "Vending machine outlet"
-                       
-                    ],
+       createApp({
+        data() {
+            return {
+                smartInputText: '',
+                // 当前选中的经销商
+                selectedReseller: '',
+                // 经销商目录列表
+                resellersCatalog: [
+                    "Twelve 28 vending", "Vend Guys Local", "PBS vending", 
+                    "Ai Vend Solution", "Genius Vend", "Mod Brands", 
+                    "NC vending LLC", "vendx", "The vending center", 
+                    "Vital Vending Sales LLC", "The Venders", "VP-Modern-Amenities LLC", 
+                    "Vend Guys Internet", "Nayax", "Century vending",  "Pay Grab And Go. LLC",
+                    "SPG Vending Solutions", "Culinary Ventures Vending", "VE solution", "Vending machine outlet"
+                ],
                     productCatalog: {
                         "Mini 360": 2400.00,
                         "Plus 440": 2600.00,
