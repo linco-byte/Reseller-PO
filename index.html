@@ -359,8 +359,9 @@
                                 <div>
                                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Target Scope</label>
                                     <select v-model="discount.scope" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs">
-                                        <option value="unit">Per Item Discount</option>
-                                        <option value="total">Total Order Discount</option>
+                                        <option value="total">Total Order Discount (整单折扣)</option>
+                                        <option value="down_payment">Down Payment Discount (首付折扣)</option>
+                                        <option value="unit">Per Item Discount (单品折扣)</option>
                                     </select>
                                 </div>
                                 <div>
@@ -756,16 +757,32 @@
                             amount: totalAmount
                         });
                     } else {
-                        let downPayment = parseFloat(this.form.downPayment) || 0;
-                        if (downPayment > totalAmount) downPayment = totalAmount;
+                        let baseDownPayment = parseFloat(this.form.downPayment) || 0;
+                        
+                        // 计算专属于首付的折扣额
+                        let downPaymentDiscount = 0;
+                        this.form.discounts.forEach(d => {
+                            if (d.scope === 'down_payment') {
+                                const val = parseFloat(d.value) || 0;
+                                if (d.type === 'percent') {
+                                    downPaymentDiscount += baseDownPayment * (val / 100);
+                                } else {
+                                    downPaymentDiscount += val;
+                                }
+                            }
+                        });
+
+                        // 实际付款首付 = 设定首付 - 首付折扣
+                        let actualDownPayment = Math.max(0, baseDownPayment - downPaymentDiscount);
+                        if (actualDownPayment > totalAmount) actualDownPayment = totalAmount;
 
                         schedule.push({
                             term: "Phase 1: Down Payment",
                             dueDate: formatDate(new Date(baseDate)),
-                            amount: downPayment
+                            amount: actualDownPayment
                         });
 
-                        const remainingAmount = totalAmount - downPayment;
+                        const remainingAmount = totalAmount - actualDownPayment;
                         const remainingPhases = termsCount - 1;
                         
                         let specifiedSum = 0;
@@ -808,6 +825,13 @@
                         if (d.scope === 'total') {
                             if (d.type === 'percent') {
                                 totalD += this.computedSubtotal * (val / 100);
+                            } else {
+                                totalD += val;
+                            }
+                        } else if (d.scope === 'down_payment') {
+                            const baseDownPayment = parseFloat(this.form.downPayment) || 0;
+                            if (d.type === 'percent') {
+                                totalD += baseDownPayment * (val / 100);
                             } else {
                                 totalD += val;
                             }
