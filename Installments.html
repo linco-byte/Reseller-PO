@@ -211,7 +211,7 @@
                 <!-- 3. Discounts Block -->
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 flex items-center gap-1.5">🏷️ 3. Discounts</h3>
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs text-slate-500 mb-0.5">Discount Type</label>
@@ -224,6 +224,20 @@
                                 <label class="block text-xs text-slate-500 mb-0.5">Discount Value</label>
                                 <input type="number" v-model.number="form.orderDiscountValue" min="0" step="0.01" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold">
                             </div>
+                        </div>
+                        
+                        <!-- Discount Reason / Promotion Selection -->
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-0.5">Discount Promotion Reason</label>
+                            <select v-model="form.orderDiscountReasonOption" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs font-medium">
+                                <option value="">-- Select Promotion / Discount Reason --</option>
+                                <option value="Q4 New Customer Promotion">Q4 New Customer Promotion</option>
+                                <option value="Q4 HAHA customer loyalty discount">Q4 HAHA customer loyalty discount</option>
+                                <option value="other">Other (Specify manually)</option>
+                            </select>
+                        </div>
+                        <div v-if="form.orderDiscountReasonOption === 'other'">
+                            <input type="text" v-model="form.orderDiscountReasonCustom" placeholder="Enter custom discount reason..." class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800">
                         </div>
                     </div>
                 </div>
@@ -358,9 +372,14 @@
                                     <span>Product Subtotal:</span>
                                     <span class="font-semibold text-slate-900">${{ formatMoney(rawSubTotal) }}</span>
                                 </div>
-                                <div v-if="computedOrderDiscount > 0" class="flex justify-between text-slate-600 font-medium">
-                                    <span>Order Discount:</span>
-                                    <span>-${{ formatMoney(computedOrderDiscount) }}</span>
+                                <div v-if="computedOrderDiscount > 0" class="space-y-0.5">
+                                    <div class="flex justify-between text-slate-600 font-medium">
+                                        <span>Order Discount:</span>
+                                        <span>-${{ formatMoney(computedOrderDiscount) }}</span>
+                                    </div>
+                                    <div v-if="displayDiscountReason" class="text-[8px] text-slate-500 italic pl-2 border-l border-slate-300 leading-tight">
+                                        Note: {{ displayDiscountReason }}
+                                    </div>
                                 </div>
                                 <div class="flex justify-between text-slate-700 font-bold border-t border-slate-200 pt-0.5">
                                     <span>Net Subtotal:</span>
@@ -595,6 +614,8 @@
                 ],
                 orderDiscountType: 'flat', // 'flat' or 'percent'
                 orderDiscountValue: 0,
+                orderDiscountReasonOption: '', // 'Q4 New Customer Promotion', 'Q4 HAHA customer loyalty discount', 'other'
+                orderDiscountReasonCustom: '',
                 freightMode: 'total', // 'per_unit' or 'total'
                 freightInput: 350,
                 taxRate: 7.00,
@@ -668,6 +689,13 @@
                     return rawSubTotal.value * (val / 100);
                 }
                 return val > rawSubTotal.value ? rawSubTotal.value : val;
+            });
+
+            const displayDiscountReason = computed(() => {
+                if (form.value.orderDiscountReasonOption === 'other') {
+                    return form.value.orderDiscountReasonCustom || '';
+                }
+                return form.value.orderDiscountReasonOption || '';
             });
 
             const grossSubTotal = computed(() => {
@@ -779,7 +807,7 @@
             return {
                 isLoggedIn, authForm, currentUser, handleRegister, handleLogout, printPage,
                 productCatalog, form, addItem, removeItem, onModelChange, totalHardwareQty,
-                rawSubTotal, computedOrderDiscount, grossSubTotal, computedFreight, computedTax, 
+                rawSubTotal, computedOrderDiscount, displayDiscountReason, grossSubTotal, computedFreight, computedTax, 
                 totalContractValue, totalDownpaymentDue, totalFinancedBalance, computedSchedules,
                 usCentralDateSigned, formatMoney
             };
